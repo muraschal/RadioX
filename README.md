@@ -16,14 +16,84 @@ Ein individuell generierbarer Radiosender, der automatisch aus Musik, AI-generie
 ```
 ai-radio-mvp/
 ├── main.py                   # Einstiegspunkt
+├── src/
+│   ├── audio/
+│   │   ├── mixer.py         # Audio-Mixing Pipeline
+│   │   ├── stream.py        # Streaming-Handler
+│   │   └── effects.py       # Audio-Effekte
+│   ├── content/
+│   │   ├── music.py         # Musik-Management
+│   │   ├── news.py          # News-Generator
+│   │   └── ads.py           # Werbe-Generator
+│   ├── tts/
+│   │   ├── elevenlabs.py    # TTS-Integration
+│   │   └── voices.py        # Voice-Management
+│   └── utils/
+│       ├── config.py        # Konfigurations-Manager
+│       └── logger.py        # Logging-System
 ├── profiles/
 │   └── marcel.json          # User-Profil mit Präferenzen
 ├── tracks/                  # Lokale Musik (Test)
 ├── audio/                   # Voice-Snippets (generiert)
 ├── output/                  # Finaler Radiomix (MP3)
+├── tests/                   # Unit Tests
 ├── .env                     # API-Keys
 ├── requirements.txt         # Dependencies
+└── docker-compose.yml       # Container-Konfiguration
 ```
+
+## ⚙️ Technische Spezifikationen
+
+### Audio-Processing
+- Format: MP3, 320kbps
+- Sample Rate: 44.1kHz
+- Channels: Stereo
+- Segment-Länge: 3-5 Minuten
+- Übergänge: Crossfade (2-3 Sekunden)
+
+### Content-Generation
+- News-Update: Alle 30 Minuten
+- Werbe-Spots: 2-3 pro Stunde
+- Voice-Over: Pro Segment
+- Musik: 70% des Contents
+
+### Personas
+- Basis-Personas: 3 (Maximalist, Cyberpunk, Retro)
+- Voice-Profile: Pro Persona
+- Sprachstil: Anpassbar
+- Übergänge: Kontextabhängig
+
+### Performance
+- Latenz: < 2 Sekunden
+- Buffer: 30 Sekunden
+- Cache: 1 Stunde Content
+- RAM: ~500MB pro Stream
+
+## 🔄 Entwicklungs-Phasen
+
+### Phase 1: Lokales MVP (2 Wochen)
+- [ ] Grundlegende Audio-Pipeline
+- [ ] Lokale Musik-Integration
+- [ ] Basic TTS mit ElevenLabs
+- [ ] Einfache Persona-Implementierung
+
+### Phase 2: Content-Generation (2 Wochen)
+- [ ] News-Generator mit GPT
+- [ ] Werbe-Spot-Generator
+- [ ] Erweiterte Personas
+- [ ] Content-Scheduling
+
+### Phase 3: Streaming (1 Woche)
+- [ ] Icecast-Integration
+- [ ] Stream-Management
+- [ ] Performance-Optimierung
+- [ ] Error-Handling
+
+### Phase 4: UI & Features (2 Wochen)
+- [ ] Web-Interface
+- [ ] Persona-Konfiguration
+- [ ] Playlist-Management
+- [ ] Analytics
 
 ## ⚙️ Setup
 ```bash
