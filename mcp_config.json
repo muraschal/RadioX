@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "RadioX": {
+      "command": "python",
+      "args": [
+        "main.py"
+      ],
+      "cwd": "D:\\DEV\\muraschal\\RadioX",
+      "env": {
+        "PYTHONPATH": "D:\\DEV\\muraschal\\RadioX"
+      }
+    }
+  }
+}

@@ -45,3 +45,11 @@
 2025-05-29 17:24:29.491 | INFO     | __main__:create_demo_segment:27 - Generiere Begrüßung für maximalist...
 2025-05-29 17:24:30.557 | INFO     | src.tts.elevenlabs:generate_speech:43 - TTS generiert und gespeichert: audio/greeting_maximalist.mp3
 2025-05-29 17:24:30.727 | INFO     | __main__:create_demo_segment:37 - Hole Top-Tracks von Spotify...
+2025-05-31 11:07:21.577 | INFO     | __main__:main:94 - Starte RadioX Demo...
+2025-05-31 11:07:21.578 | WARNING  | __main__:create_demo_segment:23 - ElevenLabs API-Key nicht gefunden - überspringe TTS
+2025-05-31 11:07:21.578 | WARNING  | __main__:create_demo_segment:29 - Spotify API-Credentials nicht vollständig - überspringe Spotify
+2025-05-31 11:07:21.579 | INFO     | __main__:create_demo_segment:45 - TTS nicht verfügbar - überspringe Begrüßung
+2025-05-31 11:07:21.579 | INFO     | __main__:create_demo_segment:59 - Spotify nicht verfügbar - überspringe Musik-Tracks
+2025-05-31 11:07:21.579 | INFO     | __main__:create_demo_segment:71 - TTS nicht verfügbar - überspringe Abschluss
+2025-05-31 11:07:21.579 | WARNING  | __main__:create_demo_segment:79 - Keine Audio-Segmente zum Exportieren vorhanden
+2025-05-31 11:07:21.580 | INFO     | __main__:main:102 - Demo beendet - keine Audio-Ausgabe erstellt (API-Keys fehlen)

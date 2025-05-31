@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RadioX - Bitcoin OG Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(90deg, #ff6b35 0%, #f7931e 100%);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-top: 0.5rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .card h2 {
+            color: #ff6b35;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .persona-selector {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .persona-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255, 107, 53, 0.2);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .persona-btn:hover {
+            background: rgba(255, 107, 53, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .persona-btn.active {
+            background: linear-gradient(90deg, #ff6b35 0%, #f7931e 100%);
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+        }
+
+        .tweets-container {
+            max-height: 600px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .tweet {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 1rem;
+            border-left: 4px solid #ff6b35;
+            transition: all 0.3s ease;
+        }
+
+        .tweet:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .tweet-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .tweet-author {
+            font-weight: bold;
+            color: #ff6b35;
+            font-size: 1.1rem;
+        }
+
+        .tweet-category {
+            background: rgba(255, 107, 53, 0.3);
+            padding: 0.2rem 0.5rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin-left: auto;
+        }
+
+        .tweet-content {
+            line-height: 1.6;
+            margin-bottom: 0.5rem;
+        }
+
+        .tweet-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .engagement-score {
+            background: rgba(247, 147, 30, 0.3);
+            padding: 0.2rem 0.5rem;
+            border-radius: 10px;
+        }
+
+        .vip-accounts {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+        }
+
+        .vip-account {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .vip-account:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: #ff6b35;
+        }
+
+        .vip-account-name {
+            font-weight: bold;
+            color: #ff6b35;
+        }
+
+        .vip-account-desc {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 0.2rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(90deg, #ff6b35 0%, #f7931e 100%);
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+
+        .status-online {
+            background: #4CAF50;
+            box-shadow: 0 0 10px #4CAF50;
+        }
+
+        .status-offline {
+            background: #f44336;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            opacity: 0.7;
+        }
+
+        .radio-segment {
+            background: rgba(255, 107, 53, 0.1);
+            border: 1px solid rgba(255, 107, 53, 0.3);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-style: italic;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            .persona-selector {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎙️ RadioX Dashboard</h1>
+        <p>Live Bitcoin OG Tweets & AI Radio Generation</p>
+    </div>
+
+    <div class="container">
+        <div class="main-content">
+            <!-- Persona Selector -->
+            <div class="card">
+                <h2>🎭 Radio Persona</h2>
+                <div class="persona-selector">
+                    <button class="persona-btn active" data-persona="maximalist">💰 Bitcoin Maximalist</button>
+                    <button class="persona-btn" data-persona="cyberpunk">🤖 Cyberpunk</button>
+                    <button class="persona-btn" data-persona="retro">🕺 80er Retro</button>
+                </div>
+                <div class="controls">
+                    <button class="btn" onclick="refreshTweets()">🔄 Tweets aktualisieren</button>
+                    <button class="btn" onclick="generateRadioSegment()">🎙️ Radio-Segment generieren</button>
+                </div>
+                <div id="radioSegment" class="radio-segment" style="display: none;"></div>
+            </div>
+
+            <!-- Live Tweets -->
+            <div class="card">
+                <h2>
+                    <span class="status-indicator status-online" id="statusIndicator"></span>
+                    🐦 Live Bitcoin OG Tweets
+                </h2>
+                <div id="tweetsContainer" class="tweets-container">
+                    <div class="loading">Lade aktuelle Tweets...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <!-- VIP Accounts -->
+            <div class="card">
+                <h2>👑 VIP Accounts</h2>
+                <div class="vip-accounts" id="vipAccounts">
+                    <!-- Wird dynamisch geladen -->
+                </div>
+            </div>
+
+            <!-- System Status -->
+            <div class="card">
+                <h2>📊 System Status</h2>
+                <div id="systemStatus">
+                    <div>X-Feed: <span id="xFeedStatus">Prüfe...</span></div>
+                    <div>Persona: <span id="currentPersona">maximalist</span></div>
+                    <div>Letzte Aktualisierung: <span id="lastUpdate">-</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPersona = 'maximalist';
+        let refreshInterval;
+
+        // Initialisierung
+        document.addEventListener('DOMContentLoaded', function() {
+            loadVIPAccounts();
+            refreshTweets();
+            updateSystemStatus();
+            
+            // Auto-refresh alle 30 Sekunden
+            refreshInterval = setInterval(refreshTweets, 30000);
+            
+            // Persona Buttons
+            document.querySelectorAll('.persona-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    setPersona(this.dataset.persona);
+                });
+            });
+        });
+
+        function setPersona(persona) {
+            currentPersona = persona;
+            
+            // Update UI
+            document.querySelectorAll('.persona-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-persona="${persona}"]`).classList.add('active');
+            document.getElementById('currentPersona').textContent = persona;
+            
+            // API Call
+            fetch(`/api/persona/${persona}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log(`Persona gewechselt zu: ${persona}`);
+                    }
+                });
+        }
+
+        function refreshTweets() {
+            fetch('/api/tweets')
+                .then(response => response.json())
+                .then(data => {
+                    displayTweets(data.tweets || []);
+                    document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+                })
+                .catch(error => {
+                    console.error('Fehler beim Laden der Tweets:', error);
+                    document.getElementById('tweetsContainer').innerHTML = 
+                        '<div class="loading">❌ Fehler beim Laden der Tweets</div>';
+                });
+        }
+
+        function displayTweets(tweets) {
+            const container = document.getElementById('tweetsContainer');
+            
+            if (tweets.length === 0) {
+                container.innerHTML = '<div class="loading">Keine aktuellen Tweets verfügbar</div>';
+                return;
+            }
+
+            container.innerHTML = tweets.map(tweet => `
+                <div class="tweet">
+                    <div class="tweet-header">
+                        <div class="tweet-author">@${tweet.username} - ${tweet.display_name}</div>
+                        <div class="tweet-category">${tweet.category}</div>
+                    </div>
+                    <div class="tweet-content">${tweet.content}</div>
+                    <div class="tweet-meta">
+                        <span>${new Date(tweet.timestamp).toLocaleString()}</span>
+                        <span class="engagement-score">⚡ ${tweet.engagement_score}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function generateRadioSegment() {
+            const segmentDiv = document.getElementById('radioSegment');
+            segmentDiv.style.display = 'block';
+            segmentDiv.innerHTML = '🎙️ Generiere Radio-Segment...';
+            
+            fetch(`/api/radio-segment?persona=${currentPersona}&count=3`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        segmentDiv.innerHTML = `
+                            <strong>🎙️ Radio-Segment (${data.persona}):</strong><br><br>
+                            ${data.segment}
+                            <br><br>
+                            <small>Basierend auf ${data.tweet_count} Tweets • ${new Date(data.generated_at).toLocaleTimeString()}</small>
+                        `;
+                    } else {
+                        segmentDiv.innerHTML = `❌ ${data.error}`;
+                    }
+                })
+                .catch(error => {
+                    segmentDiv.innerHTML = '❌ Fehler bei der Generierung';
+                });
+        }
+
+        function loadVIPAccounts() {
+            const vipAccounts = {
+                'saylor': { name: 'Michael Saylor', desc: 'MicroStrategy CEO, Bitcoin-Evangelist' },
+                'jack': { name: 'Jack Dorsey', desc: 'Twitter-Gründer, Bitcoin-Maximalist' },
+                'jackmallers': { name: 'Jack Mallers', desc: 'Strike CEO, Lightning Pioneer' },
+                'giacomozucco': { name: 'Giacomo Zucco', desc: 'Bitcoin-Educator, Plan B' },
+                'sunnydecree': { name: 'Sunny Decree', desc: 'Bitcoin Content Creator' },
+                'WatcherGuru': { name: 'Watcher Guru', desc: 'Crypto News Aggregator' }
+            };
+
+            const container = document.getElementById('vipAccounts');
+            container.innerHTML = Object.entries(vipAccounts).map(([username, info]) => `
+                <div class="vip-account" onclick="loadAccountTweets('${username}')">
+                    <div class="vip-account-name">@${username}</div>
+                    <div class="vip-account-desc">${info.desc}</div>
+                </div>
+            `).join('');
+        }
+
+        function loadAccountTweets(username) {
+            console.log(`Lade Tweets von @${username}`);
+            // Hier könnte man spezifische Account-Tweets laden
+        }
+
+        function updateSystemStatus() {
+            fetch('/api/status')
+                .then(response => response.json())
+                .then(data => {
+                    const indicator = document.getElementById('statusIndicator');
+                    const status = document.getElementById('xFeedStatus');
+                    
+                    if (data.x_feed_enabled) {
+                        indicator.className = 'status-indicator status-online';
+                        status.textContent = '✅ Online';
+                    } else {
+                        indicator.className = 'status-indicator status-offline';
+                        status.textContent = '❌ Offline';
+                    }
+                });
+        }
+    </script>
+</body>
+</html> 
