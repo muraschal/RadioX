@@ -1,17 +1,28 @@
 import os
 from pathlib import Path
 from typing import Optional
-from elevenlabs import generate, set_api_key
 from loguru import logger
+
+try:
+    from elevenlabs.client import ElevenLabs
+    from elevenlabs import VoiceSettings
+    ELEVENLABS_AVAILABLE = True
+except ImportError:
+    logger.warning("ElevenLabs-Paket nicht verfügbar")
+    ELEVENLABS_AVAILABLE = False
 
 from ..utils.config import VoiceConfig
 
 class TTSManager:
     def __init__(self, api_key: Optional[str] = None):
+        if not ELEVENLABS_AVAILABLE:
+            raise ImportError("ElevenLabs-Paket ist nicht installiert")
+            
         self.api_key = api_key or os.getenv("ELEVENLABS_API_KEY")
         if not self.api_key:
             raise ValueError("ElevenLabs API-Key nicht gefunden")
-        set_api_key(self.api_key)
+            
+        self.client = ElevenLabs(api_key=self.api_key)
         
     def generate_speech(
         self,
@@ -22,10 +33,19 @@ class TTSManager:
     ) -> str:
         """Generiert Sprachausgabe mit ElevenLabs."""
         try:
-            # Generiere Audio (angepasst an neue API)
-            audio = generate(
+            # Erstelle Voice Settings
+            voice_settings = VoiceSettings(
+                stability=voice_config.stability,
+                similarity_boost=voice_config.similarity_boost,
+                style=voice_config.style,
+                use_speaker_boost=voice_config.use_speaker_boost
+            )
+            
+            # Generiere Audio
+            audio = self.client.generate(
                 text=text,
                 voice=voice_config.voice_id,
+                voice_settings=voice_settings,
                 model="eleven_multilingual_v2"
             )
             
@@ -37,8 +57,11 @@ class TTSManager:
                 filename = f"tts_{hash(text)}.mp3"
                 
             file_path = output_path / filename
+            
+            # Schreibe Audio-Bytes in Datei
             with open(file_path, "wb") as f:
-                f.write(audio)
+                for chunk in audio:
+                    f.write(chunk)
                 
             logger.info(f"TTS generiert und gespeichert: {file_path}")
             return str(file_path)
