@@ -2,7 +2,7 @@
 
 import type { Playlist } from "@/lib/types"
 import { Button } from "@/components/ui/button"
-import { ListMusic, CheckCircle } from "lucide-react"
+import { ListMusic, CheckCircle2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface PlaylistSelectorProps {
@@ -36,7 +36,7 @@ export default function PlaylistSelector({
             )}
           >
             {selectedPlaylistId === playlist.id && (
-              <CheckCircle className="w-4 h-4 mr-2 text-purple-300 flex-shrink-0" />
+              <CheckCircle2 className="w-4 h-4 mr-2 text-purple-300 flex-shrink-0" />
             )}
             {!selectedPlaylistId && <ListMusic className="w-4 h-4 mr-2 text-slate-400 flex-shrink-0" />}
             {playlist.name}
