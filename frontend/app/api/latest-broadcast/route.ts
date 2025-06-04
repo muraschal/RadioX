@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
       broadcast: {
         filename: "latest-show.mp3",
         audioUrl: "/latest-show.mp3", // Statische Datei im public Ordner
-        coverUrl: null, // Erstmal ohne Cover
+        coverUrl: "/latest-show-cover.png", // Cover-Bild im public Ordner
         fileSize: 439000, // Ungefähre Größe in Bytes
         timestamp: new Date().toISOString(),
         metadata: {
