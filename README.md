@@ -1,5 +1,7 @@
 # RadioX - AI-Powered Radio Broadcasting System
 
+> **🚀 Alpha1 Release** - Komplett umstrukturierte modulare Architektur!
+
 Ein innovatives AI-gesteuertes Radio-System mit modularer Architektur für automatisierte Broadcast-Generierung.
 
 ## 🎯 Überblick
