@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useRef } from "react"
 import {
-  Play,
-  Pause,
+  PlayCircle,
+  PauseCircle,
   Volume2,
   Volume1,
   VolumeX,
@@ -18,7 +18,6 @@ import {
   Mountain,
   Settings2,
   CloudSun,
-  RefreshCw,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
@@ -31,24 +30,22 @@ import NewsFeed from "@/components/news-feed"
 import PersonaSelectorModal from "@/components/persona-selector-modal"
 import type { Persona, ApiStatus, Playlist, Tweet } from "@/lib/types"
 import { cn } from "@/lib/utils"
-import Image from "next/image"
 
-// Broadcast-Interface
-interface BroadcastData {
-  filename: string
-  audioUrl: string
-  coverUrl: string | null
-  fileSize: number
-  timestamp: string
-  metadata: {
-    title?: string
-    duration?: string
-    timestamp?: string
-  }
-}
-
-// Personas (Züri Style an Position 1 - DEFAULT!)
+// Personas (Breaking News an Position 1)
 const personas: Persona[] = [
+  {
+    id: "p4", // ID von Breaking News
+    name: "Breaking News",
+    description: "Welt, Schweiz & Wirtschaft",
+    icon: <AlertTriangle className="w-5 h-5" />,
+    accentColor: "text-red-500",
+    bgColor: "bg-red-600/10",
+    borderColor: "border-red-600/30",
+    hoverBgColor: "hover:bg-red-600/20",
+    glowColor: "bg-red-700",
+    secondaryGlowColor: "bg-orange-500",
+    visualizerColor: "stroke-red-600",
+  },
   {
     id: "p1",
     name: "Züri Style",
@@ -61,19 +58,6 @@ const personas: Persona[] = [
     glowColor: "bg-teal-600",
     secondaryGlowColor: "bg-amber-500",
     visualizerColor: "stroke-teal-500",
-  },
-  {
-    id: "p4", // Breaking News an Position 2
-    name: "Breaking News",
-    description: "Welt, Schweiz & Wirtschaft",
-    icon: <AlertTriangle className="w-5 h-5" />,
-    accentColor: "text-red-500",
-    bgColor: "bg-red-600/10",
-    borderColor: "border-red-600/30",
-    hoverBgColor: "hover:bg-red-600/20",
-    glowColor: "bg-red-700",
-    secondaryGlowColor: "bg-orange-500",
-    visualizerColor: "stroke-red-600",
   },
   {
     id: "p2",
@@ -189,14 +173,7 @@ export default function RadioAppFullscreen() {
   const [isPlaylistPanelOpen, setIsPlaylistPanelOpen] = useState<boolean>(false)
   const [isNewsPanelOpen, setIsNewsPanelOpen] = useState<boolean>(false)
   const [isPersonaModalOpen, setIsPersonaModalOpen] = useState<boolean>(false)
-  
-  // Neue States für Audio-Wiedergabe
-  const [currentBroadcast, setCurrentBroadcast] = useState<BroadcastData | null>(null)
-  const [isLoadingBroadcast, setIsLoadingBroadcast] = useState<boolean>(false)
-  const [audioDuration, setAudioDuration] = useState<number>(0)
-  const [currentTime, setCurrentTime] = useState<number>(0)
-  
-  const audioRef = useRef<HTMLAudioElement>(null)
+
   const appRef = useRef<HTMLDivElement>(null)
   const targetMousePosition = useRef({ x: 0.5, y: 0.5 })
   const animatedGlow1Position = useRef({ x: 0.5, y: 0.5 })
@@ -209,93 +186,52 @@ export default function RadioAppFullscreen() {
     elevenLabs: { connected: false, error: "API Key not set", lastChecked: new Date().toLocaleTimeString() },
   }
 
-  // Lade neueste Broadcast-Datei
-  const loadLatestBroadcast = async () => {
-    setIsLoadingBroadcast(true)
-    try {
-      const response = await fetch('/api/latest-broadcast')
-      const data = await response.json()
-      
-      if (data.success && data.broadcast) {
-        setCurrentBroadcast(data.broadcast)
-        setCurrentShow({
-          title: data.broadcast.metadata.title || `RadioX Broadcast ${data.broadcast.timestamp}`,
-          artist: "RadioX AI - Marcel & Jarvis"
-        })
-        console.log('Loaded broadcast:', data.broadcast.filename)
-      } else {
-        console.error('Failed to load broadcast:', data.error)
-      }
-    } catch (error) {
-      console.error('Error loading latest broadcast:', error)
-    } finally {
-      setIsLoadingBroadcast(false)
-    }
-  }
-
-  // Audio-Event-Handler
-  const handleAudioLoad = () => {
-    if (audioRef.current) {
-      setAudioDuration(audioRef.current.duration)
-    }
-  }
-
-  const handleTimeUpdate = () => {
-    if (audioRef.current) {
-      setCurrentTime(audioRef.current.currentTime)
-      const progressPercent = (audioRef.current.currentTime / audioRef.current.duration) * 100
-      setProgress(progressPercent)
-    }
-  }
-
-  const handleAudioEnd = () => {
-    setIsPlaying(false)
-    setProgress(0)
-    setCurrentTime(0)
-  }
-
-  const togglePlayPause = () => {
-    if (!currentBroadcast) {
-      loadLatestBroadcast()
-      return
-    }
-
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause()
-      } else {
-        audioRef.current.play()
-      }
-      setIsPlaying(!isPlaying)
-    }
-  }
-
-  const handleVolumeChange = (value: number[]) => {
-    const newVolume = value[0] / 100
-    setVolume(newVolume)
-    if (audioRef.current) {
-      audioRef.current.volume = newVolume
-    }
-  }
-
-  // Format Zeit für Anzeige
-  const formatTime = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60)
-    const secs = Math.floor(seconds % 60)
-    return `${mins}:${secs.toString().padStart(2, '0')}`
-  }
-
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 2500)
     return () => clearTimeout(timer)
   }, [])
 
-  // Lade neueste Broadcast beim Start
   useEffect(() => {
-    if (!isLoading) {
-      loadLatestBroadcast()
+    let interval: NodeJS.Timeout
+    if (isPlaying && !isLoading) {
+      interval = setInterval(() => {
+        setProgress((p) => (p >= 100 ? 0 : p + 1))
+      }, 1000)
     }
-  }, [isLoading])
+    return () => clearInterval(interval)
+  }, [isPlaying, isLoading])
+
+  const handlePersonaSelect = (persona: Persona) => {
+    setCurrentPersona(persona)
+    setCurrentShow({ title: `${persona.name} Stream`, artist: "RadioX AI" })
+    setIsPlaying(true)
+    setProgress(0)
+    console.log(
+      `%c[RadioX AI]%c Playing ${persona.name} persona audio cue... (Simulated - Intro: "${getPersonaIntro(persona.name)}")`,
+      "color: #8B5CF6; font-weight: bold;",
+      "color: inherit;",
+    )
+    setIsPersonaModalOpen(false)
+  }
+
+  const getPersonaIntro = (personaName: string): string => {
+    switch (personaName) {
+      case "Züri Style":
+        return "Grüezi Zürich! Hier sind eure lokalen News..."
+      case "Bitcoin OG":
+        return "Stack sats, stay humble! Hier sind die Bitcoin News..."
+      case "TradFi News":
+        return "Willkommen zu Ihrem Finanzüberblick."
+      case "Breaking News":
+        return "Breaking: Hier sind die neuesten Entwicklungen..."
+      case "Tech Insider":
+        return "Hey Tech Community! Hier sind die neuesten Updates..."
+      case "Swiss Local":
+        return "Hallo Schweiz! Hier sind eure lokalen Nachrichten..."
+      default:
+        return "RadioX AI startet..."
+    }
+  }
 
   useEffect(() => {
     const handleMouseMove = (event: MouseEvent) => {
@@ -338,38 +274,6 @@ export default function RadioAppFullscreen() {
     return () => cancelAnimationFrame(animationFrameId)
   }, [isLoading])
 
-  const handlePersonaSelect = (persona: Persona) => {
-    setCurrentPersona(persona)
-    setCurrentShow({ title: `${persona.name} Stream`, artist: "RadioX AI" })
-    setIsPlaying(true)
-    setProgress(0)
-    console.log(
-      `%c[RadioX AI]%c Playing ${persona.name} persona audio cue... (Simulated - Intro: "${getPersonaIntro(persona.name)}")`,
-      "color: #8B5CF6; font-weight: bold;",
-      "color: inherit;",
-    )
-    setIsPersonaModalOpen(false)
-  }
-
-  const getPersonaIntro = (personaName: string): string => {
-    switch (personaName) {
-      case "Züri Style":
-        return "Grüezi Zürich! Hier sind eure lokalen News..."
-      case "Bitcoin OG":
-        return "Stack sats, stay humble! Hier sind die Bitcoin News..."
-      case "TradFi News":
-        return "Willkommen zu Ihrem Finanzüberblick."
-      case "Breaking News":
-        return "Breaking: Hier sind die neuesten Entwicklungen..."
-      case "Tech Insider":
-        return "Hey Tech Community! Hier sind die neuesten Updates..."
-      case "Swiss Local":
-        return "Hallo Schweiz! Hier sind eure lokalen Nachrichten..."
-      default:
-        return "RadioX AI startet..."
-    }
-  }
-
   const VolumeIcon = volume === 0 ? VolumeX : volume < 0.5 ? Volume1 : Volume2
   if (isLoading) {
     return <StartupAnimation />
@@ -393,18 +297,6 @@ export default function RadioAppFullscreen() {
       ref={appRef}
       className="flex flex-col h-full p-3 sm:p-4 md:p-6 items-center justify-between relative font-sans overflow-hidden"
     >
-      {/* Audio Element */}
-      {currentBroadcast && (
-        <audio
-          ref={audioRef}
-          src={currentBroadcast.audioUrl}
-          onLoadedMetadata={handleAudioLoad}
-          onTimeUpdate={handleTimeUpdate}
-          onEnded={handleAudioEnd}
-          preload="metadata"
-        />
-      )}
-
       {/* Background Glows */}
       <div
         className={cn(
@@ -440,20 +332,7 @@ export default function RadioAppFullscreen() {
           </h1>
         </div>
         {/* Right Settings Button */}
-        <div className="flex justify-end space-x-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={loadLatestBroadcast}
-            disabled={isLoadingBroadcast}
-            className={cn(
-              "text-slate-300 hover:text-white transition-colors rounded-lg bg-slate-800/50 hover:bg-slate-700/70 backdrop-blur-sm border border-slate-700/50 p-2",
-              currentPersona.accentColor,
-            )}
-            title="Neueste Sendung laden"
-          >
-            <RefreshCw className={cn("w-4 h-4 sm:w-5 sm:h-5", isLoadingBroadcast && "animate-spin")} />
-          </Button>
+        <div className="flex justify-end">
           <Button
             variant="ghost"
             size="icon"
@@ -476,78 +355,50 @@ export default function RadioAppFullscreen() {
       <main className="flex flex-col items-center space-y-3 sm:space-y-4 md:space-y-6 z-10 w-full max-w-md sm:max-w-lg md:max-w-xl overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 hover:scrollbar-thumb-slate-600 scrollbar-track-transparent py-2 sm:py-4 flex-grow">
         {/* Player Section */}
         <section className="w-full bg-slate-800/60 backdrop-blur-lg p-3 sm:p-4 md:p-6 rounded-xl shadow-2xl border border-slate-700/50 flex-shrink-0">
-          {/* Cover Art - Fullwidth */}
-          {currentBroadcast?.coverUrl && (
-            <div className="w-full mb-3 sm:mb-4">
-              <div className="relative w-full h-48 sm:h-56 md:h-64 rounded-lg overflow-hidden border-2 border-slate-600/50">
-                <Image
-                  src={currentBroadcast.coverUrl}
-                  alt="Broadcast Cover"
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 100vw, 100vw"
-                />
-              </div>
-            </div>
-          )}
-          
           <div className="text-center mb-2 sm:mb-3">
             <p className="text-[10px] sm:text-xs text-slate-400 uppercase tracking-wider">Now Playing</p>
             <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-slate-100 mt-0.5 sm:mt-1">
               {currentShow.title}
             </h2>
             <p className={cn("text-xs sm:text-sm transition-colors duration-500", currentPersona.accentColor)}>
-              RadioX AI - Marcel & Jarvis
+              {currentShow.artist}
             </p>
-            {currentBroadcast && (
-              <p className="text-[10px] sm:text-xs text-slate-500 mt-1">
-                {currentBroadcast.filename} • {Math.round(currentBroadcast.fileSize / 1024 / 1024)} MB
-              </p>
-            )}
           </div>
-          
           <AudioVisualizerLine
             isPlaying={isPlaying}
             className={cn("my-2 sm:my-3 h-8 sm:h-10 w-full", currentPersona.visualizerColor)}
           />
-          
           <div className="w-full h-1 sm:h-1.5 bg-slate-700 rounded-full overflow-hidden my-2 sm:my-3">
             <div
               className={cn("h-full transition-all duration-500 ease-linear", currentVisualizerBgClass)}
               style={{ width: `${progress}%` }}
             />
           </div>
-          
           <div className="flex items-center justify-between text-[10px] sm:text-xs text-slate-400 mb-2 sm:mb-4">
-            <span>{formatTime(currentTime)}</span>
-            <span>{formatTime(audioDuration)}</span>
+            <span>{new Date(progress * 1000).toISOString().substr(14, 5)}</span>
+            <span>{new Date(100 * 1000).toISOString().substr(14, 5)}</span>
           </div>
-          
           <div className="flex items-center justify-center space-x-4 sm:space-x-6">
             <Button
               variant="ghost"
               size="icon"
               className="text-slate-400 hover:text-white transition-colors"
-              onClick={togglePlayPause}
-              disabled={!currentBroadcast && isLoadingBroadcast}
+              onClick={() => setIsPlaying(!isPlaying)}
             >
-              {isLoadingBroadcast ? (
-                <RefreshCw className="w-12 h-12 sm:w-16 sm:h-16 animate-spin" />
-              ) : isPlaying ? (
-                <Pause className="w-12 h-12" />
+              {isPlaying ? (
+                <PauseCircle className="w-12 h-12 sm:w-16 sm:h-16" />
               ) : (
-                <Play className="w-12 h-12" />
+                <PlayCircle className="w-12 h-12 sm:w-16 sm:h-16" />
               )}
             </Button>
           </div>
-          
           <div className="flex items-center space-x-1.5 sm:space-x-2 mt-3 sm:mt-4">
             <VolumeIcon className="w-4 h-4 sm:w-5 sm:h-5 text-slate-400" />
             <Slider
               defaultValue={[volume * 100]}
               max={100}
               step={1}
-              onValueChange={handleVolumeChange}
+              onValueChange={(value) => setVolume(value[0] / 100)}
               className={cn(
                 "[&>span:first-child]:h-full",
                 "[&>.rc-slider-track]:h-full",
@@ -589,13 +440,11 @@ export default function RadioAppFullscreen() {
               Aktuelle Stunde
             </span>
           </h3>
-          <NewsFeed persona={currentPersona.id} />
+          <NewsFeed tweets={mockNews} />
         </section>
 
         <div className="w-full max-w-md text-center bg-slate-800/70 backdrop-blur-sm py-1 px-2 sm:py-1.5 sm:px-3 rounded-md border border-slate-700 flex-shrink-0">
-          <p className="text-[10px] sm:text-xs text-slate-300">
-            {currentBroadcast ? 'Live Broadcast Streaming' : 'Demo Mode - Pre-generated Shows Only'}
-          </p>
+          <p className="text-[10px] sm:text-xs text-slate-300">Demo Mode - Pre-generated Shows Only</p>
         </div>
       </main>
 
@@ -662,7 +511,7 @@ export default function RadioAppFullscreen() {
         onClose={() => setIsNewsPanelOpen(false)}
         position="right"
       >
-        <NewsFeed persona={currentPersona.id} isArchiveView={true} />
+        <NewsFeed tweets={generateMockNews(20)} isArchiveView={true} />
       </SidePanel>
     </div>
   )

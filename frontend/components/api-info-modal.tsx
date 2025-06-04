@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import type { ApiStatus } from "@/lib/types"
-import { CheckCircle2, XCircle, AlertTriangle } from "lucide-react"
+import { CheckCircle, XCircle, AlertTriangle } from "lucide-react"
 
 interface ApiInfoModalProps {
   isOpen: boolean
@@ -28,7 +28,7 @@ const StatusIndicator: React.FC<{ connected: boolean; message?: string; error?: 
   if (connected) {
     return (
       <span className="flex items-center text-green-400">
-        <CheckCircle2 className="w-4 h-4 mr-2" />
+        <CheckCircle className="w-4 h-4 mr-2" />
         Connected {message && `(${message})`}
       </span>
     )
