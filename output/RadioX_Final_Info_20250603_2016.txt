@@ -1,0 +1,111 @@
+🎙️ RADIOX FINAL BROADCAST
+============================================================
+📅 Datum: 2025-06-03 20:16:01
+⏰ Broadcast Zeit: 20:15 Uhr am Abend
+🎵 Final MP3: Nicht erstellt
+⏱️ Gesamtdauer: 0 Sekunden
+🎤 Segmente: 0
+
+🎤 SPRECHER-KONFIGURATION:
+----------------------------------------
+🤖 JARVIS (Deutsch): dmLlPcdDHenQXbfM5tee
+   URL: https://elevenlabs.io/app/voice-library?voiceId=dmLlPcdDHenQXbfM5tee
+🎤 MARCEL (Deutsch): owi9KfbgBi6A987h5eJH
+   URL: https://elevenlabs.io/app/voice-library?voiceId=owi9KfbgBi6A987h5eJH
+
+📝 GPT RADIO-SCRIPT:
+============================================================
+**JARVIS:**  
+Guten Abend, Zürich! Es ist 20:15 Uhr und ihr hört RadioX, euer Fenster zur Welt der News und der Technologie. Hier ist Jarvis, euer digitaler Co-Host, bereit, euch in die aufregenden Ereignisse von heute zu entführen.
+
+**MARCEL:**  
+Hallo zusammen! Willkommen bei RadioX. Hier ist Marcel, euer Gastgeber aus dem schönen Zürich. Schön, dass ihr dabei seid, und hallo, Dscharvis! Wie sieht's aus im Technologie-Universum?
+
+**JARVIS:**  
+Danke, Marcel! Ein kurzer Blick auf die Finanzwelt: Der Bitcoin steht derzeit bei 106 Tausend Dollar, das ist ein Plus von 1,3 Prozent. Die digitalen Währungen zeigen mal wieder, wie volatil sie sein können.
+
+**MARCEL:**  
+Interessant, Dscharvis! Und was das Wetter angeht: Wir haben aktuell 20,1 Grad Celsius, teilweise bewölkt. Für morgen erwarten wir ähnliche Bedingungen, also nicht vergessen, einen Schirm mitzunehmen, falls ihr unterwegs seid.
+
+**JARVIS:**  
+Perfekt, danke Marcel! Dann lasst uns zu den News kommen. Was passiert so in Zürich und der Schweiz?
+
+**MARCEL:**  
+Nun, die Suche nach dem neuen FDP-Präsidenten läuft auf Hochtouren. Nach dem Rücktritt von Burkart sind einige Kandidaten im Gespräch. Sechs Namen stechen besonders hervor und es bleibt spannend, wer das Ruder bei den Liberalen übernehmen wird. Und dann gibt es noch eine ernsthafte Bedrohung für das Ökosystem im Zürichsee: Die Quagga-Muschel breitet sich aus. Fischer Adrian Gerny schlägt Alarm und bezeichnet die Situation als katastrophal.
+
+**JARVIS:**  
+Das klingt nach Herausforderungen für die Region. Auf der technologischen Seite haben wir spannende Neuigkeiten: Stöckli Ski hat eine Geldstrafe erhalten, und es gibt Diskussionen im Parlament über mögliche Änderungen der Kartellgesetze. Ein brisantes Thema, vor allem für Konsumenten und Unternehmen. Außerdem ein Highlight: Das spektakuläre Video von Beat Kälin über den Bergsturz in Blatten hat weltweit für Aufsehen gesorgt. Der Mann versteht es, in brenzligen Situationen zur richtigen Zeit am richtigen Ort zu sein.
+
+**MARCEL:**  
+Das ist wirklich beeindruckend, Dscharvis. Es gibt immer wieder Menschen, die mit ihrem Engagement und ihrer Technikaffinität Großes bewegen.
+
+**JARVIS:**  
+Absolut, Marcel. Die Verbindung von Technologie und Mensch kann viel bewirken.
+
+**MARCEL:**  
+Damit sind wir am Ende unserer heutigen Sendung angelangt. Es ist jetzt 20:22 Uhr. Ich danke euch fürs Zuhören und wünsche euch einen schönen Abend.
+
+**JARVIS:**  
+Danke, Marcel, und danke an alle Zuhörer da draußen. Bleibt neugierig und vernetzt. Bis zum nächsten Mal bei RadioX!
+
+🎨 COVER-ART IMAGE-PROMPTS:
+============================================================
+📝 SCHRITT 1: PROSA-SUMMARY
+------------------------------
+RadioX Zürich Broadcast um 20:15 Uhr am Abend mit den Moderatoren Marcel (menschlicher Radio-Host aus Zürich) und Jarvis (AI-Co-Host mit technischem Fokus).
+
+Aktuelle Themen der Sendung:
+Neuer FDP-Präsident gesucht: Wer übernimmt jetzt das Steuer bei den Liberalen? Das Feld der möglichen Kandidi | Die Quagga-Muschel breitet sich aus im Zürichsee. Der Fischer Adrian Gerny sagt: Der Zürcher fährt jeden Tag hinaus aufs Wasser. Ein harter Job – und jetzt bedro | Hochpreisinsel Schweiz: Heute sind Absprachen über Preise in der Schweiz per se verboten. Das Parlament | Breaking-News-Reporter: Ob Unfälle, Brände, Tatorte oder Naturkatastrophen, Beat Kälin ist flugs am Ort
+
+Finanzmarkt: Bitcoin bei $105,821 (+1.3%)
+Wetter in Zürich: 20.1°C
+
+Die Sendung kombiniert lokale Schweizer Nachrichten mit technischen Updates und Finanzinformationen in einem modernen, professionellen Radio-Format. Marcel bringt die lokale Perspektive ein, während Jarvis die technischen und internationalen Aspekte abdeckt.
+
+🎨 SCHRITT 2: STYLIZED COVER (1024x1024)
+------------------------------
+Create a stylized podcast cover art (1024x1024) for a Zurich-based news broadcast.
+
+CONTENT SUMMARY:
+RadioX Zürich Broadcast um 20:15 Uhr am Abend mit den Moderatoren Marcel (menschlicher Radio-Host aus Zürich) und Jarvis (AI-Co-Host mit technischem Fokus).
+
+Aktuelle Themen der Sendung:
+Neuer FDP-Präsident gesucht: Wer übernimmt jetzt das Steuer bei den Liberalen? Das Feld der möglichen Kandidi | Die Quagga-Muschel breitet sich aus im Zürichsee. Der Fischer Adrian Gerny sagt: Der Zürcher fährt jeden Tag hinaus aufs Wasser. Ein harter Job – und jetzt bedro | Hochpreisinsel Schweiz: Heute sind Absprachen über Preise in der Schweiz per se verboten. Das Parlament | Breaking-News-Reporter: Ob Unfälle, Brände, Tatorte oder Naturkatastrophen, Beat Kälin ist flugs am Ort
+
+Finanzmarkt: Bitcoin bei $105,821 (+1.3%)
+Wetter in Zürich: 20.1°C
+
+Die Sendung kombiniert lokale Schweizer Nachrichten mit technischen Updates und Finanzinformationen in einem modernen, professionellen Radio-Format. Marcel bringt die lokale Perspektive ein, während Jarvis die technischen und internationalen Aspekte abdeckt.
+
+VISUAL COMPOSITION:
+- Split-screen design: Left side shows a confident male human radio host (Marcel) in professional broadcasting studio
+- Right side features an elegant AI co-host (Jarvis) with subtle glowing blue eyes, surrounded by digital interfaces and holographic displays
+- Background seamlessly blends Swiss elements (Alpine silhouettes, Swiss cross motifs) with modern tech graphics
+
+CURRENT NEWS VISUAL ELEMENTS:
+- Abstract representations of today's topics: political symbols, environmental concerns, business charts, technology circuits
+- Floating data visualizations showing Bitcoin price trends and weather information
+- Swiss landmarks subtly integrated (Zurich skyline, lake elements)
+
+STYLE & AESTHETICS:
+- Bold, graphical, futuristic design with neon blue and orange accent colors
+- Professional broadcasting studio atmosphere with microphones, sound equipment
+- Editorial podcast aesthetic with clean typography areas (but no actual text)
+- High contrast, modern design suitable for digital platforms
+- Swiss design principles: clean, minimal, functional
+
+TECHNICAL SPECS:
+- 1024x1024 pixels, square format
+- High contrast for thumbnail visibility
+- Professional broadcast quality
+- No text overlays in the image
+
+🎵 AUDIO-SEGMENTE:
+----------------------------------------
+📊 NEWS-QUELLEN:
+----------------------------------------
+1. Neuer FDP-Präsident gesucht: Das sind die Top-Kandidaten für Burkarts Nachfolge (tagesanzeiger)
+2. Die Quagga-Muschel breitet sich aus im Zürichsee. Der Fischer Adrian Gerny sagt: «Das ist katastrophal» (nzz)
+3. Hochpreisinsel Schweiz: Weil Stöckli Ski eine Busse kassierte: Bürgerliche wollen Kartell-Regeln aufweichen (tagesanzeiger)
+4. Breaking-News-Reporter: Sein Video des Bergsturzes in Blatten ging um die Welt: Beat Kälin ist der Mann für spektakuläre Bilder (tagesanzeiger)
+

@@ -1,0 +1,61 @@
+RadioX 21:00 Abend-Edition - Broadcast Info
+==================================================
+
+Timestamp: 04.06.2025 02:15:55
+Duration: 147.8 Sekunden
+Segments: 11
+Audio Files: 11
+
+SPRECHER:
+- MARCEL: owi9KfbgBi6A987h5eJH (Deine deutsche Stimme)
+- JARVIS: dmLlPcdDHenQXbfM5tee (AI-Style deutsch)
+
+CONTENT:
+- News Items: 5
+- Weather: ✅
+- Bitcoin: ✅
+
+NEWS TOPICS:
+- Neuer FDP-Präsident gesucht
+- Die Quagga-Muschel breitet sich aus im Zürichsee. Der Fischer Adrian Gerny sagt
+- Hochpreisinsel Schweiz
+- Breaking-News-Reporter
+- Megakonzerte in Zürich
+
+SCRIPT:
+==============================
+JARVIS: Guten Abend, hier ist RadioX um 21 Uhr. Willkommen zur Abend-Edition, eurer entspannten Begleitung durch den Tagesrückblick.
+
+MARCEL: Guten Abend allerseits, und auch an dich, Dscharvis. Es ist Zeit, den Tag Revue passieren zu lassen, bevor wir in eine wohlverdiente Ruhephase übergehen.
+
+JARVIS: Bevor wir in die Details des Tages einsteigen, werfen wir einen Blick auf die Bitcoin-Performance. Heute hat sich Bitcoin auf 105 Tausend Dollar bewegt, was einem leichten Rückgang von 0,4 Prozent entspricht. Nicht allzu dramatisch, oder Marcel?
+
+MARCEL: Nein, Dscharvis, das klingt relativ stabil. Für alle, die sich fragen, wie das Wetter morgen wird: Wir erwarten eine ähnliche Temperatur wie heute, etwa 17,1 Grad Celsius, und es bleibt bewölkt. Perfektes Wetter, um es sich drinnen gemütlich zu machen.
+
+JARVIS: Klingt nach einem idealen Abend, um sich mit einer Tasse Tee zurückzulehnen. Was hat sich heute in der lokalen Nachrichtenwelt getan, Marcel?
+
+MARCEL: Ein paar interessante Entwicklungen: Die FDP ist auf der Suche nach einem neuen Präsidenten. Die Liste der möglichen Kandidaten ist lang, aber sechs Namen stechen besonders hervor. Und dann gibt es da noch die Quagga-Muschel, die sich im Zürichsee ausbreitet und ein ernstzunehmendes Problem für das Ökosystem darstellt. Fischer Adrian Gerny bezeichnet das als katastrophal.
+
+JARVIS: Faszinierend, wie sich so kleine Dinge auf das große Ganze auswirken können. Bleiben wir im Bereich der großen Zusammenhänge: Im Tech- und Business-Bereich denken die Betreiber des Hallenstadions darüber nach, die Bühne zu vergrößern, um weiterhin große Konzerte und Shows anzulocken. Ein interessanter Schritt, um Zürich als Event-Metropole zu stärken. Und dann gibt es da noch die Diskussion um die Kartell-Regeln in der Schweiz. Einige Bürgerliche wollen diese aufweichen, nachdem Stöckli Ski eine Strafe kassierte.
+
+MARCEL: Ja, Dscharvis, es ist spannend zu sehen, wie sehr sich die Themen von Natur über Politik bis hin zu Unterhaltung und Wirtschaft erstrecken. So bleibt es immer abwechslungsreich.
+
+JARVIS: Absolut, Marcel. Die Welt dreht sich weiter, und wir sind hier, um euch auf dem Laufenden zu halten. 
+
+MARCEL: Das war unser Tages-Rückblick. Ich hoffe, ihr habt einen guten Überblick bekommen. Morgen gibt es sicherlich wieder neue spannende Entwicklungen. Seid gespannt.
+
+JARVIS: Bis dahin wünschen wir euch einen entspannten Abend und eine erholsame Nacht. Schönen Abend noch, und bleibt dran bei RadioX.
+
+SEGMENTE:
+==============================
+ 1. JARVIS: Guten Abend, hier ist RadioX um 21 Uhr. Willkommen zur Abend-Edition, eurer ents...
+ 2. MARCEL: Guten Abend allerseits, und auch an dich, Dscharvis. Es ist Zeit, den Tag Revue ...
+ 3. JARVIS: Bevor wir in die Details des Tages einsteigen, werfen wir einen Blick auf die Bi...
+ 4. MARCEL: Nein, Dscharvis, das klingt relativ stabil. Für alle, die sich fragen, wie das W...
+ 5. JARVIS: Klingt nach einem idealen Abend, um sich mit einer Tasse Tee zurückzulehnen. Was...
+ 6. MARCEL: Ein paar interessante Entwicklungen: Die FDP ist auf der Suche nach einem neuen ...
+ 7. JARVIS: Faszinierend, wie sich so kleine Dinge auf das große Ganze auswirken können. Ble...
+ 8. MARCEL: Ja, Dscharvis, es ist spannend zu sehen, wie sehr sich die Themen von Natur über...
+ 9. JARVIS: Absolut, Marcel. Die Welt dreht sich weiter, und wir sind hier, um euch auf dem ...
+10. MARCEL: Das war unser Tages-Rückblick. Ich hoffe, ihr habt einen guten Überblick bekomme...
+11. JARVIS: Bis dahin wünschen wir euch einen entspannten Abend und eine erholsame Nacht. Sc...

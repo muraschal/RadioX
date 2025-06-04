@@ -1,0 +1,128 @@
+# RadioX AI Project - Git Ignore Rules
+
+# ===== OUTPUT ORDNER REGELN =====
+# Nur .txt Dateien behalten, MP3 und PNG ignorieren
+output/*.mp3
+output/*.png
+output/old/
+
+# Aber .txt Dateien explizit tracken
+!output/*.txt
+
+# ===== ENVIRONMENT & SECRETS =====
+.env
+.env.local
+.env.production
+.env.staging
+*.key
+config.json
+
+# ===== PYTHON =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ===== NODE.JS / FRONTEND =====
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.next/
+.nuxt/
+dist/
+.cache/
+
+# ===== LOGS =====
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# ===== TEMPORARY FILES =====
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# ===== IDE / EDITOR =====
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.atom/
+
+# ===== AUDIO PROCESSING =====
+*.wav
+*.flac
+*.aac
+temp_audio/
+audio_cache/
+
+# ===== BACKUP FILES =====
+*.bak
+*.backup
+*.old
+
+# ===== SYSTEM FILES =====
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ===== DOCUMENTATION BUILDS =====
+docs/_build/
+site/
+
+# ===== COVERAGE REPORTS =====
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# ===== JUPYTER NOTEBOOKS =====
+.ipynb_checkpoints
+
+# ===== VIRTUAL ENVIRONMENTS =====
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# ===== MYPY =====
+.mypy_cache/
+.dmypy.json
+dmypy.json 

@@ -1,0 +1,103 @@
+🎙️ RADIOX FINAL BROADCAST
+============================================================
+📅 Datum: 2025-06-03 20:03:15
+⏰ Broadcast Zeit: 20:02 Uhr am Abend
+🎵 Final MP3: RadioX_Final_20250603_2003.mp3
+⏱️ Gesamtdauer: 121 Sekunden
+🎤 Segmente: 13
+
+🎤 SPRECHER-KONFIGURATION:
+----------------------------------------
+🤖 JARVIS (Deutsch): dmLlPcdDHenQXbfM5tee
+   URL: https://elevenlabs.io/app/voice-library?voiceId=dmLlPcdDHenQXbfM5tee
+🎤 MARCEL (Deutsch): owi9KfbgBi6A987h5eJH
+   URL: https://elevenlabs.io/app/voice-library?voiceId=owi9KfbgBi6A987h5eJH
+
+📝 GPT RADIO-SCRIPT:
+============================================================
+JARVIS: Es ist 20:02 Uhr am Abend, liebe Zuhörer, und Sie hören RadioX Zürich. Ich bin Jarvis, Ihr AI-Co-Host, und wir haben heute spannende Themen für Sie vorbereitet. Bleiben Sie dran, denn wir haben sowohl lokale als auch internationale News, die Sie nicht verpassen sollten.
+
+MARCEL: Guten Abend zusammen, hier ist Marcel. Schön, dass ihr mit dabei seid! Ich hoffe, euch geht's gut. Was meinst du, Dscharvis, starten wir mit den News?
+
+JARVIS: Absolut, Marcel. Dann lasst uns gleich loslegen und einen Blick auf die aktuellen Schlagzeilen werfen.
+
+MARCEL: Beginnen wir mit den lokalen News. Die Quagga-Muschel breitet sich im Zürichsee aus und sorgt für Aufregung. Der Fischer Adrian Gerny beschreibt die Situation als katastrophal, da dieser Eindringling das gesamte Ökosystem bedroht. Ein ernstes Thema, das uns alle betrifft.
+
+MARCEL: Und dann haben wir noch die Suche nach einem neuen FDP-Präsidenten. Die Nachfolge von Burkart ist offen, und es gibt einige Top-Kandidaten, die das Steuer bei den Liberalen übernehmen könnten. Ein spannendes Rennen, das die politische Landschaft beeinflussen könnte.
+
+JARVIS: Interessante Entwicklungen, Marcel. Auf der Tech- und Business-Seite gibt es auch einiges zu berichten. Zum einen hat Stöckli Ski eine Busse kassiert, was die Diskussion um die Kartell-Regeln in der Schweiz neu entfacht hat. Es gibt Stimmen, die für eine Aufweichung der Regeln plädieren – ein umstrittenes Thema.
+
+JARVIS: Und dann ist da noch Beat Kälin, der Breaking-News-Reporter, dessen Video vom Bergsturz in Blatten weltweit Aufsehen erregt hat. Sein Talent für spektakuläre Bilder ist wirklich beeindruckend und zeigt, wie wichtig schnelle, visuelle Berichterstattung ist.
+
+MARCEL: Die Geschichte von Beat Kälin klingt wirklich spannend, Dscharvis. Es ist faszinierend, wie solche Bilder um die Welt gehen können.
+
+JARVIS: Absolut, Marcel. Und jetzt noch ein kurzer Blick auf die Finanzwelt: Bitcoin steht heute bei 105,959 Dollar, ein Plus von 1.5%. Eine interessante Entwicklung für alle Krypto-Enthusiasten da draußen.
+
+MARCEL: Danke für das Update, Dscharvis. Und wie sieht's mit dem Wetter aus?
+
+JARVIS: Das Wetter sieht heute Abend teilweise bewölkt aus, mit angenehmen 20.2 Grad Celsius. Perfekt für einen entspannten Abendspaziergang.
+
+MARCEL: Hört sich gut an. Damit sind wir am Ende unserer heutigen Sendung angelangt. Es ist jetzt 20:10 Uhr, danke fürs Zuhören und bleibt dran für mehr spannende Inhalte.
+
+JARVIS: Danke, dass Sie eingeschaltet haben. Bleiben Sie neugierig, und wir freuen uns, Sie das nächste Mal wieder zu begrüßen. Have a great evening!
+
+🎨 COVER-ART IMAGE-PROMPT:
+============================================================
+Stylized podcast cover art for a Zurich-based news broadcast featuring current topics: Neuer FDP-Präsident gesucht: Wer übernimmt jetzt das Steuer bei den Liberalen? Das Feld der möglichen Kandidierenden ist gross. D | Die Quagga-Muschel breitet sich aus im Zürichsee. Der Fischer Adrian Gerny sagt: Der Zürcher fährt jeden Tag hinaus aufs Wasser. Ein harter Job – und jetzt bedroht ein gefrässiger E | Hochpreisinsel Schweiz: Heute sind Absprachen über Preise in der Schweiz per se verboten. Das Parlament könnte das jetzt änd | Breaking-News-Reporter: Ob Unfälle, Brände, Tatorte oder Naturkatastrophen, Beat Kälin ist flugs am Ort des Geschehens. Im L. 
+
+Split visual composition: Left side shows a confident male human radio host (Marcel) with professional broadcasting setup, right side features an elegant AI co-host with subtle glowing eyes (Jarvis) surrounded by digital interfaces. 
+
+The background dynamically blends graphic visual elements representing today's news: technology circuits and digital interfaces, Swiss landmarks and Zurich cityscape elements, abstract news and media symbols. 
+
+Current broadcast context: 20:02 Uhr am Abend, Bitcoin at $105,959 (+1.5%), Weather 20.2°C in Zurich.
+
+Style: Bold, graphical, futuristic with neon blue/orange accents, editorial podcast aesthetic, Swiss elements subtly integrated (Swiss cross, Alpine silhouettes). Professional broadcasting studio atmosphere. No text overlays in the image.
+
+🎵 AUDIO-SEGMENTE:
+----------------------------------------
+✅ Segment 01: 🤖 JARVIS (0s-14s)
+   💬 Es ist 20:02 Uhr am Abend, liebe Zuhörer, und Sie hören RadioX Zürich. Ich bin Jarvis, Ihr AI-Co-Host, und wir haben heute spannende Themen für Sie vorbereitet. Bleiben Sie dran, denn wir haben sowohl lokale als auch internationale News, die Sie nicht verpassen sollten.
+
+✅ Segment 02: 🎤 MARCEL (14s-22s)
+   💬 Guten Abend zusammen, hier ist Marcel. Schön, dass ihr mit dabei seid! Ich hoffe, euch geht's gut. Was meinst du, Dscharvis, starten wir mit den News?
+
+✅ Segment 03: 🤖 JARVIS (22s-27s)
+   💬 Absolut, Marcel. Dann lasst uns gleich loslegen und einen Blick auf die aktuellen Schlagzeilen werfen.
+
+✅ Segment 04: 🎤 MARCEL (27s-40s)
+   💬 Beginnen wir mit den lokalen News. Die Quagga-Muschel breitet sich im Zürichsee aus und sorgt für Aufregung. Der Fischer Adrian Gerny beschreibt die Situation als katastrophal, da dieser Eindringling das gesamte Ökosystem bedroht. Ein ernstes Thema, das uns alle betrifft.
+
+✅ Segment 05: 🎤 MARCEL (40s-53s)
+   💬 Und dann haben wir noch die Suche nach einem neuen FDP-Präsidenten. Die Nachfolge von Burkart ist offen, und es gibt einige Top-Kandidaten, die das Steuer bei den Liberalen übernehmen könnten. Ein spannendes Rennen, das die politische Landschaft beeinflussen könnte.
+
+✅ Segment 06: 🤖 JARVIS (53s-69s)
+   💬 Interessante Entwicklungen, Marcel. Auf der Tech- und Business-Seite gibt es auch einiges zu berichten. Zum einen hat Stöckli Ski eine Busse kassiert, was die Diskussion um die Kartell-Regeln in der Schweiz neu entfacht hat. Es gibt Stimmen, die für eine Aufweichung der Regeln plädieren – ein umstrittenes Thema.
+
+✅ Segment 07: 🤖 JARVIS (69s-80s)
+   💬 Und dann ist da noch Beat Kälin, der Breaking-News-Reporter, dessen Video vom Bergsturz in Blatten weltweit Aufsehen erregt hat. Sein Talent für spektakuläre Bilder ist wirklich beeindruckend und zeigt, wie wichtig schnelle, visuelle Berichterstattung ist.
+
+✅ Segment 08: 🎤 MARCEL (80s-86s)
+   💬 Die Geschichte von Beat Kälin klingt wirklich spannend, Dscharvis. Es ist faszinierend, wie solche Bilder um die Welt gehen können.
+
+✅ Segment 09: 🤖 JARVIS (86s-95s)
+   💬 Absolut, Marcel. Und jetzt noch ein kurzer Blick auf die Finanzwelt: Bitcoin steht heute bei 105,959 Dollar, ein Plus von 1.5%. Eine interessante Entwicklung für alle Krypto-Enthusiasten da draußen.
+
+✅ Segment 10: 🎤 MARCEL (95s-99s)
+   💬 Danke für das Update, Dscharvis. Und wie sieht's mit dem Wetter aus?
+
+✅ Segment 11: 🤖 JARVIS (99s-105s)
+   💬 Das Wetter sieht heute Abend teilweise bewölkt aus, mit angenehmen 20.2 Grad Celsius. Perfekt für einen entspannten Abendspaziergang.
+
+✅ Segment 12: 🎤 MARCEL (105s-114s)
+   💬 Hört sich gut an. Damit sind wir am Ende unserer heutigen Sendung angelangt. Es ist jetzt 20:10 Uhr, danke fürs Zuhören und bleibt dran für mehr spannende Inhalte.
+
+✅ Segment 13: 🤖 JARVIS (114s-121s)
+   💬 Danke, dass Sie eingeschaltet haben. Bleiben Sie neugierig, und wir freuen uns, Sie das nächste Mal wieder zu begrüßen. Have a great evening!
+
+📊 NEWS-QUELLEN:
+----------------------------------------
+1. Neuer FDP-Präsident gesucht: Das sind die Top-Kandidaten für Burkarts Nachfolge (tagesanzeiger)
+2. Die Quagga-Muschel breitet sich aus im Zürichsee. Der Fischer Adrian Gerny sagt: «Das ist katastrophal» (nzz)
+3. Hochpreisinsel Schweiz: Weil Stöckli Ski eine Busse kassierte: Bürgerliche wollen Kartell-Regeln aufweichen (tagesanzeiger)
+4. Breaking-News-Reporter: Sein Video des Bergsturzes in Blatten ging um die Welt: Beat Kälin ist der Mann für spektakuläre Bilder (tagesanzeiger)
+
