@@ -2,33 +2,20 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
   try {
-    // Backend-URL
-    const backendUrl = process.env.BACKEND_URL || 'http://localhost:8000'
-    
-    // Backend-Request für neueste Broadcast-Datei
-    const response = await fetch(`${backendUrl}/api/latest-broadcast`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    })
-    
-    if (!response.ok) {
-      throw new Error(`Backend error: ${response.status}`)
-    }
-    
-    const data = await response.json()
-    
-    // Vollständige URLs für Frontend erstellen
+    // Quick and dirty: Direkte Referenz auf statische Datei
     const result = {
       success: true,
       broadcast: {
-        filename: data.mp3_file,
-        audioUrl: `${backendUrl}${data.mp3_path}`,
-        coverUrl: data.cover_path ? `${backendUrl}${data.cover_path}` : null,
-        fileSize: data.file_size,
-        timestamp: data.timestamp,
-        metadata: data.metadata || {}
+        filename: "latest-show.mp3",
+        audioUrl: "/latest-show.mp3", // Statische Datei im public Ordner
+        coverUrl: null, // Erstmal ohne Cover
+        fileSize: 439000, // Ungefähre Größe in Bytes
+        timestamp: new Date().toISOString(),
+        metadata: {
+          title: "RadioX 8:00 Enhanced Show",
+          duration: "00:03:30", // Ungefähre Dauer
+          timestamp: new Date().toISOString()
+        }
       }
     }
     

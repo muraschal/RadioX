@@ -528,8 +528,9 @@ NEWS TOPICS:
         
         try:
             headers = {
-                'Authorization': f'Bearer {self.elevenlabs_api_key}',
-                'Content-Type': 'application/json'
+                'Accept': 'audio/mpeg',
+                'Content-Type': 'application/json',
+                'xi-api-key': self.elevenlabs_api_key
             }
             
             data = {
