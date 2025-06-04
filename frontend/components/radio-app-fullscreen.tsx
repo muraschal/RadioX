@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useRef } from "react"
 import {
-  PlayCircle,
-  PauseCircle,
+  Play,
+  Pause,
   Volume2,
   Volume1,
   VolumeX,
@@ -534,9 +534,9 @@ export default function RadioAppFullscreen() {
               {isLoadingBroadcast ? (
                 <RefreshCw className="w-12 h-12 sm:w-16 sm:h-16 animate-spin" />
               ) : isPlaying ? (
-                <PauseCircle className="w-12 h-12 sm:w-16 sm:h-16" />
+                <Pause className="w-12 h-12" />
               ) : (
-                <PlayCircle className="w-12 h-12 sm:w-16 sm:h-16" />
+                <Play className="w-12 h-12" />
               )}
             </Button>
           </div>
