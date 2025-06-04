@@ -1,0 +1,26 @@
+# RadioX Backend Environment Variables
+# Kopiere diese Datei zu .env und fülle deine API Keys ein
+
+# X (Twitter) API Configuration
+# Gehe zu: https://developer.twitter.com/en/portal/dashboard
+# Erstelle ein neues Projekt und App
+# Kopiere den Bearer Token hierher
+X_BEARER_TOKEN=your_x_bearer_token_here
+
+# OpenAI API (für News-Zusammenfassungen und Radio-Ansagen)
+OPENAI_API_KEY=your_openai_api_key_here
+
+# ElevenLabs API (für Voice-Over Generation)
+ELEVENLABS_API_KEY=your_elevenlabs_api_key_here
+
+# Supabase Configuration
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_KEY=your_supabase_anon_key
+
+# Spotify API (für Musik-Integration)
+SPOTIFY_CLIENT_ID=your_spotify_client_id
+SPOTIFY_CLIENT_SECRET=your_spotify_client_secret
+
+# Development Settings
+DEBUG=true
+LOG_LEVEL=INFO 

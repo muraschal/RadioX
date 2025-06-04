@@ -1,0 +1,48 @@
+# RadioX Backend Dependencies
+# Standalone Version ohne MCP/Cursor Dependencies
+
+# Core Dependencies
+asyncio-mqtt==0.16.2
+aiohttp==3.9.1
+aiofiles==23.2.1
+
+# Logging
+loguru==0.7.2
+
+# Environment Variables
+python-dotenv==1.0.0
+
+# Database
+supabase==2.3.4
+postgrest==0.13.2
+
+# OpenAI API
+openai==1.6.1
+
+# RSS/XML Parsing
+feedparser==6.0.10
+beautifulsoup4==4.12.2
+lxml==4.9.4
+
+# HTTP Requests
+httpx==0.26.0
+requests==2.31.0
+
+# Date/Time
+python-dateutil==2.8.2
+pytz==2023.3
+
+# JSON/Data Processing
+pydantic==2.5.2
+typing-extensions==4.9.0
+
+# Audio Processing (optional)
+pydub==0.25.1
+
+# Development/Testing
+pytest==7.4.4
+pytest-asyncio==0.23.2
+
+# Utilities
+pathlib2==2.3.7
+uuid==1.30 

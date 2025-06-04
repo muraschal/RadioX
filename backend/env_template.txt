@@ -1,0 +1,27 @@
+# RadioX Backend Environment Variables
+# Kopiere diese Datei zu .env und fülle die echten Werte ein
+
+# Supabase Configuration
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+
+# Twitter/X API Configuration
+X_BEARER_TOKEN=your-bearer-token
+X_API_KEY=your-api-key
+X_API_SECRET=your-api-secret
+X_ACCESS_TOKEN=your-access-token
+X_ACCESS_TOKEN_SECRET=your-access-token-secret
+
+# OpenAI Configuration
+OPENAI_API_KEY=your-openai-api-key
+
+# ElevenLabs Configuration
+ELEVENLABS_API_KEY=your-elevenlabs-api-key
+
+# Spotify Configuration
+SPOTIFY_CLIENT_ID=your-spotify-client-id
+SPOTIFY_CLIENT_SECRET=your-spotify-client-secret
+
+# Environment
+ENVIRONMENT=development 

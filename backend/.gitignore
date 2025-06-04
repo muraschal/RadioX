@@ -1,0 +1,59 @@
+# RadioX Backend - Generierte Dateien ignorieren
+
+# Output-Ordner
+output/
+audio_archive/
+
+# Temporäre Ordner (falls sie erstellt werden)
+temp/
+generated_audio/
+test_audio_archive/
+elevenlabs_mcp_test/
+
+# Test- und Demo-Dateien
+test_*.py
+demo_*.py
+debug_*.py
+
+# Generierte JSON-Dateien
+*.json
+!requirements.txt
+!package.json
+
+# Audio-Dateien
+*.mp3
+*.wav
+*.m4a
+*.aac
+
+# Logs
+*.log
+logs/
+
+# Environment-Dateien
+.env
+.env.local
+.env.production
+
+# Python Cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backup-Dateien
+*.bak
+*.backup
+*.old 
