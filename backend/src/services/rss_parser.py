@@ -30,18 +30,19 @@ class RSSParser:
     """RSS Parser für Schweizer News-Quellen"""
     
     def __init__(self):
-        # Schweizer News RSS Feeds
+        # Schweizer News RSS Feeds - KORRIGIERT UND ERWEITERT!
         self.rss_feeds = {
-            "20min": {
-                "base_url": "https://www.20min.ch",
-                "feeds": {
-                    "schweiz": "https://partner-feeds.20min.ch/rss/20minuten/schweiz",
-                    "wirtschaft": "https://partner-feeds.20min.ch/rss/20minuten/wirtschaft", 
-                    "sport": "https://partner-feeds.20min.ch/rss/20minuten/sport",
-                    "digital": "https://partner-feeds.20min.ch/rss/20minuten/digital",
-                    "zurich": "https://partner-feeds.20min.ch/rss/20minuten/zuerich"
-                }
-            },
+            # 20min RSS-Feeds sind aktuell nicht verfügbar (404 Fehler)
+            # "20min": {
+            #     "base_url": "https://www.20min.ch",
+            #     "feeds": {
+            #         "schweiz": "https://www.20min.ch/rss/rss.tmpl?type=channel&get=5",
+            #         "wirtschaft": "https://www.20min.ch/rss/rss.tmpl?type=channel&get=3", 
+            #         "sport": "https://www.20min.ch/rss/rss.tmpl?type=channel&get=6",
+            #         "digital": "https://www.20min.ch/rss/rss.tmpl?type=channel&get=54",
+            #         "zurich": "https://www.20min.ch/rss/rss.tmpl?type=channel&get=10"
+            #     }
+            # },
             "nzz": {
                 "base_url": "https://www.nzz.ch",
                 "feeds": {
@@ -52,12 +53,15 @@ class RSSParser:
                     "zurich": "https://www.nzz.ch/zuerich.rss"
                 }
             },
+            # SRF - KORRIGIERTE FUNKTIONIERENDE FEEDS!
             "srf": {
                 "base_url": "https://www.srf.ch",
                 "feeds": {
-                    "news": "https://www.srf.ch/news/bnf/rss/1646",
-                    "schweiz": "https://www.srf.ch/news/bnf/rss/1646",
-                    "sport": "https://www.srf.ch/sport/bnf/rss/1948"
+                    "news": "https://www.srf.ch/news/bnf/rss/19032223",  # Das Neueste - FUNKTIONIERT!
+                    "schweiz": "https://www.srf.ch/news/bnf/rss/1926",  # Schweiz News
+                    "international": "https://www.srf.ch/bnf/rss/19920122",  # International
+                    "wirtschaft": "https://www.srf.ch/news/bnf/rss/1646",  # Wirtschaft
+                    "sport": "https://www.srf.ch/sport/bnf/rss/1948"  # Sport
                 }
             },
             "tagesanzeiger": {
@@ -80,7 +84,7 @@ class RSSParser:
                     "zurich": "https://www.zueritoday.ch/rss.xml"
                 }
             },
-            # INTERNATIONALE BREAKING NEWS QUELLEN
+            # INTERNATIONALE BREAKING NEWS QUELLEN - ERWEITERT!
             "reuters": {
                 "base_url": "https://www.reuters.com",
                 "feeds": {
@@ -106,7 +110,7 @@ class RSSParser:
                     "science": "https://rss.dw.com/rdf/rss-en-sci"
                 }
             },
-            # TECH NEWS QUELLEN
+            # TECH NEWS QUELLEN - MASSIV ERWEITERT!
             "techcrunch": {
                 "base_url": "https://techcrunch.com",
                 "feeds": {
@@ -134,11 +138,30 @@ class RSSParser:
                     "security": "https://www.heise.de/security/rss/news-atom.xml"
                 }
             },
+            # NEUE TECH-QUELLEN!
+            "wired": {
+                "base_url": "https://www.wired.com",
+                "feeds": {
+                    "latest": "https://www.wired.com/feed/rss"
+                }
+            },
+            "engadget": {
+                "base_url": "https://www.engadget.com",
+                "feeds": {
+                    "tech": "https://www.engadget.com/rss.xml"
+                }
+            },
+            "mashable": {
+                "base_url": "https://mashable.com",
+                "feeds": {
+                    "tech": "https://mashable.com/feeds/rss/all"
+                }
+            },
             # BITCOIN/CRYPTO QUELLEN
             "cointelegraph": {
                 "base_url": "https://cointelegraph.com",
                 "feeds": {
-                    "bitcoin": "https://cointelegraph.com/rss/tag/bitcoin",
+                    "bitcoin": "https://de.cointelegraph.com/rss/tag/bitcoin",  # FUNKTIONIERT! Deutsche Version
                     "latest": "https://cointelegraph.com/rss"
                 }
             },
@@ -162,6 +185,31 @@ class RSSParser:
                 "base_url": "https://insideparadeplatz.ch",
                 "feeds": {
                     "finanz": "https://insideparadeplatz.ch/feed/"
+                }
+            },
+            # NEUE INTERNATIONALE QUELLEN!
+            "cnn": {
+                "base_url": "https://www.cnn.com",
+                "feeds": {
+                    "world": "http://rss.cnn.com/rss/edition.rss",
+                    "business": "http://rss.cnn.com/rss/money_latest.rss",
+                    "tech": "http://rss.cnn.com/rss/edition_technology.rss"
+                }
+            },
+            "guardian": {
+                "base_url": "https://www.theguardian.com",
+                "feeds": {
+                    "world": "https://www.theguardian.com/world/rss",
+                    "business": "https://www.theguardian.com/business/rss",
+                    "technology": "https://www.theguardian.com/technology/rss"
+                }
+            },
+            "spiegel": {
+                "base_url": "https://www.spiegel.de",
+                "feeds": {
+                    "schlagzeilen": "https://www.spiegel.de/schlagzeilen/index.rss",
+                    "wirtschaft": "https://www.spiegel.de/wirtschaft/index.rss",
+                    "netzwelt": "https://www.spiegel.de/netzwelt/index.rss"
                 }
             }
         }
@@ -353,7 +401,7 @@ class RSSParser:
         """Sammelt aktuelle News von allen konfigurierten Quellen"""
         
         if not sources:
-            sources = ["20min", "nzz", "srf"]
+            sources = ["nzz", "srf", "tagesanzeiger", "bbc", "cointelegraph", "techcrunch"]  # Bitcoin/Crypto + Tech hinzugefügt, Reuters entfernt
         
         logger.info(f"📰 Sammle News von {len(sources)} Quellen...")
         

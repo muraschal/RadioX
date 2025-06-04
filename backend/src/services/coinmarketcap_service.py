@@ -36,23 +36,12 @@ class CoinMarketCapService:
     def __init__(self):
         self.base_url = "https://pro-api.coinmarketcap.com/v1"
         self.api_key = os.getenv("COINMARKETCAP_API_KEY")
-        self.session = None
         
         # Fallback: Free API endpoint (ohne API Key)
         self.free_base_url = "https://api.coinmarketcap.com/v1"
         
         self.logger = logging.getLogger(__name__)
         
-    async def __aenter__(self):
-        """Async context manager entry"""
-        self.session = aiohttp.ClientSession()
-        return self
-        
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
-        """Async context manager exit"""
-        if self.session:
-            await self.session.close()
-    
     async def get_bitcoin_price(self) -> Optional[CryptoPrice]:
         """Holt aktuellen Bitcoin Preis in USD und CHF"""
         try:
@@ -66,28 +55,27 @@ class CoinMarketCapService:
                 'include_24hr_vol': 'true'
             }
             
-            if not self.session:
-                self.session = aiohttp.ClientSession()
-                
-            async with self.session.get(url, params=params) as response:
-                if response.status == 200:
-                    data = await response.json()
-                    btc_data = data['bitcoin']
-                    
-                    return CryptoPrice(
-                        symbol="BTC",
-                        name="Bitcoin",
-                        price_usd=btc_data['usd'],
-                        price_chf=btc_data['chf'],
-                        change_24h=btc_data['usd_24h_change'],
-                        market_cap=btc_data.get('usd_market_cap', 0),
-                        volume_24h=btc_data.get('usd_24h_vol', 0),
-                        last_updated=datetime.now()
-                    )
-                else:
-                    self.logger.error(f"CoinGecko API Error: {response.status}")
-                    return await self._fallback_coinmarketcap()
-                    
+            # Verwende eigene Session für diese Anfrage
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url, params=params) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        btc_data = data['bitcoin']
+                        
+                        return CryptoPrice(
+                            symbol="BTC",
+                            name="Bitcoin",
+                            price_usd=btc_data['usd'],
+                            price_chf=btc_data['chf'],
+                            change_24h=btc_data['usd_24h_change'],
+                            market_cap=btc_data.get('usd_market_cap', 0),
+                            volume_24h=btc_data.get('usd_24h_vol', 0),
+                            last_updated=datetime.now()
+                        )
+                    else:
+                        self.logger.error(f"CoinGecko API Error: {response.status}")
+                        return await self._fallback_coinmarketcap()
+                        
         except Exception as e:
             self.logger.error(f"Error fetching Bitcoin price from CoinGecko: {e}")
             return await self._fallback_coinmarketcap()
@@ -97,25 +85,27 @@ class CoinMarketCapService:
         try:
             url = "https://api.coinmarketcap.com/v1/ticker/bitcoin/"
             
-            async with self.session.get(url) as response:
-                if response.status == 200:
-                    data = await response.json()
-                    btc_data = data[0]
-                    price_usd = float(btc_data['price_usd'])
-                    
-                    return CryptoPrice(
-                        symbol="BTC",
-                        name="Bitcoin",
-                        price_usd=price_usd,
-                        price_chf=price_usd * 0.82,  # Approximation USD->CHF
-                        change_24h=float(btc_data['percent_change_24h']),
-                        market_cap=float(btc_data['market_cap_usd']),
-                        volume_24h=float(btc_data['24h_volume_usd']),
-                        last_updated=datetime.now()
-                    )
-                else:
-                    self.logger.error(f"CoinMarketCap Fallback API Error: {response.status}")
-                    return None
+            # Verwende eigene Session für Fallback
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        btc_data = data[0]
+                        price_usd = float(btc_data['price_usd'])
+                        
+                        return CryptoPrice(
+                            symbol="BTC",
+                            name="Bitcoin",
+                            price_usd=price_usd,
+                            price_chf=price_usd * 0.82,  # Approximation USD->CHF
+                            change_24h=float(btc_data['percent_change_24h']),
+                            market_cap=float(btc_data['market_cap_usd']),
+                            volume_24h=float(btc_data['24h_volume_usd']),
+                            last_updated=datetime.now()
+                        )
+                    else:
+                        self.logger.error(f"CoinMarketCap Fallback API Error: {response.status}")
+                        return None
         except Exception as e:
             self.logger.error(f"Fallback CoinMarketCap error: {e}")
             return None
@@ -140,48 +130,47 @@ class CoinMarketCapService:
                 headers = {'Accept': 'application/json'}
                 params = {}
             
-            if not self.session:
-                self.session = aiohttp.ClientSession()
-                
-            async with self.session.get(url, headers=headers, params=params) as response:
-                if response.status == 200:
-                    data = await response.json()
-                    cryptos = []
-                    
-                    if self.api_key:
-                        # Pro API
-                        for crypto in data['data']:
-                            quote = crypto['quote']['USD']
-                            cryptos.append(CryptoPrice(
-                                symbol=crypto['symbol'],
-                                name=crypto['name'],
-                                price_usd=quote['price'],
-                                price_chf=quote['price'] * 0.82,
-                                change_24h=quote['percent_change_24h'],
-                                market_cap=quote['market_cap'],
-                                volume_24h=quote['volume_24h'],
-                                last_updated=datetime.now()
-                            ))
+            # Verwende eigene Session für diese Anfrage
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url, headers=headers, params=params) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        cryptos = []
+                        
+                        if self.api_key:
+                            # Pro API
+                            for crypto in data['data']:
+                                quote = crypto['quote']['USD']
+                                cryptos.append(CryptoPrice(
+                                    symbol=crypto['symbol'],
+                                    name=crypto['name'],
+                                    price_usd=quote['price'],
+                                    price_chf=quote['price'] * 0.82,
+                                    change_24h=quote['percent_change_24h'],
+                                    market_cap=quote['market_cap'],
+                                    volume_24h=quote['volume_24h'],
+                                    last_updated=datetime.now()
+                                ))
+                        else:
+                            # Free API
+                            for crypto in data:
+                                price_usd = float(crypto['price_usd'])
+                                cryptos.append(CryptoPrice(
+                                    symbol=crypto['symbol'],
+                                    name=crypto['name'],
+                                    price_usd=price_usd,
+                                    price_chf=price_usd * 0.82,
+                                    change_24h=float(crypto['percent_change_24h']),
+                                    market_cap=float(crypto['market_cap_usd']),
+                                    volume_24h=float(crypto['24h_volume_usd']),
+                                    last_updated=datetime.now()
+                                ))
+                        
+                        return cryptos
                     else:
-                        # Free API
-                        for crypto in data:
-                            price_usd = float(crypto['price_usd'])
-                            cryptos.append(CryptoPrice(
-                                symbol=crypto['symbol'],
-                                name=crypto['name'],
-                                price_usd=price_usd,
-                                price_chf=price_usd * 0.82,
-                                change_24h=float(crypto['percent_change_24h']),
-                                market_cap=float(crypto['market_cap_usd']),
-                                volume_24h=float(crypto['24h_volume_usd']),
-                                last_updated=datetime.now()
-                            ))
-                    
-                    return cryptos
-                else:
-                    self.logger.error(f"CoinMarketCap API Error: {response.status}")
-                    return []
-                    
+                        self.logger.error(f"CoinMarketCap API Error: {response.status}")
+                        return []
+                        
         except Exception as e:
             self.logger.error(f"Error fetching top cryptos: {e}")
             return []
