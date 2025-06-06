@@ -81,7 +81,7 @@ class SystemMonitoringService:
         
         try:
             error_data = {
-                "session_id": None,
+                "session_id": "system_monitoring",  # Fix: NOT NULL constraint
                 "event_type": "system_error",
                 "event_data": {
                     "error_type": error_type,
@@ -508,7 +508,7 @@ class SystemMonitoringService:
         
         try:
             log_data = {
-                "session_id": None,
+                "session_id": "system_monitoring",  # Fix: NOT NULL constraint
                 "event_type": event_type,
                 "event_data": event_data,
                 "timestamp": datetime.now().isoformat()

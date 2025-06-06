@@ -25,7 +25,7 @@ class SupabaseClient:
     def __init__(self):
         self.client: Client = create_client(
             settings.supabase_url,
-            settings.supabase_service_role_key
+            settings.supabase_anon_key
         )
         logger.info("Supabase Client initialisiert")
     

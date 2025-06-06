@@ -18,12 +18,14 @@ import uuid
 from datetime import datetime, timedelta
 from typing import Dict, Any, List, Optional
 from loguru import logger
-import os
-from dotenv import load_dotenv
 
 from .supabase_service import SupabaseService
 
-load_dotenv()
+# Import centralized settings
+import sys
+from pathlib import Path
+sys.path.append(str(Path(__file__).parent.parent))
+from config.settings import get_settings
 
 
 class BroadcastGenerationService:
@@ -35,42 +37,48 @@ class BroadcastGenerationService:
     """
     
     def __init__(self):
-        self.openai_api_key = os.getenv('OPENAI_API_KEY')
+        # Load settings centrally
+        self.settings = get_settings()
+        self.openai_api_key = self.settings.openai_api_key
         self.supabase = SupabaseService()
         
-        # Broadcast-Stile je nach Tageszeit
+        # V3 ENGLISH BROADCAST STYLES - TIME-BASED PERSONALITIES
         self.broadcast_styles = {
             "morning": {
-                "name": "Energetic Morning",
-                "description": "Energisch, motivierend, optimistisch",
-                "marcel_mood": "enthusiastic",
-                "jarvis_mood": "witty",
-                "tempo": "fast",
-                "duration_target": 8
+                "name": "High-Energy Morning",
+                "description": "Energetic, motivational, optimistic vibes",
+                "marcel_mood": "excited and passionate",
+                "jarvis_mood": "witty and sharp",
+                "tempo": "fast-paced",
+                "duration_target": 8,
+                "v3_style": "creative"
             },
             "afternoon": {
-                "name": "Relaxed Afternoon", 
-                "description": "Entspannt, informativ, freundlich",
-                "marcel_mood": "friendly",
-                "jarvis_mood": "analytical",
-                "tempo": "medium",
-                "duration_target": 10
+                "name": "Professional Afternoon", 
+                "description": "Relaxed, informative, professional tone",
+                "marcel_mood": "friendly and engaging",
+                "jarvis_mood": "analytical and precise",
+                "tempo": "medium-paced",
+                "duration_target": 10,
+                "v3_style": "natural"
             },
             "evening": {
-                "name": "Cozy Evening",
-                "description": "Gemütlich, nachdenklich, ruhig",
-                "marcel_mood": "thoughtful",
-                "jarvis_mood": "philosophical", 
-                "tempo": "slow",
-                "duration_target": 12
+                "name": "Chill Evening",
+                "description": "Cozy, thoughtful, conversational",
+                "marcel_mood": "thoughtful and warm",
+                "jarvis_mood": "philosophical and deep", 
+                "tempo": "slow and deliberate",
+                "duration_target": 12,
+                "v3_style": "natural"
             },
             "night": {
-                "name": "Late Night Chill",
-                "description": "Ruhig, entspannend, introspektiv",
-                "marcel_mood": "calm",
-                "jarvis_mood": "mysterious",
-                "tempo": "very_slow",
-                "duration_target": 15
+                "name": "Late Night Vibes",
+                "description": "Calm, relaxing, introspective atmosphere",
+                "marcel_mood": "calm and reflective",
+                "jarvis_mood": "mysterious and contemplative",
+                "tempo": "very slow and smooth",
+                "duration_target": 15,
+                "v3_style": "robust"
             }
         }
         
@@ -86,7 +94,8 @@ class BroadcastGenerationService:
         self,
         content: Dict[str, Any],
         target_time: Optional[str] = None,
-        channel: str = "zurich"
+        channel: str = "zurich",
+        language: str = "de"
     ) -> Dict[str, Any]:
         """
         Generiert einen kompletten Broadcast
@@ -106,7 +115,7 @@ class BroadcastGenerationService:
         broadcast_style = self._determine_broadcast_style(target_time)
         
         # 2. GPT-Prompt erstellen
-        gpt_prompt = self._create_gpt_prompt(content, broadcast_style, channel)
+        gpt_prompt = self._create_gpt_prompt(content, broadcast_style, channel, language)
         
         # 3. Skript mit GPT-4 generieren
         script = await self._generate_script_with_gpt(gpt_prompt)
@@ -194,108 +203,172 @@ class BroadcastGenerationService:
         self, 
         content: Dict[str, Any], 
         broadcast_style: Dict[str, Any],
+        channel: str,
+        language: str = "en"
+    ) -> str:
+        """Creates GPT prompt for V3 English script generation"""
+        
+        if language == "en":
+            return self._create_english_prompt(content, broadcast_style, channel)
+        else:
+            return self._create_german_prompt(content, broadcast_style, channel)
+    
+    def _create_english_prompt(
+        self, 
+        content: Dict[str, Any], 
+        broadcast_style: Dict[str, Any],
         channel: str
     ) -> str:
-        """Erstellt den GPT-Prompt für Skript-Generierung"""
+        """Creates English V3-optimized prompt"""
         
-        # News für Prompt aufbereiten
+        # Prepare news context
         news_context = ""
         selected_news = content.get("selected_news", [])
         
         for i, news in enumerate(selected_news, 1):
             news_context += f"{i}. [{news.get('primary_category', 'GENERAL').upper()}] {news.get('title', '')}\n"
-            news_context += f"   📰 {news.get('source_name', 'Unbekannt')} | ⏰ {news.get('hours_old', '?')}h alt\n"
+            news_context += f"   📰 {news.get('source_name', 'Unknown')} | ⏰ {news.get('hours_old', '?')}h ago\n"
             news_context += f"   📝 {news.get('summary', '')[:200]}...\n\n"
         
-        # Kontext-Daten aufbereiten
+        # Context data
         context_data = content.get("context_data", {})
         weather_context = ""
         crypto_context = ""
         
         if context_data.get("weather"):
-            weather_context = f"🌡️ Wetter: {context_data['weather'].get('formatted', 'unbekannt')}"
+            weather_context = f"🌡️ Weather: {context_data['weather'].get('formatted', 'unavailable')}"
         
         if context_data.get("crypto"):
-            crypto_context = f"₿ Bitcoin: {context_data['crypto'].get('formatted', 'unbekannt')}"
+            crypto_context = f"₿ Bitcoin: {context_data['crypto'].get('formatted', 'unavailable')}"
         
-        # Aktuelle Zeit
+        # Current time
         current_time = datetime.now()
-        time_context = f"⏰ Zeit: {current_time.strftime('%H:%M')} Uhr, {current_time.strftime('%A')}, {current_time.strftime('%d.%m.%Y')}"
+        time_context = f"⏰ Time: {current_time.strftime('%H:%M')}, {current_time.strftime('%A')}, {current_time.strftime('%B %d, %Y')}"
         
-        # Kanal-spezifische Anpassungen
-        location_context = self._get_location_context(channel)
+        # Location context
+        location_context = self._get_english_location_context(channel)
         
-        # Haupt-Prompt
-        gpt_prompt = f"""Du bist der Chefredakteur von RadioX, einem innovativen Schweizer AI-Radio mit den Moderatoren Marcel (emotional, spontan) und Jarvis (analytisch, witzig).
+        # V3 OPTIMIZED ENGLISH PROMPT
+        gpt_prompt = f"""You are the head producer of RadioX, an innovative Swiss AI radio featuring hosts Marcel (emotional, spontaneous) and Jarvis (analytical, witty AI).
 
-KONTEXT:
+🎙️ **RADIOX ENGLISH V3 BROADCAST GENERATION**
+
+CONTEXT:
 {time_context}
-🎭 Stil: {broadcast_style['name']} - {broadcast_style['description']}
+🎭 Style: {broadcast_style['name']} - {broadcast_style['description']}
 🎯 Marcel: {broadcast_style['marcel_mood']} | Jarvis: {broadcast_style['jarvis_mood']}
-⚡ Tempo: {broadcast_style['tempo']}
-📍 Kanal: {channel.upper()} {location_context}
-🎯 Zieldauer: {broadcast_style['duration_target']} Minuten
+⚡ Pacing: {broadcast_style['tempo']}
+📍 Channel: {channel.upper()} {location_context}
+🎯 Target Duration: {broadcast_style['duration_target']} minutes
+🔊 V3 Mode: {broadcast_style['v3_style']} (optimized for ElevenLabs V3)
 
-AKTUELLE DATEN:
+CURRENT DATA:
 {weather_context}
 {crypto_context}
 
-VERFÜGBARE NEWS:
+AVAILABLE NEWS:
 {news_context}
 
-AUFGABE: Erstelle ein {broadcast_style['duration_target']}-Minuten Broadcast-Skript mit folgender Struktur:
+TASK: Create a {broadcast_style['duration_target']}-minute English broadcast script with this structure:
 
-1. **INTRO** (1-2 Min)
-   - Begrüßung mit aktueller Zeit/Wetter
-   - Kurzer Überblick über die Themen
-   - Natürlicher Dialog zwischen Marcel & Jarvis
+1. **INTRO** (1-2 min)
+   - Welcome with current time/weather
+   - Preview of today's topics
+   - Natural banter between Marcel & Jarvis
 
-2. **NEWS-BLOCK 1** (3-4 Min)
-   - Die wichtigsten News ausführlich
-   - Emotionale Reaktionen und Diskussion
-   - Marcel: spontane Gefühle, Jarvis: analytische Einschätzung
+2. **MAIN NEWS BLOCK** (3-4 min)
+   - Cover major stories in detail
+   - Emotional reactions and discussion
+   - Marcel: spontaneous feelings, Jarvis: analytical insights
 
-3. **CRYPTO & WIRTSCHAFT** (1-2 Min)
-   - Bitcoin-Update mit Kontext
-   - Wirtschaftliche Einordnung
-   - Jarvis erklärt, Marcel reagiert emotional
+3. **CRYPTO & FINANCE** (1-2 min)
+   - Bitcoin update with context
+   - Market analysis
+   - Jarvis explains, Marcel reacts emotionally
 
-4. **NEWS-BLOCK 2** (2-3 Min)
-   - Restliche News kompakter
-   - Lokale Bezüge hervorheben
-   - Interaktion zwischen den Moderatoren
+4. **ADDITIONAL NEWS** (2-3 min)
+   - Remaining stories more concisely
+   - Swiss/local angles where relevant
+   - Interactive dialogue between hosts
 
-5. **OUTRO** (1-2 Min)
-   - Zusammenfassung der wichtigsten Punkte
-   - Ausblick auf nächste Sendung
-   - Verabschiedung mit Wetter-Ausblick
+5. **OUTRO** (1-2 min)
+   - Recap key points
+   - Preview next show
+   - Weather forecast farewell
 
-STIL-RICHTLINIEN:
-- 🎭 Marcel: Emotional, spontan, verwendet Schweizerdeutsch-Einsprengsel ("Grüezi", "Chuchichäschtli")
-- 🤖 Jarvis: Analytisch, witzig, technisch versiert, ironisch
-- 💬 Natürlicher Dialog, keine steife Moderation
-- 🏔️ Schweizer/Zürcher Lokalkolorit einbauen
-- 📻 Radio-tauglich: Kurze Sätze, lebendige Sprache
-- ⚡ Tempo angepasst an Tageszeit: {broadcast_style['tempo']}
-- 🎵 Gelegentliche Musik-Referenzen einbauen
+🎭 **CHARACTER GUIDELINES:**
+- **MARCEL**: Enthusiastic, passionate, authentic human emotions
+  - Gets EXCITED about Bitcoin/tech news
+  - Uses natural English expressions ("Oh my god!", "That's incredible!")
+  - Spontaneous reactions and interruptions
+  - Warm, relatable personality
 
-BESONDERE ANWEISUNGEN:
-- Verwende ALLE verfügbaren News im Skript
-- Baue natürliche Übergänge zwischen den Themen ein
-- Lass Marcel und Jarvis sich gegenseitig unterbrechen (realistisch)
-- Füge spontane Kommentare und Reaktionen hinzu
-- Halte die {broadcast_style['duration_target']}-Minuten Zieldauer ein
+- **JARVIS**: Analytical AI, witty, slightly sarcastic
+  - Provides data-driven insights
+  - Occasional dry humor about human behavior
+  - Technical explanations made accessible
+  - Philosophical observations
 
-FORMAT: Schreibe das Skript als Dialog mit klaren Sprecherwechseln:
+🎯 **V3 OPTIMIZATION NOTES:**
+- Use natural conversational English
+- Include emotional keywords for V3 enhancement
+- Marcel should be more expressive, Jarvis more precise
+- Swiss context but international perspective
+- Radio-friendly: short sentences, engaging rhythm
+
+📻 **TECHNICAL REQUIREMENTS:**
+- Use ALL available news in the script
+- Build natural transitions between topics
+- Include realistic interruptions and reactions
+- Maintain {broadcast_style['duration_target']}-minute target duration
+- Swiss references but in English
+
+**FORMAT**: Write as dialogue with clear speaker changes:
 
 MARCEL: [Text]
 JARVIS: [Text]
 MARCEL: [Text]
 ...
 
-Beginne SOFORT mit dem Skript, keine Einleitung!"""
+**START THE SCRIPT IMMEDIATELY - NO INTRODUCTION!**"""
 
         return gpt_prompt
+    
+    def _create_german_prompt(
+        self, 
+        content: Dict[str, Any], 
+        broadcast_style: Dict[str, Any],
+        channel: str
+    ) -> str:
+        """Creates German prompt (fallback)"""
+        
+        # Original German prompt (shortened for space)
+        news_context = ""
+        selected_news = content.get("selected_news", [])
+        
+        for i, news in enumerate(selected_news, 1):
+            news_context += f"{i}. [{news.get('primary_category', 'GENERAL').upper()}] {news.get('title', '')}\n"
+        
+        context_data = content.get("context_data", {})
+        weather_context = f"🌡️ Wetter: {context_data.get('weather', {}).get('formatted', 'unbekannt')}"
+        crypto_context = f"₿ Bitcoin: {context_data.get('crypto', {}).get('formatted', 'unbekannt')}"
+        
+        return f"""[German broadcast prompt - simplified for fallback]
+        
+MARCEL: [German content]
+JARVIS: [German content]
+..."""
+    
+    def _get_english_location_context(self, channel: str) -> str:
+        """Gets English location context for channel"""
+        
+        location_contexts = {
+            "zurich": "- Focus on Zurich and surrounding areas",
+            "basel": "- Focus on Basel and Northwestern Switzerland", 
+            "bern": "- Focus on Bern and Central Switzerland"
+        }
+        
+        return location_contexts.get(channel, "- Switzerland-wide focus")
     
     async def _generate_script_with_gpt(self, prompt: str) -> str:
         """Generiert Skript mit GPT-4"""

@@ -17,10 +17,10 @@ from datetime import datetime, timedelta
 from typing import Dict, Any, List, Optional
 from loguru import logger
 
-from .rss_feed_manager import RSSFeedManager
+from .rss_service import RSSService
 from .weather_service import WeatherService
 from .crypto_service import CoinMarketCapService
-from .twitter_service import TwitterService
+# Twitter service removed - no longer used
 
 
 class DataCollectionService:
@@ -32,10 +32,10 @@ class DataCollectionService:
     """
     
     def __init__(self):
-        self.rss_manager = RSSFeedManager()
+        self.rss_service = RSSService()
         self.weather_service = WeatherService()
         self.crypto_service = CoinMarketCapService()
-        self.twitter_service = TwitterService()
+        # self.twitter_service = TwitterService()  # Removed - no longer used
         
         # Konfiguration
         self.config = {
@@ -150,7 +150,7 @@ class DataCollectionService:
         
         # Test RSS Feeds
         try:
-            test_feeds = await self.rss_manager.load_feed_configs("zurich")
+            test_feeds = await self.rss_service.get_feeds_for_channel("zurich")
             results["rss_feeds"] = len(test_feeds) > 0
         except Exception as e:
             logger.error(f"RSS Test Fehler: {e}")
@@ -172,10 +172,10 @@ class DataCollectionService:
             logger.error(f"Crypto Test Fehler: {e}")
             results["crypto_service"] = False
         
-        # Test Twitter Service
+        # Test Twitter Service - DISABLED (service removed)
         try:
-            twitter_status = await self.twitter_service.test_connection()
-            results["twitter_service"] = twitter_status
+            logger.info("🐦 Twitter Service deaktiviert")
+            results["twitter_service"] = False
         except Exception as e:
             logger.error(f"Twitter Test Fehler: {e}")
             results["twitter_service"] = False
@@ -187,40 +187,40 @@ class DataCollectionService:
     
     async def _collect_news_safe(self, channel: str, max_age_hours: int) -> List[Dict[str, Any]]:
         """Sammelt News mit Fehlerbehandlung"""
+        
+        logger.info(f"📰 Sammle News für Kanal '{channel}' (max {max_age_hours}h alt)")
+        
         try:
-            # Lade Feed-Konfigurationen
-            feed_configs = await self.rss_manager.load_feed_configs(channel)
+            # Verwende die neue RSSService API
+            news_items = await self.rss_service.get_recent_news(
+                channel=channel,
+                max_age_hours=max_age_hours
+            )
             
-            if not feed_configs:
-                logger.warning(f"⚠️ Keine RSS-Feeds für Kanal '{channel}' gefunden")
+            if not news_items:
+                logger.warning(f"⚠️ Keine News für Kanal '{channel}' gefunden")
                 return []
             
-            # Sammle News von allen Feeds
+            # Konvertiere zu Dictionary format
             all_news = []
-            for config in feed_configs:
-                if config.get("is_active", True):
-                    try:
-                        feed_news = await self.rss_manager.fetch_feed_news(
-                            config["feed_url"],
-                            max_age_hours=max_age_hours
-                        )
+            for item in news_items:
+                try:
+                    if hasattr(item, '__dict__'):
+                        news_dict = item.__dict__.copy()
                         
-                        # Füge Metadaten hinzu
-                        for news in feed_news:
-                            news.update({
-                                "source_name": config["source_name"],
-                                "feed_category": config["feed_category"],
-                                "priority": config.get("priority", 5),
-                                "weight": config.get("weight", 1.0)
-                            })
+                        # Konvertiere datetime zu string
+                        if hasattr(item, 'published') and item.published:
+                            news_dict['published'] = item.published.isoformat()
+                        if hasattr(item, 'collected_at') and item.collected_at:
+                            news_dict['collected_at'] = item.collected_at.isoformat()
                         
-                        all_news.extend(feed_news)
+                        all_news.append(news_dict)
                         
-                    except Exception as e:
-                        logger.warning(f"⚠️ Fehler bei Feed {config['source_name']}: {e}")
-                        continue
+                except Exception as e:
+                    logger.warning(f"⚠️ Fehler bei News-Item Konvertierung: {e}")
+                    continue
             
-            logger.info(f"📰 {len(all_news)} News von {len(feed_configs)} Feeds gesammelt")
+            logger.info(f"📰 {len(all_news)} News erfolgreich gesammelt")
             return all_news
             
         except Exception as e:
@@ -271,18 +271,10 @@ class DataCollectionService:
             return None
     
     async def _collect_twitter_safe(self, channel: str) -> Optional[List[Dict[str, Any]]]:
-        """Sammelt Twitter-Daten mit Fehlerbehandlung"""
+        """Sammelt Twitter-Daten mit Fehlerbehandlung - DISABLED"""
         try:
-            # Definiere Suchbegriffe basierend auf Kanal
-            search_terms = self._get_twitter_terms_for_channel(channel)
-            
-            tweets = await self.twitter_service.search_tweets(
-                query=" OR ".join(search_terms),
-                max_results=10
-            )
-            
-            logger.info(f"🐦 {len(tweets) if tweets else 0} Tweets gesammelt")
-            return tweets
+            logger.info("🐦 Twitter Service deaktiviert - keine Tweets gesammelt")
+            return None
             
         except Exception as e:
             logger.error(f"❌ Fehler bei Twitter-Sammlung: {e}")

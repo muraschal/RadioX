@@ -18,9 +18,11 @@ from datetime import datetime, timedelta
 from typing import Dict, Any, List, Optional
 from loguru import logger
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv()
+# Load environment variables from ROOT directory
+load_dotenv(Path(__file__).parent.parent.parent.parent / '.env')
 
 
 class CoinMarketCapService:
@@ -32,7 +34,14 @@ class CoinMarketCapService:
     """
     
     def __init__(self):
-        self.api_key = os.getenv('COINMARKETCAP_API_KEY')
+        # Import centralized settings
+        import sys
+        from pathlib import Path
+        sys.path.append(str(Path(__file__).parent.parent))
+        from config.settings import get_settings
+        
+        settings = get_settings()
+        self.api_key = settings.coinmarketcap_api_key
         self.base_url = "https://pro-api.coinmarketcap.com/v1"
         
         # Konfiguration

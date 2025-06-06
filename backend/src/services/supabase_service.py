@@ -39,13 +39,20 @@ class SupabaseService:
     """Supabase Service für RadioX"""
     
     def __init__(self):
-        # Prüfe beide Varianten der Environment-Variablen
-        self.supabase_url = os.getenv('NEXT_PUBLIC_SUPABASE_URL') or os.getenv('SUPABASE_URL')
-        self.supabase_key = os.getenv('NEXT_PUBLIC_SUPABASE_ANON_KEY') or os.getenv('SUPABASE_ANON_KEY')
+        # Lade Environment-Variablen (mehrere Varianten für Kompatibilität)
+                # Import centralized settings
+        import sys
+        from pathlib import Path
+        sys.path.append(str(Path(__file__).parent.parent))
+        from config.settings import get_settings
+        
+        settings = get_settings()
+        self.supabase_url = settings.supabase_url
+        self.supabase_key = settings.supabase_anon_key
         
         if not self.supabase_url or not self.supabase_key:
             logger.error("❌ Supabase Credentials nicht gefunden!")
-            logger.info("💡 Prüfe NEXT_PUBLIC_SUPABASE_URL und NEXT_PUBLIC_SUPABASE_ANON_KEY in der .env Datei")
+            logger.info("💡 Prüfe PUBLIC_SUPABASE_URL und PUBLIC_SUPABASE_ANON_KEY in der .env Datei")
             logger.info(f"🔍 SUPABASE_URL: {'✅ gefunden' if self.supabase_url else '❌ fehlt'}")
             logger.info(f"🔍 SUPABASE_ANON_KEY: {'✅ gefunden' if self.supabase_key else '❌ fehlt'}")
             raise ValueError("❌ Supabase Credentials fehlen!")

@@ -1,0 +1,41 @@
+#!/usr/bin/expect -f
+
+set timeout 60
+set track [lindex $argv 0]
+
+# Starte rip search
+spawn rip search tidal track $track
+
+# Warte auf "SPACE - select" oder ähnliche Meldung
+expect {
+    "SPACE - select, ENTER - download, ESC - exit" {
+        # Drücke SPACE für Track 1, dann ENTER für Download
+        send " "
+        sleep 1
+        send "\r"
+        
+        # Warte auf Download-Abschluss oder nächste Eingabe
+        expect {
+            "Successfully downloaded" { 
+                puts "✅ Download erfolgreich"
+                exit 0 
+            }
+            "Failed to download" { 
+                puts "❌ Download fehlgeschlagen"
+                exit 1 
+            }
+            timeout { 
+                puts "⏰ Timeout"
+                exit 1 
+            }
+        }
+    }
+    "No results found" {
+        puts "❌ Keine Ergebnisse"
+        exit 1
+    }
+    timeout {
+        puts "⏰ Timeout beim Warten auf Ergebnisse"
+        exit 1
+    }
+}

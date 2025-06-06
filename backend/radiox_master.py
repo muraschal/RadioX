@@ -61,7 +61,8 @@ class RadioXMaster:
         channel: str = "zurich",
         news_count: int = 4,
         max_news_age: int = 1,
-        generate_audio: bool = False
+        generate_audio: bool = False,
+        language: str = "en"
     ) -> Dict[str, Any]:
         """
         Generiert einen kompletten Broadcast
@@ -72,12 +73,13 @@ class RadioXMaster:
             news_count: Anzahl News für den Broadcast
             max_news_age: Maximales Alter der News in Stunden
             generate_audio: Ob Audio-Dateien generiert werden sollen
+            language: Sprache des Broadcasts (de, en)
             
         Returns:
             Dict mit allen Broadcast-Daten
         """
         
-        logger.info("🎙️ RADIOX MASTER - STARTE BROADCAST-GENERIERUNG")
+        logger.info(f"🎙️ RADIOX MASTER V3 - {'🇺🇸 ENGLISH' if language == 'en' else '🇩🇪 GERMAN'} BROADCAST GENERATION")
         logger.info("=" * 60)
         
         try:
@@ -97,19 +99,22 @@ class RadioXMaster:
             )
             
             # 3. BROADCAST-GENERIERUNG
-            logger.info("🎭 Phase 3: Broadcast-Generierung")
+            logger.info(f"🎭 Phase 3: {'🇺🇸 English V3' if language == 'en' else '🇩🇪 German'} Broadcast Generation")
             broadcast_script = await self.broadcast_generator.generate_broadcast(
                 content=processed_content,
                 target_time=target_time,
-                channel=channel
+                channel=channel,
+                language=language
             )
             
-            # 4. AUDIO-GENERIERUNG (optional)
+            # 4. AUDIO-GENERIERUNG MIT COVER (optional)
             audio_files = None
             if generate_audio:
-                logger.info("🔊 Phase 4: Audio-Generierung")
-                audio_files = await self.audio_generator.generate_audio(
-                    script=broadcast_script
+                logger.info("🔊🎨 Phase 4: Audio- und Cover-Generierung")
+                audio_files = await self.audio_generator.generate_audio_with_cover(
+                    script=broadcast_script,
+                    broadcast_content=processed_content,
+                    target_time=target_time
                 )
             
             # 5. SYSTEM-MONITORING
@@ -252,6 +257,7 @@ async def main():
     
     parser.add_argument("--time", help="Zielzeit für Broadcast (HH:MM)")
     parser.add_argument("--channel", default="zurich", help="Radio-Kanal")
+    parser.add_argument("--language", choices=["de", "en"], default="en", help="Language: English (en) or German (de)")
     parser.add_argument("--news-count", type=int, default=4, help="Anzahl News")
     parser.add_argument("--max-age", type=int, default=1, help="Max. News-Alter (Stunden)")
     parser.add_argument("--generate-audio", action="store_true", help="Audio generieren")
@@ -276,7 +282,8 @@ async def main():
                 channel=args.channel,
                 news_count=args.news_count,
                 max_news_age=args.max_age,
-                generate_audio=args.generate_audio
+                generate_audio=args.generate_audio,
+                language=args.language
             )
             
         elif args.action == "analyze_news":

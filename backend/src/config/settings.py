@@ -12,9 +12,8 @@ class Settings(BaseSettings):
     """RadioX Konfiguration"""
     
     # Supabase
-    supabase_url: str = "https://your-project.supabase.co"
-    supabase_key: str = "your-anon-key"
-    supabase_anon_key: Optional[str] = None
+    supabase_url: Optional[str] = None
+    supabase_anon_key: Optional[str] = None  
     supabase_service_role_key: Optional[str] = None
     
     # OpenAI
@@ -22,6 +21,14 @@ class Settings(BaseSettings):
     
     # ElevenLabs
     elevenlabs_api_key: Optional[str] = None
+    elevenlabs_marcel_voice_id: Optional[str] = None
+    elevenlabs_jarvis_voice_id: Optional[str] = None
+    
+    # CoinMarketCap
+    coinmarketcap_api_key: Optional[str] = None
+    
+    # Weather API
+    weather_api_key: Optional[str] = None
     
     # Twitter/X (alte und neue Feldnamen)
     twitter_bearer_token: Optional[str] = None
@@ -70,6 +77,8 @@ def get_settings() -> Settings:
         print(f"🔑 Settings geladen:")
         print(f"   OpenAI API Key: {'✅ Vorhanden' if _settings.openai_api_key else '❌ Fehlt'}")
         print(f"   ElevenLabs API Key: {'✅ Vorhanden' if _settings.elevenlabs_api_key else '❌ Fehlt'}")
-        print(f"   Supabase URL: {'✅ Vorhanden' if _settings.supabase_url != 'https://your-project.supabase.co' else '❌ Standard'}")
+        print(f"   CoinMarketCap API Key: {'✅ Vorhanden' if _settings.coinmarketcap_api_key else '❌ Fehlt'}")
+        print(f"   Weather API Key: {'✅ Vorhanden' if _settings.weather_api_key else '❌ Fehlt'}")
+        print(f"   Supabase URL: {'✅ Vorhanden' if _settings.supabase_url else '❌ Fehlt'}")
         print(f"   Twitter Bearer: {'✅ Vorhanden' if _settings.x_bearer_token else '❌ Fehlt'}")
     return _settings 

@@ -76,8 +76,17 @@ class WeatherService:
     async def get_current_weather(self, location: str = "zurich") -> Optional[CurrentWeather]:
         """Aktuelles Wetter für eine Stadt abrufen"""
         try:
+            # Normalisiere Stadt-Namen (handle verschiedene Schreibweisen)
+            location_mapping = {
+                "zürich": "zurich",
+                "zuerich": "zurich",
+                "Zürich": "zurich",
+                "Zuerich": "zurich"
+            }
+            location = location_mapping.get(location, location.lower())
+            
             if location not in self.locations:
-                logger.warning(f"Unbekannte Stadt: {location}")
+                logger.warning(f"Unbekannte Stadt: {location}, verwende Fallback: zurich")
                 location = "zurich"  # Fallback
             
             loc = self.locations[location]
