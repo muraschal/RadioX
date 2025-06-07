@@ -29,7 +29,7 @@ class ContentCombinerService:
     
     def __init__(self):
         # Output-Verzeichnisse
-        self.output_dir = Path("output/final")
+        self.output_dir = Path("outplay/final")
         self.output_dir.mkdir(parents=True, exist_ok=True)
         
         # Kombination-Konfiguration

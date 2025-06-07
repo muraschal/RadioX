@@ -34,7 +34,7 @@ class ImageGenerationService:
         self.dall_e_base_url = "https://api.openai.com/v1/images/generations"
         
         # Output-Verzeichnis - DIREKT IM ROOT (nicht in backend/)
-        self.output_dir = Path(__file__).parent.parent.parent.parent / "output"
+        self.output_dir = Path(__file__).parent.parent.parent.parent / "outplay"
         self.output_dir.mkdir(parents=True, exist_ok=True)
         
         # Cover-Konfiguration

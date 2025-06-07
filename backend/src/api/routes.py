@@ -9,7 +9,7 @@ from pathlib import Path
 router = APIRouter()
 
 # Output-Verzeichnis
-OUTPUT_DIR = Path(__file__).parent.parent.parent.parent / "output"
+OUTPUT_DIR = Path(__file__).parent.parent.parent.parent / "outplay"
 
 @router.get("/api/latest-broadcast")
 async def get_latest_broadcast():

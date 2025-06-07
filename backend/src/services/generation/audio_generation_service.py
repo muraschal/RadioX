@@ -68,7 +68,7 @@ class AudioGenerationService:
         ]
         
         # Output-Verzeichnis - DIREKT IM ROOT (nicht in backend/)
-        self.output_dir = Path(__file__).parent.parent.parent.parent / "output"
+        self.output_dir = Path(__file__).parent.parent.parent.parent / "outplay"
         self.output_dir.mkdir(parents=True, exist_ok=True)
     
     async def get_voice_with_fallback(self, speaker_name: str) -> Optional[Dict[str, Any]]:
@@ -1052,8 +1052,18 @@ Thanks for tuning in to RadioX AI News!"""
             final_filename = f"RadioX_{channel}_{date_str}_{time_str}"
             
             # 2. Finale Verzeichnisse erstellen
-            final_dir = Path("output/final")
+            final_dir = Path("outplay/final")
             final_dir.mkdir(parents=True, exist_ok=True)
+            
+            # Erstelle Unterverzeichnisse
+            audio_dir = final_dir / "audio"
+            covers_dir = final_dir / "covers"
+            audio_dir.mkdir(exist_ok=True)
+            covers_dir.mkdir(exist_ok=True)
+            
+            # Sammle alle Dateien
+            output_audio_dir = Path("outplay/audio")
+            output_covers_dir = Path("outplay/covers")
             
             # 3. MP3 mit Cover und Metadaten erstellen
             final_mp3_path = final_dir / f"{final_filename}.mp3"
@@ -1148,8 +1158,8 @@ Thanks for tuning in to RadioX AI News!"""
                 files_to_delete.append(original_cover_file)
             
             # 3. Alle anderen Session-bezogenen Dateien finden
-            output_audio_dir = Path("output/audio")
-            output_covers_dir = Path("output/covers")
+            output_audio_dir = Path("outplay/audio")
+            output_covers_dir = Path("outplay/covers")
             
             # Session-ID Pattern (erste 8 Zeichen)
             session_short = session_id[:8] if len(session_id) >= 8 else session_id
@@ -1348,7 +1358,7 @@ Thanks for tuning in to RadioX AI News!"""
                 files_to_delete.append(cover_file)
             
             # 2. Alle anderen Session-bezogenen Dateien im Output-Verzeichnis finden
-            output_dir = Path(__file__).parent.parent.parent.parent / "output"
+            output_dir = Path(__file__).parent.parent.parent.parent / "outplay"
             
             # Session-ID Pattern (erste 8 Zeichen)
             session_short = session_id[:8] if len(session_id) >= 8 else session_id

@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📰 RadioX RSS Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #2c3e50;
+        }
+        .container { max-width: 1400px; margin: 0 auto; background: rgba(255,255,255,0.95); border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; padding: 30px; text-align: center; }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; padding: 30px; background: #f8f9fa; }
+        .stat-card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: center; }
+        .stat-card .icon { font-size: 3em; margin-bottom: 15px; }
+        .stat-card .number { font-size: 2.5em; font-weight: bold; color: #2c3e50; margin-bottom: 10px; }
+        .stat-card .label { font-size: 1.1em; color: #7f8c8d; text-transform: uppercase; letter-spacing: 1px; }
+        .content { padding: 30px; }
+        .section { background: white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-bottom: 30px; overflow: hidden; }
+        .section-header { background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: white; padding: 20px; font-size: 1.5em; font-weight: bold; }
+        .news-table { width: 100%; border-collapse: collapse; }
+        .news-table th { background: #34495e; color: white; padding: 15px; text-align: left; font-weight: 600; }
+        .news-table td { padding: 15px; border-bottom: 1px solid #ecf0f1; vertical-align: top; }
+        .news-table tr:hover { background: #f8f9fa; }
+        .source-badge { padding: 4px 12px; border-radius: 12px; font-weight: bold; text-transform: uppercase; font-size: 0.8em; color: white; }
+        .source-nzz { background: #e74c3c; }
+        .source-20min { background: #f39c12; }
+        .source-srf { background: #27ae60; }
+        .source-tagesanzeiger { background: #8e44ad; }
+        .source-cash { background: #2ecc71; }
+        .source-heise { background: #34495e; }
+        .source-cointelegraph { background: #f1c40f; color: black; }
+        .source-techcrunch { background: #1abc9c; }
+        .source-theverge { background: #9b59b6; }
+        .source-rt { background: #e67e22; }
+        .source-bbc { background: #c0392b; }
+        .news-link { color: #3498db; text-decoration: none; font-weight: bold; }
+        .news-link:hover { color: #2980b9; }
+        .timestamp { text-align: center; padding: 20px; background: #ecf0f1; color: #7f8c8d; font-style: italic; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📰 RadioX RSS Dashboard</h1>
+            <div style="font-size: 1.2em; opacity: 0.9;">Alle RSS-Feeds im Überblick</div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="icon">📰</div>
+                <div class="number">121</div>
+                <div class="label">Artikel Total</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">📡</div>
+                <div class="number">12</div>
+                <div class="label">Aktive Quellen</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">🏷️</div>
+                <div class="number">10</div>
+                <div class="label">Kategorien</div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <div class="section-header">📊 Quellen-Verteilung</div>
+                <div style="padding: 20px;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+                <div style="background: #ecf0f1; padding: 15px; border-radius: 8px; text-align: center;">
+                    <div class="source-badge source-Srf" style="display: inline-block; margin-bottom: 8px;">Srf</div>
+                    <div style="font-size: 1.5em; font-weight: bold; color: #2c3e50;">44</div>
+                    <div style="font-size: 0.9em; color: #7f8c8d;">Artikel</div>
+                </div>
+            
+                <div style="background: #ecf0f1; padding: 15px; border-radius: 8px; text-align: center;">
+                    <div class="source-badge source-Tagesanzeiger" style="display: inline-block; margin-bottom: 8px;">Tagesanzeiger</div>
+                    <div style="font-size: 1.5em; font-weight: bold; color: #2c3e50;">20</div>
+                    <div style="font-size: 0.9em; color: #7f8c8d;">Artikel</div>
+                </div>
+            
+                <div style="background: #ecf0f1; padding: 15px; border-radius: 8px; text-align: center;">
+                    <div class="source-badge source-20Min" style="display: inline-block; margin-bottom: 8px;">20Min</div>
+                    <div style="font-size: 1.5em; font-weight: bold; color: #2c3e50;">10</div>
+                    <div style="font-size: 0.9em; color: #7f8c8d;">Artikel</div>
+                </div>
+            
+                <div style="background: #ecf0f1; padding: 15px; border-radius: 8px; text-align: center;">
+                    <div class="source-badge source-Bbc" style="display: inline-block; margin-bottom: 8px;">Bbc</div>
+                    <div style="font-size: 1.5em; font-weight: bold; color: #2c3e50;">8</div>
+                    <div style="font-size: 0.9em; color: #7f8c8d;">Artikel</div>
+                </div>
+            
+                <div style="background: #ecf0f1; padding: 15px; border-radius: 8px; text-align: center;">
+                    <div class="source-badge source-Nzz" style="display: inline-block; margin-bottom: 8px;">Nzz</div>
+                    <div style="font-size: 1.5em; font-weight: bold; color: #2c3e50;">8</div>
+                    <div style="font-size: 0.9em; color: #7f8c8d;">Artikel</div>
+                </div>
+            
+                <div style="background: #ecf0f1; padding: 15px; border-radius: 8px; text-align: center;">
+                    <div class="source-badge source-Theverge" style="display: inline-block; margin-bottom: 8px;">Theverge</div>
+                    <div style="font-size: 1.5em; font-weight: bold; color: #2c3e50;">8</div>
+                    <div style="font-size: 0.9em; color: #7f8c8d;">Artikel</div>
+                </div>
+            
+                <div style="background: #ecf0f1; padding: 15px; border-radius: 8px; text-align: center;">
+                    <div class="source-badge source-Techcrunch" style="display: inline-block; margin-bottom: 8px;">Techcrunch</div>
+                    <div style="font-size: 1.5em; font-weight: bold; color: #2c3e50;">6</div>
+                    <div style="font-size: 0.9em; color: #7f8c8d;">Artikel</div>
+                </div>
+            
+                <div style="background: #ecf0f1; padding: 15px; border-radius: 8px; text-align: center;">
+                    <div class="source-badge source-Cash" style="display: inline-block; margin-bottom: 8px;">Cash</div>
+                    <div style="font-size: 1.5em; font-weight: bold; color: #2c3e50;">6</div>
+                    <div style="font-size: 0.9em; color: #7f8c8d;">Artikel</div>
+                </div>
+            
+                <div style="background: #ecf0f1; padding: 15px; border-radius: 8px; text-align: center;">
+                    <div class="source-badge source-Cointelegraph" style="display: inline-block; margin-bottom: 8px;">Cointelegraph</div>
+                    <div style="font-size: 1.5em; font-weight: bold; color: #2c3e50;">5</div>
+                    <div style="font-size: 0.9em; color: #7f8c8d;">Artikel</div>
+                </div>
+            
+                <div style="background: #ecf0f1; padding: 15px; border-radius: 8px; text-align: center;">
+                    <div class="source-badge source-Heise" style="display: inline-block; margin-bottom: 8px;">Heise</div>
+                    <div style="font-size: 1.5em; font-weight: bold; color: #2c3e50;">2</div>
+                    <div style="font-size: 0.9em; color: #7f8c8d;">Artikel</div>
+                </div>
+            
+                <div style="background: #ecf0f1; padding: 15px; border-radius: 8px; text-align: center;">
+                    <div class="source-badge source-Nzz Finanzen" style="display: inline-block; margin-bottom: 8px;">Nzz Finanzen</div>
+                    <div style="font-size: 1.5em; font-weight: bold; color: #2c3e50;">2</div>
+                    <div style="font-size: 0.9em; color: #7f8c8d;">Artikel</div>
+                </div>
+            
+                <div style="background: #ecf0f1; padding: 15px; border-radius: 8px; text-align: center;">
+                    <div class="source-badge source-Rt" style="display: inline-block; margin-bottom: 8px;">Rt</div>
+                    <div style="font-size: 1.5em; font-weight: bold; color: #2c3e50;">2</div>
+                    <div style="font-size: 0.9em; color: #7f8c8d;">Artikel</div>
+                </div>
+            </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">📰 Alle RSS-Artikel</div>
+                <table class="news-table">
+                    <thead>
+                        <tr>
+                            <th>Quelle</th>
+                            <th>Kategorie</th>
+                            <th>Titel</th>
+                            <th>Zusammenfassung</th>
+                            <th>Alter</th>
+                            <th>Link</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                <tr>
+                    <td><span class="source-badge source-Tagesanzeiger">Tagesanzeiger</span></td>
+                    <td>schweiz</td>
+                    <td style="max-width: 400px;"><strong>Neuer John-Wick-Film im Kino: Eine Frau kämpft sich als Rächerin durch eine Killerwelt</strong></td>
+                    <td style="max-width: 300px;">Keanu Reeves ist zurück als John Wick im Action-Drama «Ballerina». Die tolle Ana de Armas ist die Heldin in einer lustvoll überdrehten Geschichte, in ...</td>
+                    <td>2h</td>
+                    <td><a href="https://www.tagesanzeiger.ch/ballerina-der-neue-film-mit-john-wick-spielt-in-oesterreich-770393596977" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Tagesanzeiger">Tagesanzeiger</span></td>
+                    <td>schweiz</td>
+                    <td style="max-width: 400px;"><strong>Kleidermarke in Schwierigkeiten: Schweizer Ökolabel Nikin: Mit Nachhaltigkeit in die Krise</strong></td>
+                    <td style="max-width: 300px;">Nikin wollte gross durchstarten und sammelte 5 Millionen Franken von Kleininvestoren ein. Doch zuletzt ging es umsatzmässig stark abwärts – wie lange ...</td>
+                    <td>2h</td>
+                    <td><a href="https://www.tagesanzeiger.ch/schweizer-oekolabel-nikin-mit-nachhaltigkeit-in-die-krise-398435225817" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Tagesanzeiger">Tagesanzeiger</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Kleidermarke in Schwierigkeiten: Schweizer Ökolabel Nikin: Mit Nachhaltigkeit in die Krise</strong></td>
+                    <td style="max-width: 300px;">Nikin wollte gross durchstarten und sammelte 5 Millionen Franken von Kleininvestoren ein. Doch zuletzt ging es umsatzmässig stark abwärts – wie lange ...</td>
+                    <td>2h</td>
+                    <td><a href="https://www.tagesanzeiger.ch/schweizer-oekolabel-nikin-mit-nachhaltigkeit-in-die-krise-398435225817" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Tagesanzeiger">Tagesanzeiger</span></td>
+                    <td>schweiz</td>
+                    <td style="max-width: 400px;"><strong>Interview zur Lage der Schweiz: «Das Bewusstsein, dass Freiheit und Sicherheit nicht gratis sind, ist nicht unbedingt vorhanden»</strong></td>
+                    <td style="max-width: 300px;">Markus Mäder ist der Chef der Schweizer Sicherheitspolitik. Er sagt, weshalb er damit rechnet, dass die USA unter Trump an Europas Seite bleiben – und...</td>
+                    <td>2h</td>
+                    <td><a href="https://www.tagesanzeiger.ch/markus-maeder-ueber-schweizer-sicherheitspolitik-usa-und-nato-694026410444" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Tagesanzeiger">Tagesanzeiger</span></td>
+                    <td>schweiz</td>
+                    <td style="max-width: 400px;"><strong>Neue Volksinitiative: Für mehr Biodiversität: Bakterien sollen in die Bundesverfassung</strong></td>
+                    <td style="max-width: 300px;">Eine Gruppe um den Liedermacher Linard Bardill und den Unternehmer Daniel Häni plant eine Initiative für fruchtbare Böden und gesunde Menschen. Verbot...</td>
+                    <td>2h</td>
+                    <td><a href="https://www.tagesanzeiger.ch/volksinitiative-zum-mikrobiom-bakterien-sollen-in-die-verfassung-145878106753" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Tagesanzeiger">Tagesanzeiger</span></td>
+                    <td>schweiz</td>
+                    <td style="max-width: 400px;"><strong>Umweltverbände sind entsetzt: 5 Rappen fürs Plastiksäckli: Detailhändler wollen Vereinbarung auflösen</strong></td>
+                    <td style="max-width: 300px;">Die grossen Ladenketten hatten sich auf Druck der Politik verpflichtet, die kleinen Säckli nicht mehr gratis abzugeben, um Plastikmüll zu reduzieren. ...</td>
+                    <td>2h</td>
+                    <td><a href="https://www.tagesanzeiger.ch/detailhaendler-wollen-plastiksaeckli-vertrag-kuenden-droht-nun-eine-saeckliflut-337488880340" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>England bodigt Andorra dank Kane – Österreich und «Oranje» siegen</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/f853e2.jpg" />Der Vize-Europameister mühte sich am Samstag in Barcelona zu einem 1:0 ...</td>
+                    <td>3h</td>
+                    <td><a href="https://www.srf.ch/sport/fussball/fussball-allgemein/round-up-wm-qualifikation-england-bodigt-andorra-dank-kane-oesterreich-und-oranje-siegen" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Bbc">Bbc</span></td>
+                    <td>international</td>
+                    <td style="max-width: 400px;"><strong>Biggest drone strike hits Ukraine's second city</strong></td>
+                    <td style="max-width: 300px;">At least three people were killed and dozens injured in Kharkiv in an overnight drone and missile attack....</td>
+                    <td>3h</td>
+                    <td><a href="https://www.bbc.com/news/articles/cwyjd1z8yg5o" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Bbc">Bbc</span></td>
+                    <td>international</td>
+                    <td style="max-width: 400px;"><strong>Six killed by Israeli gunfire near Gaza aid site, Hamas officials say</strong></td>
+                    <td style="max-width: 300px;">Dozens of Palestinians have been killed close to the controversial supply centre in Gaza....</td>
+                    <td>3h</td>
+                    <td><a href="https://www.bbc.com/news/articles/cy5evz4xdklo" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Techcrunch">Techcrunch</span></td>
+                    <td>latest</td>
+                    <td style="max-width: 400px;"><strong>iOS 19: All the rumored changes Apple could be bringing to its new operating system</strong></td>
+                    <td style="max-width: 300px;">As Apple prepares to unveil iOS 19 at WWDC 2025, several rumors have surfaced, including a potential new name for the operating system and more....</td>
+                    <td>3h</td>
+                    <td><a href="https://techcrunch.com/2025/06/07/ios-19-all-the-rumored-changes-apple-could-be-bringing-to-its-new-operating-system/" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Techcrunch">Techcrunch</span></td>
+                    <td>latest</td>
+                    <td style="max-width: 400px;"><strong>Trump administration takes aim at Biden and Obama cybersecurity rules</strong></td>
+                    <td style="max-width: 300px;">In a White House fact sheet, the administration claims that Biden’s Executive Order 14144 — signed days before the end of his presidency — was an atte...</td>
+                    <td>3h</td>
+                    <td><a href="https://techcrunch.com/2025/06/07/trump-administration-takes-aim-at-biden-and-obama-cybersecurity-rules/" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Heise">Heise</span></td>
+                    <td>tech</td>
+                    <td style="max-width: 400px;"><strong>X half ausprobiert und Sigmas Cine-Primes– Fotonews der Woche 23/2025</strong></td>
+                    <td style="max-width: 300px;">Fujis digitale Halbbild-Kamera simuliert analogen Workflow überzeugend, Sigma plant 13 Objektive für Filmer und alles über einen echten Klassiker....</td>
+                    <td>3h</td>
+                    <td><a href="https://www.heise.de/news/X-half-ausprobiert-und-Sigmas-Cine-Primes-Fotonews-der-Woche-23-2025-10436968.html?wt_mc=rss.red.ho.beitrag.rdf.beitrag.beitrag" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Tagesanzeiger">Tagesanzeiger</span></td>
+                    <td>schweiz</td>
+                    <td style="max-width: 400px;"><strong>Wende bei Rüstungsexporten: Ständeräte öffnen Tür für indirekte Waffenlieferungen in die Ukraine</strong></td>
+                    <td style="max-width: 300px;">Parlamentarier aus Mitte, FDP und SVP wollen die Ausfuhr von Schweizer Kriegsmaterial in viele Länder massiv vereinfachen. Die Linke droht mit dem Ref...</td>
+                    <td>3h</td>
+                    <td><a href="https://www.tagesanzeiger.ch/staenderat-oeffnet-tuere-fuer-indirekte-ruestungsexporte-in-die-ukraine-826429499587" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Bbc">Bbc</span></td>
+                    <td>international</td>
+                    <td style="max-width: 400px;"><strong>Trump says relationship with Musk is over</strong></td>
+                    <td style="max-width: 300px;">The US president says Musk has been "very disrespectful" and he has no interest in mending ties with the tech billionaire....</td>
+                    <td>3h</td>
+                    <td><a href="https://www.bbc.com/news/articles/c9wg240q0plo" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>news</td>
+                    <td style="max-width: 400px;"><strong>Athen fehlt es an Grünflächen – nun pflügt die Stadt um</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/8cd190.jpg" />Grünflächen verbessern laut der WHO Gesundheit und Wohlbefinden. In Gri...</td>
+                    <td>4h</td>
+                    <td><a href="https://www.srf.ch/news/international/fuer-besseres-stadtklima-athen-fehlt-es-an-gruenflaechen-nun-pfluegt-die-stadt-um" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Athen fehlt es an Grünflächen – nun pflügt die Stadt um</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/8cd190.jpg" />Grünflächen verbessern laut der WHO Gesundheit und Wohlbefinden. In Gri...</td>
+                    <td>4h</td>
+                    <td><a href="https://www.srf.ch/news/international/fuer-besseres-stadtklima-athen-fehlt-es-an-gruenflaechen-nun-pfluegt-die-stadt-um" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Nzz">Nzz</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Mächtiger als jeder Banker: Der Bundesrat stattet den Finma-Chef mit Superkräften aus</strong></td>
+                    <td style="max-width: 300px;">Geschäftsbereiche schliessen, Bonuszahlungen verbieten, die Bankführung auswechseln oder gleich die Dividende aussetzen: Die Finanzmarktaufsicht soll ...</td>
+                    <td>4h</td>
+                    <td><a href="https://www.nzz.ch/wirtschaft/ld.1887727" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Nzz">Nzz</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>INTERVIEW - Syngenta-Chef Jeff Rowe: «Unsere Performance war schlicht nicht gut genug»</strong></td>
+                    <td style="max-width: 300px;">Der kalte Krieg zwischen den USA und China trifft kein Unternehmen stärker als den Agrochemie-Giganten Syngenta. Der CEO Jeff Rowe erklärt im Intervie...</td>
+                    <td>4h</td>
+                    <td><a href="https://www.nzz.ch/wirtschaft/syngenta-chef-jeff-rowe-unsere-performance-war-schlicht-nicht-gut-genug-ld.1887690" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Nzz">Nzz</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Der Thermomix für Könner: Ein programmierbarer Topf aus der Schweiz will das Kochen vereinfachen</strong></td>
+                    <td style="max-width: 300px;">Das Zürcher Startup Wired Cooking hat einen App-gesteuerten Kochtopf entwickelt, der die Temperatur exakt kontrolliert. Das soll nicht nur beim Kochen...</td>
+                    <td>4h</td>
+                    <td><a href="https://www.nzz.ch/wirtschaft/der-thermomix-fuer-koenner-ein-programmierbarer-topf-aus-der-schweiz-will-das-kochen-vereinfachen-ld.1885802" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Nzz">Nzz</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Ein Fettfleck auf Andreas Caminadas perfekt gebügelter Kochschürze: Das «Igniv» in Bad Ragaz geht zu</strong></td>
+                    <td style="max-width: 300px;">Bislang baute der Bündner Spitzenkoch sein Imperium ohne sichtbare Rückschläge auf. Mit dem Aus des Zwei-Sterne-Restaurants zeigen sich nun Risse in s...</td>
+                    <td>4h</td>
+                    <td><a href="https://www.nzz.ch/wirtschaft/ein-fettfleck-auf-andreas-caminadas-perfekt-gebuegelter-kochschuerze-das-igniv-in-bad-ragaz-geht-zu-ld.1888053" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Nzz">Nzz</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>«Hohe Schweizer Kaufkraft»: Ein brisantes Statement bringt die Swiss in Erklärungsnot</strong></td>
+                    <td style="max-width: 300px;">Schweizer Flugpassagiere hegen schon lange den Verdacht, dass sie bei Lufthansa-Airlines einen Schweiz-Zuschlag bezahlen müssen. Nun scheint das Meile...</td>
+                    <td>4h</td>
+                    <td><a href="https://www.nzz.ch/wirtschaft/erhebt-die-lufthansa-einen-schweiz-zuschlag-ein-brisantes-statement-bringt-die-swiss-in-erklaerungsnot-ld.1887535" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Nzz">Nzz</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>KOMMENTAR - Die stille Schwester der AHV: Auch bei den Ergänzungsleistungen laufen die Kosten aus dem Ruder</strong></td>
+                    <td style="max-width: 300px;">Die Finanzierung der AHV bereitet derzeit viel Kopfzerbrechen. Dabei sollten aber auch die Ergänzungsleistungen nicht unter dem Radar bleiben....</td>
+                    <td>4h</td>
+                    <td><a href="https://www.nzz.ch/wirtschaft/die-stille-schwester-der-ahv-auch-bei-den-ergaenzungsleistungen-laufen-die-kosten-aus-dem-ruder-ld.1887687" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Nzz">Nzz</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Als Dank für die Subventionshilfe? Stahl Gerlafingen betraut den Sozialdemokraten Roger Nordmann mit Beratungsmandat</strong></td>
+                    <td style="max-width: 300px;">Roger Nordmann war zusammen mit dem SVP-Nationalrat Christian Imark die treibende Kraft hinter den umstrittenen Subventionen für die Stahlindustrie. E...</td>
+                    <td>4h</td>
+                    <td><a href="https://www.nzz.ch/wirtschaft/als-dank-fuer-die-subventionshilfe-stahl-gerlafingen-betraut-sozialdemokrat-roger-nordmann-mit-beratungsmandat-ld.1887526" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Nzz Finanzen">Nzz Finanzen</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Anleihenfonds mit fixem Ablaufdatum sind eine nützliche Innovation</strong></td>
+                    <td style="max-width: 300px;">Bei diesen Bond-ETF gibt es keine bösen Überraschungen: Investoren wissen gleich zu Beginn, wie viel Rendite sie über die gesamte Laufzeit erzielen kö...</td>
+                    <td>4h</td>
+                    <td><a href="https://www.nzz.ch/finanzen/anleihen-fonds-mit-fixem-ablaufdatum-sind-eine-nuetzliche-innovation-ld.1887936" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Techcrunch">Techcrunch</span></td>
+                    <td>latest</td>
+                    <td style="max-width: 400px;"><strong>WWDC 2025: What to expect from this year’s conference</strong></td>
+                    <td style="max-width: 300px;">At WWDC 2025, Apple will likely focus on the next iOS, which is rumored to have the most significant design change since the introduction of iOS 7....</td>
+                    <td>4h</td>
+                    <td><a href="https://techcrunch.com/2025/06/07/wwdc-2025-what-to-expect-from-this-years-conference/" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Bbc">Bbc</span></td>
+                    <td>international</td>
+                    <td style="max-width: 400px;"><strong>Andrew Tate caught speeding 146km/h over limit in Romania</strong></td>
+                    <td style="max-width: 300px;">A sports car driven by the controversial influencer clocked four times the speed limit in a 30mph zone....</td>
+                    <td>4h</td>
+                    <td><a href="https://www.bbc.com/news/articles/cy8dwwylpyxo" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>news</td>
+                    <td style="max-width: 400px;"><strong>Sabalenka spült Frust mit Zucker und Alkohol runter</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/1a8792.jpg" />Die Weltnummer 1 kann ihre Niederlage im French-Open-Final nicht fassen...</td>
+                    <td>4h</td>
+                    <td><a href="https://www.srf.ch/sport/tennis/grand-slam-turniere/nach-final-niederlage-bedient-sabalenka-spuelt-frust-mit-zucker-und-alkohol-runter" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Sabalenka spült Frust mit Zucker und Alkohol runter</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/1a8792.jpg" />Die Weltnummer 1 kann ihre Niederlage im French-Open-Final nicht fassen...</td>
+                    <td>4h</td>
+                    <td><a href="https://www.srf.ch/sport/tennis/grand-slam-turniere/nach-final-niederlage-bedient-sabalenka-spuelt-frust-mit-zucker-und-alkohol-runter" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>news</td>
+                    <td style="max-width: 400px;"><strong>In Afrika könnte ein neues Meer entstehen – schneller als gedacht</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/f0b517.jpg" />In Afrika driften zwei Erdplatten auseinander. Wie das zur Bildung eine...</td>
+                    <td>5h</td>
+                    <td><a href="https://www.srf.ch/news/tektonische-plattenbewegungen-in-afrika-koennte-ein-neues-meer-entstehen-schneller-als-gedacht" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>In Afrika könnte ein neues Meer entstehen – schneller als gedacht</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/f0b517.jpg" />In Afrika driften zwei Erdplatten auseinander. Wie das zur Bildung eine...</td>
+                    <td>5h</td>
+                    <td><a href="https://www.srf.ch/news/tektonische-plattenbewegungen-in-afrika-koennte-ein-neues-meer-entstehen-schneller-als-gedacht" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Theverge">Theverge</span></td>
+                    <td>tech</td>
+                    <td style="max-width: 400px;"><strong>At the Bitcoin Conference, the Republicans were for sale</strong></td>
+                    <td style="max-width: 300px;">"I want to make a big announcement," said Faryar Shirzad, the chief policy officer of Coinbase, to a nearly empty room. His words echoed across the ma...</td>
+                    <td>5h</td>
+                    <td><a href="https://www.theverge.com/cryptocurrency/679685/bitcoin-conference-gop-takeover" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-20Min">20Min</span></td>
+                    <td>schweiz</td>
+                    <td style="max-width: 400px;"><strong>Schweizweit über 200 potenziell gefährliche Bergbereiche</strong></td>
+                    <td style="max-width: 300px;">Der Bergsturz in Blatten hat ein neues Schlaglicht auf die Gefahren in den Alpen geworfen. An zahlreichen weiteren Orten sehen die Behörden Gefahren u...</td>
+                    <td>5h</td>
+                    <td><a href="https://www.20min.ch/story/bergstuerze-schweizweit-ueber-200-potenziell-gefaehrliche-bergbereiche-103359533" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>news</td>
+                    <td style="max-width: 400px;"><strong>Warum verzichten Senioren weiterhin auf Internet und Smartphone?</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/6ad441.jpg" />Eine Studie zeigt: Noch immer sind viele Seniorinnen nicht online. Pete...</td>
+                    <td>5h</td>
+                    <td><a href="https://www.srf.ch/news/schweiz/neue-studie-von-pro-senectute-warum-verzichten-senioren-weiterhin-auf-internet-und-smartphone" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Warum verzichten Senioren weiterhin auf Internet und Smartphone?</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/6ad441.jpg" />Eine Studie zeigt: Noch immer sind viele Seniorinnen nicht online. Pete...</td>
+                    <td>5h</td>
+                    <td><a href="https://www.srf.ch/news/schweiz/neue-studie-von-pro-senectute-warum-verzichten-senioren-weiterhin-auf-internet-und-smartphone" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>news</td>
+                    <td style="max-width: 400px;"><strong>Nach Stau reichem Tag: Verkehr beim Gotthard-Nordportal fliesst</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/59f7761.jpg" />Am Vormittag stauten sich die Fahrzeuge in Richtung Süden zeitweise au...</td>
+                    <td>5h</td>
+                    <td><a href="https://www.srf.ch/news/schweiz/alle-wollten-in-den-sueden-nach-stau-reichem-tag-verkehr-beim-gotthard-nordportal-fliesst" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Nach Stau reichem Tag: Verkehr beim Gotthard-Nordportal fliesst</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/59f7761.jpg" />Am Vormittag stauten sich die Fahrzeuge in Richtung Süden zeitweise au...</td>
+                    <td>5h</td>
+                    <td><a href="https://www.srf.ch/news/schweiz/alle-wollten-in-den-sueden-nach-stau-reichem-tag-verkehr-beim-gotthard-nordportal-fliesst" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Nach Stau reichem Tag: Verkehr beim Gotthard-Nordportal fliesst</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/59f7761.jpg" />Am Vormittag stauten sich die Fahrzeuge in Richtung Süden zeitweise au...</td>
+                    <td>5h</td>
+                    <td><a href="https://www.srf.ch/news/schweiz/alle-wollten-in-den-sueden-nach-stau-reichem-tag-verkehr-beim-gotthard-nordportal-fliesst" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-20Min">20Min</span></td>
+                    <td>schweiz</td>
+                    <td style="max-width: 400px;"><strong>Nigerianer (39) tot: Bruder nennt Polizeieinsatz «barbarisch»</strong></td>
+                    <td style="max-width: 300px;">In Lausanne forderten am Samstag rund 1000 Menschen Gerechtigkeit für den nach einer Polizeikontrolle verstorbenen Kenechukwu. Sein Bruder spricht von...</td>
+                    <td>6h</td>
+                    <td><a href="https://www.20min.ch/story/lausanne-nigerianer-starb-nach-polizeikontrolle-demos-und-strafverfahren-103360173" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>news</td>
+                    <td style="max-width: 400px;"><strong>Budgetkürzungen für die humanitäre UNO-Hilfe sorgen für Unruhe</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/cdb618.jpg" />Zahlreiche Länder streichen ihre Budgets für die Entwicklungshilfe. Ein...</td>
+                    <td>6h</td>
+                    <td><a href="https://www.srf.ch/news/international/humanitaere-hilfe-budgetkuerzungen-fuer-die-humanitaere-uno-hilfe-sorgen-fuer-unruhe" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Budgetkürzungen für die humanitäre UNO-Hilfe sorgen für Unruhe</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/cdb618.jpg" />Zahlreiche Länder streichen ihre Budgets für die Entwicklungshilfe. Ein...</td>
+                    <td>6h</td>
+                    <td><a href="https://www.srf.ch/news/international/humanitaere-hilfe-budgetkuerzungen-fuer-die-humanitaere-uno-hilfe-sorgen-fuer-unruhe" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Bbc">Bbc</span></td>
+                    <td>international</td>
+                    <td style="max-width: 400px;"><strong>Liberia's ex-speaker charged with arson over parliament fire</strong></td>
+                    <td style="max-width: 300px;">The blaze broke out a day after protests over plans to oust former speaker Jonathan Fonati Koffa....</td>
+                    <td>6h</td>
+                    <td><a href="https://www.bbc.com/news/articles/cgq3j5nq15wo" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Erste Besucher vor Ort – Betroffene nehmen Augenschein</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/95a058.jpg" />Zehn Tage nach dem Gletscher-Abbruch ist das Walliser Lötschental wiede...</td>
+                    <td>6h</td>
+                    <td><a href="https://www.srf.ch/news/schweiz/katastrophe-im-loetschental-erste-besucher-vor-ort-betroffene-nehmen-augenschein" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-20Min">20Min</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Konsumentenforum warnt vor Ticket-Kauf bei Viagogo</strong></td>
+                    <td style="max-width: 300px;">Die Festivalsaison steht an. Wegen Problemen mit Tickets bei Viagogo häufen sich die Meldungen bei der Ombudsstelle. Konsumentenschützer raten vom Kau...</td>
+                    <td>6h</td>
+                    <td><a href="https://www.20min.ch/story/ticket-reseller-konsumentenforum-warnt-vor-ticket-kauf-bei-viagogo-103359171" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Techcrunch">Techcrunch</span></td>
+                    <td>latest</td>
+                    <td style="max-width: 400px;"><strong>Week in Review: Why Anthropic cut access to Windsurf</strong></td>
+                    <td style="max-width: 300px;">Welcome back to Week in Review! Got lots for you today, including why Windsurf lost access to Claude, ChatGPT&#8217;s new features, WWDC 2025, Elon Mu...</td>
+                    <td>6h</td>
+                    <td><a href="https://techcrunch.com/2025/06/07/week-in-review-why-anthropic-cut-access-to-windsurf/" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Theverge">Theverge</span></td>
+                    <td>tech</td>
+                    <td style="max-width: 400px;"><strong>8 games from the Wholesome Direct 2025 that you can play right now</strong></td>
+                    <td style="max-width: 300px;">The Wholesome Direct is always full of cute and charming games to keep an eye on for the future. But it's also a great place to find things to play no...</td>
+                    <td>6h</td>
+                    <td><a href="https://www.theverge.com/games/678265/wholesome-direct-2025-best-games-play-now" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Bbc">Bbc</span></td>
+                    <td>international</td>
+                    <td style="max-width: 400px;"><strong>Central Asia's tallest Lenin statue taken down</strong></td>
+                    <td style="max-width: 300px;">The monument to the Soviet patriarch will be replaced with a flagpole, authorities in Kyrgyzstan say....</td>
+                    <td>7h</td>
+                    <td><a href="https://www.bbc.com/news/articles/c201yy6gknpo" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Techcrunch">Techcrunch</span></td>
+                    <td>latest</td>
+                    <td style="max-width: 400px;"><strong>Will Musk vs. Trump affect xAI’s $5 billion debt deal?</strong></td>
+                    <td style="max-width: 300px;">While the online feud between Elon Musk and President Donald Trump seemed to drive traffic to Musk’s social media platform X (formerly Twitter), it co...</td>
+                    <td>7h</td>
+                    <td><a href="https://techcrunch.com/2025/06/07/will-musk-vs-trump-affect-xais-5-billion-debt-deal/" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>news</td>
+                    <td style="max-width: 400px;"><strong>Lausanne: Rund 1000 Menschen demonstrieren gegen «Polizeigewalt»</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/9e8cf9.jpg" />Zwei Wochen nach dem Tod eines 39-jährigen Nigerianers gehen erneut Leu...</td>
+                    <td>7h</td>
+                    <td><a href="https://www.srf.ch/news/schweiz/nach-tod-eines-mannes-lausanne-rund-1000-menschen-demonstrieren-gegen-polizeigewalt" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Lausanne: Rund 1000 Menschen demonstrieren gegen «Polizeigewalt»</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/9e8cf9.jpg" />Zwei Wochen nach dem Tod eines 39-jährigen Nigerianers gehen erneut Leu...</td>
+                    <td>7h</td>
+                    <td><a href="https://www.srf.ch/news/schweiz/nach-tod-eines-mannes-lausanne-rund-1000-menschen-demonstrieren-gegen-polizeigewalt" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>news</td>
+                    <td style="max-width: 400px;"><strong>Gauff feiert bei Sabalenkas Fehler-Orgie ihre Paris-Premiere</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/b2ca32.jpg" />Coco Gauff besiegt im Final von Paris die Weltnummer 1 Aryna Sabalenka ...</td>
+                    <td>7h</td>
+                    <td><a href="https://www.srf.ch/sport/tennis/grand-slam-turniere/french-open-final-frauen-gauff-feiert-bei-sabalenkas-fehler-orgie-ihre-paris-premiere" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Gauff feiert bei Sabalenkas Fehler-Orgie ihre Paris-Premiere</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/b2ca32.jpg" />Coco Gauff besiegt im Final von Paris die Weltnummer 1 Aryna Sabalenka ...</td>
+                    <td>7h</td>
+                    <td><a href="https://www.srf.ch/sport/tennis/grand-slam-turniere/french-open-final-frauen-gauff-feiert-bei-sabalenkas-fehler-orgie-ihre-paris-premiere" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Rt">Rt</span></td>
+                    <td>international</td>
+                    <td style="max-width: 400px;"><strong>Kiev sends the living to die, but won’t accept its dead</strong></td>
+                    <td style="max-width: 300px;"><img align="left" alt="Preview" src="https://mf.b37mrtl.ru/files/2025.06/thumbnail/684456fc2030272b3460e14b.jpg" style="margin-right: 10px;" /> Contro...</td>
+                    <td>7h</td>
+                    <td><a href="https://www.rt.com/russia/618779-kiev-living-dead-accept/?utm_source=rss&utm_medium=rss&utm_campaign=RSS" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>news</td>
+                    <td style="max-width: 400px;"><strong>Diese Juni-Regenwetterquiz vertreibt jede Langeweile</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/7bed86e.jpg" />10 Fragen rund ums «Huddelwetter» und den Juni...</td>
+                    <td>7h</td>
+                    <td><a href="https://www.srf.ch/meteo/meteo-stories/meteo-quiz-diese-juni-regenwetterquiz-vertreibt-jede-langeweile" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Tagesanzeiger">Tagesanzeiger</span></td>
+                    <td>zurich</td>
+                    <td style="max-width: 400px;"><strong>Kampf um Sitze im Zürcher Stadtrat: Mandy Abou Shoak erhielt beim SP-Podium den lautesten Applaus</strong></td>
+                    <td style="max-width: 300px;">Die 35-Jährige zeigte sich persönlich und emotional. Ihr Kontrahent ums Zürcher Stadtpräsidium – Raphael Golta – lieferte routiniert. Bei einer Frage ...</td>
+                    <td>7h</td>
+                    <td><a href="https://www.tagesanzeiger.ch/sp-podium-in-zuerich-mandy-abou-shoak-vs-raphael-golta-517808530931" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Bbc">Bbc</span></td>
+                    <td>international</td>
+                    <td style="max-width: 400px;"><strong>US brings back El Salvador deportee to face charges</strong></td>
+                    <td style="max-width: 300px;">Salvadoran Kilmar Ábrego García, whose case became a political flashpoint, has been charged with human trafficking by US officials....</td>
+                    <td>7h</td>
+                    <td><a href="https://www.bbc.com/news/articles/c7v7ynv98r8o" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>news</td>
+                    <td style="max-width: 400px;"><strong>Arbeiten nach dem Uber-Prinzip ist eine Gefahr für die Gesundheit</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/618421.jpg" />Digitale Lieferdienste für Essen und anderes setzen ihr Personal gesund...</td>
+                    <td>7h</td>
+                    <td><a href="https://www.srf.ch/news/dialog/uberisierung-der-arbeit-arbeiten-nach-dem-uber-prinzip-ist-eine-gefahr-fuer-die-gesundheit" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Arbeiten nach dem Uber-Prinzip ist eine Gefahr für die Gesundheit</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/618421.jpg" />Digitale Lieferdienste für Essen und anderes setzen ihr Personal gesund...</td>
+                    <td>7h</td>
+                    <td><a href="https://www.srf.ch/news/dialog/uberisierung-der-arbeit-arbeiten-nach-dem-uber-prinzip-ist-eine-gefahr-fuer-die-gesundheit" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Cash">Cash</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Taylor Swift machte alle reich — sogar ihre Feinde</strong></td>
+                    <td style="max-width: 300px;">Unterhaltung - Popstar Taylor Swift hat endlich ihre Songs zurück. Ein Einblick in ihre Karriere und wie jeder, der an ihrer Musik beteiligt war, Geld...</td>
+                    <td>7h</td>
+                    <td><a href="https://www.cash.ch/news/top-news/taylor-swift-machte-alle-reich-sogar-ihre-feinde-830021" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Cash">Cash</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>China bestätigt Gespräche mit den USA</strong></td>
+                    <td style="max-width: 300px;">Handelsstreit - Delegationen der USA und Chinas wollen sich nächste Woche in London an einen Tisch setzen....</td>
+                    <td>8h</td>
+                    <td><a href="https://www.cash.ch/news/top-news/china-bestatigt-gesprache-mit-den-usa-831629" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Nzz">Nzz</span></td>
+                    <td>zurich</td>
+                    <td style="max-width: 400px;"><strong>Raphael Golta verkörpert das Establishment, Mandy Abou Shoak ist die Stimme der Migranten – die Zürcher SP steht vor einer Richtungswahl</strong></td>
+                    <td style="max-width: 300px;">An einem Podium treffen die beiden Konkurrenten für das Stadtpräsidium aufeinander – und sind sehr nett zueinander....</td>
+                    <td>8h</td>
+                    <td><a href="https://www.nzz.ch/zuerich/stadtzuercher-sp-duell-wer-folgt-auf-corine-mauch-ld.1888014" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>news</td>
+                    <td style="max-width: 400px;"><strong>Schulden nicht bezahlt: Brescia verschwindet aus Profifussball</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/f0fdf6a.jpg" />Hier finden Sie die wichtigsten Neuigkeiten aus dem internationalen Fu...</td>
+                    <td>8h</td>
+                    <td><a href="https://www.srf.ch/sport/fussball/internationale-ligen/internationale-fussball-news-schulden-nicht-bezahlt-brescia-verschwindet-aus-profifussball" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Techcrunch">Techcrunch</span></td>
+                    <td>latest</td>
+                    <td style="max-width: 400px;"><strong>Superblocks CEO: How to find a unicorn idea by studying AI system prompts</strong></td>
+                    <td style="max-width: 300px;">Brad Menezes, CEO of enterprise vibe coding startup Superblocks, is convinced that the next crop of billion-dollar startup ideas are hiding in almost ...</td>
+                    <td>8h</td>
+                    <td><a href="https://techcrunch.com/2025/06/07/superblocks-ceo-how-to-find-a-unicorn-idea-by-studying-ai-system-prompts/" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Rt">Rt</span></td>
+                    <td>international</td>
+                    <td style="max-width: 400px;"><strong>Ukraine’s shame: Why Kiev refuses to take back its dead and wounded</strong></td>
+                    <td style="max-width: 300px;"><img align="left" alt="Preview" src="https://mf.b37mrtl.ru/files/2025.06/thumbnail/6844550820302720696e6633.jpg" style="margin-right: 10px;" /> Accept...</td>
+                    <td>8h</td>
+                    <td><a href="https://www.rt.com/russia/618778-ukraine-pow-swap-dead/?utm_source=rss&utm_medium=rss&utm_campaign=RSS" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Tagesanzeiger">Tagesanzeiger</span></td>
+                    <td>schweiz</td>
+                    <td style="max-width: 400px;"><strong>Bürohr – Wirtschaftsnews der Woche: McKinsey weiss, wie man Stellen einspart</strong></td>
+                    <td style="max-width: 300px;">Das «Bürohr» der «SonntagsZeitung» ist eine Institution. Gerüchte, Possen, Erfolgsmeldungen: Hier lesen Sie, was abseits der grossen Schlagzeilen in d...</td>
+                    <td>8h</td>
+                    <td><a href="https://www.tagesanzeiger.ch/buerohr-mckinsey-weiss-wie-man-stellen-einspart-261633104423" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Tagesanzeiger">Tagesanzeiger</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Bürohr – Wirtschaftsnews der Woche: McKinsey weiss, wie man Stellen einspart</strong></td>
+                    <td style="max-width: 300px;">Das «Bürohr» der «SonntagsZeitung» ist eine Institution. Gerüchte, Possen, Erfolgsmeldungen: Hier lesen Sie, was abseits der grossen Schlagzeilen in d...</td>
+                    <td>8h</td>
+                    <td><a href="https://www.tagesanzeiger.ch/buerohr-mckinsey-weiss-wie-man-stellen-einspart-261633104423" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Theverge">Theverge</span></td>
+                    <td>tech</td>
+                    <td style="max-width: 400px;"><strong>The Verge’s 2025 Father’s Day gift guide</strong></td>
+                    <td style="max-width: 300px;">Father's Day rules. It's a day to celebrate all that dads have contributed to the people, homes, and communities that they're a part of. Being a dad i...</td>
+                    <td>8h</td>
+                    <td><a href="https://www.theverge.com/tech/673799/best-fathers-day-gift-ideas-2025" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Theverge">Theverge</span></td>
+                    <td>tech</td>
+                    <td style="max-width: 400px;"><strong>The soul of The Last of Us is in Gustavo Santaolalla&#8217;s music</strong></td>
+                    <td style="max-width: 300px;">When fans nervously tuned in to watch HBO's adaptation of one of their favorite video games, there was one familiar presence that immediately calmed t...</td>
+                    <td>8h</td>
+                    <td><a href="https://www.theverge.com/interview/681172/gustavo-santaolalla-interview-the-last-of-us-music" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Cash">Cash</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Anleger blicken in der neuen Woche auf US-Konjunkturdaten</strong></td>
+                    <td style="max-width: 300px;">Börsenvorschau - In der neue Woche treffen US-Konjunkturdaten ein, die Hinweise auf kommende Zinsentscheide geben....</td>
+                    <td>8h</td>
+                    <td><a href="https://www.cash.ch/news/top-news/anleger-blicken-in-der-neuen-woche-auf-us-konjunkturdaten-831486" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>news</td>
+                    <td style="max-width: 400px;"><strong>Downhillerin Balanche neben Podest – Chabbey gibt Leadertrikot ab</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/68ca07.jpg" />Hier finden Sie die wichtigsten Meldungen des Tages aus dem Radsport....</td>
+                    <td>9h</td>
+                    <td><a href="https://www.srf.ch/sport/mehr-sport/rad/news-aus-dem-radsport-downhillerin-balanche-neben-podest-chabbey-gibt-leadertrikot-ab" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>news</td>
+                    <td style="max-width: 400px;"><strong>Blatten nach der Katastrophe –  die neuesten Bilder</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/02f0b1.jpg" />Millionen Tonnen Geröll und Eis haben die Berggemeinde begraben. Nun ba...</td>
+                    <td>9h</td>
+                    <td><a href="https://www.srf.ch/news/gletscherkollaps-im-oberwallis-blatten-nach-der-katastrophe-die-neuesten-bilder" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Blatten nach der Katastrophe –  die neuesten Bilder</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/02f0b1.jpg" />Millionen Tonnen Geröll und Eis haben die Berggemeinde begraben. Nun ba...</td>
+                    <td>9h</td>
+                    <td><a href="https://www.srf.ch/news/gletscherkollaps-im-oberwallis-blatten-nach-der-katastrophe-die-neuesten-bilder" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Blatten nach der Katastrophe –  die neuesten Bilder</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/02f0b1.jpg" />Millionen Tonnen Geröll und Eis haben die Berggemeinde begraben. Nun ba...</td>
+                    <td>9h</td>
+                    <td><a href="https://www.srf.ch/news/gletscherkollaps-im-oberwallis-blatten-nach-der-katastrophe-die-neuesten-bilder" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>news</td>
+                    <td style="max-width: 400px;"><strong>«Die Russen schiessen mehr, weil sie mehr Munition haben»</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/ae0e44.jpg" />Russland greift den Osten der Ukraine massiv an – vor allem um Charkiw....</td>
+                    <td>9h</td>
+                    <td><a href="https://www.srf.ch/news/international/bericht-von-der-ostfront-die-russen-schiessen-mehr-weil-sie-mehr-munition-haben" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>«Die Russen schiessen mehr, weil sie mehr Munition haben»</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/ae0e44.jpg" />Russland greift den Osten der Ukraine massiv an – vor allem um Charkiw....</td>
+                    <td>9h</td>
+                    <td><a href="https://www.srf.ch/news/international/bericht-von-der-ostfront-die-russen-schiessen-mehr-weil-sie-mehr-munition-haben" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Cash">Cash</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Musk löscht brisanten Post zu Epstein-Akten im Onlinedienst X</strong></td>
+                    <td style="max-width: 300px;">Missbrauchsskandal - Einträge auf der Onlineplattform X sind verschwunden, wonach Musk behauptet hatte, Trump komme in unter Verschluss gehaltenen Akt...</td>
+                    <td>9h</td>
+                    <td><a href="https://www.cash.ch/news/top-news/musk-loscht-brisanten-post-zu-epstein-akten-im-onlinedienst-x-831624" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Bbc">Bbc</span></td>
+                    <td>international</td>
+                    <td style="max-width: 400px;"><strong>Body of Thai hostage recovered from Gaza, Israel says</strong></td>
+                    <td style="max-width: 300px;">Nattapong Pinta was captured alive and was likely killed during the first months of captivity, the Israeli military says....</td>
+                    <td>9h</td>
+                    <td><a href="https://www.bbc.com/news/articles/cev4l7kxdllo" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Theverge">Theverge</span></td>
+                    <td>tech</td>
+                    <td style="max-width: 400px;"><strong>Apple’s latest AirPods Pro with USB-C just received a $70 discount</strong></td>
+                    <td style="max-width: 300px;">This year’s WWDC kicks off in less than a week, which means Apple is likely to announce a string of software changes in short order, some of which are...</td>
+                    <td>9h</td>
+                    <td><a href="https://www.theverge.com/tech/681365/apple-airpods-2-usb-c-meta-quest-3s-deal-sale" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-20Min">20Min</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Mit diesen 74 Ländern will der Bundesrat Krypto-Daten teilen</strong></td>
+                    <td style="max-width: 300px;">Der Bundesrat hat dem Parlament 74 Staaten für den Informationsaustausch über Kryptowerte vorgeschlagen. Der erste Datenaustausch soll 2027 erfolgen....</td>
+                    <td>9h</td>
+                    <td><a href="https://www.20min.ch/story/steuertransparenz-mit-diesen-74-laendern-will-die-schweiz-krypto-daten-teilen-103360048" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-20Min">20Min</span></td>
+                    <td>crypto</td>
+                    <td style="max-width: 400px;"><strong>Mit diesen 74 Ländern will der Bundesrat Krypto-Daten teilen</strong></td>
+                    <td style="max-width: 300px;">Der Bundesrat hat dem Parlament 74 Staaten für den Informationsaustausch über Kryptowerte vorgeschlagen. Der erste Datenaustausch soll 2027 erfolgen....</td>
+                    <td>9h</td>
+                    <td><a href="https://www.20min.ch/story/steuertransparenz-mit-diesen-74-laendern-will-die-schweiz-krypto-daten-teilen-103360048" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Cointelegraph">Cointelegraph</span></td>
+                    <td>bitcoin</td>
+                    <td style="max-width: 400px;"><strong>Is a Bitcoin price rally to $150K possible by year&#039;s end?</strong></td>
+                    <td style="max-width: 300px;"><p style="float: right; margin: 0 0 10px 15px; width: 240px;"><img alt="Is a Bitcoin price rally to $150K possible by year&#039;s end?" src="https://i...</td>
+                    <td>9h</td>
+                    <td><a href="https://cointelegraph.com/news/is-bitcoin-price-rally-to-150k-possible-by-year-end?utm_source=rss_feed&utm_medium=rss_tag_bitcoin&utm_campaign=rss_partner_inbound" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Cointelegraph">Cointelegraph</span></td>
+                    <td>crypto</td>
+                    <td style="max-width: 400px;"><strong>Is a Bitcoin price rally to $150K possible by year&#039;s end?</strong></td>
+                    <td style="max-width: 300px;"><p style="float: right; margin: 0 0 10px 15px; width: 240px;"><img alt="Is a Bitcoin price rally to $150K possible by year&#039;s end?" src="https://i...</td>
+                    <td>9h</td>
+                    <td><a href="https://cointelegraph.com/news/is-bitcoin-price-rally-to-150k-possible-by-year-end?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Theverge">Theverge</span></td>
+                    <td>tech</td>
+                    <td style="max-width: 400px;"><strong>A ban on state AI laws could smash Big Tech&#8217;s legal guardrails</strong></td>
+                    <td style="max-width: 300px;">Senate Commerce Republicans have kept a ten year moratorium on state AI laws in their latest version of President Donald Trump's massive budget packag...</td>
+                    <td>9h</td>
+                    <td><a href="https://www.theverge.com/politics/681727/ro-khanna-ai-state-law-moratorium-reconciliation" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Tagesanzeiger">Tagesanzeiger</span></td>
+                    <td>zurich</td>
+                    <td style="max-width: 400px;"><strong>Kunst im Park Seleger Moor: Die Grinsekatze von «Alice im Wunderland» taucht im Park auf</strong></td>
+                    <td style="max-width: 300px;">Üppige Natur, exotische Pflanzen, riesige Bäume und dazwischen Kunst: Im Park Seleger Moor in Rifferswil ist die «MoorArt25» eröffnet worden....</td>
+                    <td>9h</td>
+                    <td><a href="https://www.tagesanzeiger.ch/seleger-moor-moorart25-im-park-in-rifferswil-ist-eroeffnet-650158567073" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Heise">Heise</span></td>
+                    <td>tech</td>
+                    <td style="max-width: 400px;"><strong>Mini-PC Acemagic M1 im Test: Ryzen 7 für 336 Euro – Preis-Tipp mit Abstrichen</strong></td>
+                    <td style="max-width: 300px;">Der Acemagic M1 verspricht auf dem Papier starke Hardware, die für 336 Euro unüblich ist. Ob er das Leistungsversprechen einhalten kann, zeigt sich im...</td>
+                    <td>9h</td>
+                    <td><a href="https://www.heise.de/bestenlisten/testbericht/mini-pc-acemagic-m1-im-test/0y2t27b?wt_mc=rss.red.ho.beitrag.rdf.beitrag.beitrag" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Cash">Cash</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Chinas Exportbeschränkungen für Seltene Erden</strong></td>
+                    <td style="max-width: 300px;">Rohstoffe - Hersteller in der ganzen Welt warnen vor den Auswirkungen chinesischer Exportbeschränkungen für Seltene Erden....</td>
+                    <td>9h</td>
+                    <td><a href="https://www.cash.ch/news/top-news/chinas-exportbeschrankungen-fur-seltene-erden-831479" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>news</td>
+                    <td style="max-width: 400px;"><strong>Die Schweizer Maschinenindustrie hat die Schmerzgrenze erreicht</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/fd640b.jpg" />Der Kampf gegen die Konjunktur und die Trumpschen Zölle am Beispiel der...</td>
+                    <td>10h</td>
+                    <td><a href="https://www.srf.ch/news/wirtschaft/krise-im-maschinenbau-die-schweizer-maschinenindustrie-hat-die-schmerzgrenze-erreicht" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>schweiz</td>
+                    <td style="max-width: 400px;"><strong>Die Schweizer Maschinenindustrie hat die Schmerzgrenze erreicht</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/fd640b.jpg" />Der Kampf gegen die Konjunktur und die Trumpschen Zölle am Beispiel der...</td>
+                    <td>10h</td>
+                    <td><a href="https://www.srf.ch/news/wirtschaft/krise-im-maschinenbau-die-schweizer-maschinenindustrie-hat-die-schmerzgrenze-erreicht" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Die Schweizer Maschinenindustrie hat die Schmerzgrenze erreicht</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/fd640b.jpg" />Der Kampf gegen die Konjunktur und die Trumpschen Zölle am Beispiel der...</td>
+                    <td>10h</td>
+                    <td><a href="https://www.srf.ch/news/wirtschaft/krise-im-maschinenbau-die-schweizer-maschinenindustrie-hat-die-schmerzgrenze-erreicht" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-20Min">20Min</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Algen begraben karibische Traumstrände unter sich</strong></td>
+                    <td style="max-width: 300px;">Algen überziehen Küsten von Puerto Rico bis Guyana. Der Tourismus leidet. Die Ursache ist für Experten ein Rätsel....</td>
+                    <td>10h</td>
+                    <td><a href="https://www.20min.ch/story/rekordmenge-algen-begraben-karibische-traumstraende-unter-sich-103360103" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-20Min">20Min</span></td>
+                    <td>tech</td>
+                    <td style="max-width: 400px;"><strong>Deepfake-Schock in Neuseeland: Politikerin zeigt KI-Nacktfoto</strong></td>
+                    <td style="max-width: 300px;">Die neuseeländische Abgeordnete Laura McClure hat im Parlament ein KI-generiertes Nacktfoto von sich selbst präsentiert. Damit macht sie auf die wachs...</td>
+                    <td>10h</td>
+                    <td><a href="https://www.20min.ch/video/deepfake-politikerin-zeigt-ki-nacktfoto-im-parlament-in-neuseeland-103360111" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>news</td>
+                    <td style="max-width: 400px;"><strong>Unser Beckenboden – der Orgasmus-Booster schlechthin</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/8df375.jpg" />Ein Teil der Sexualität ist lernbar: Mit Beckenbodentraining lässt sich...</td>
+                    <td>10h</td>
+                    <td><a href="https://www.srf.ch/wissen/gesundheit/sexualitaet-staerken-unser-beckenboden-der-orgasmus-booster-schlechthin" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Unser Beckenboden – der Orgasmus-Booster schlechthin</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/8df375.jpg" />Ein Teil der Sexualität ist lernbar: Mit Beckenbodentraining lässt sich...</td>
+                    <td>10h</td>
+                    <td><a href="https://www.srf.ch/wissen/gesundheit/sexualitaet-staerken-unser-beckenboden-der-orgasmus-booster-schlechthin" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>news</td>
+                    <td style="max-width: 400px;"><strong>Marc vor Alex: Marquez-Brüder in Aragon eine Klasse für sich</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/002ca4.jpg" />Marc Marquez feiert beim 8. Sprintrennen der Saison im spanischen Arago...</td>
+                    <td>10h</td>
+                    <td><a href="https://www.srf.ch/sport/motorsport/motorrad/motogp-sprint-von-aragon-marc-vor-alex-marquez-brueder-in-aragon-eine-klasse-fuer-sich" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Nzz Finanzen">Nzz Finanzen</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Der Börsengang der Krypto-Firma Circle ist ein durchschlagender Erfolg. Doch wieso schwächeln Bitcoin und Co.?</strong></td>
+                    <td style="max-width: 300px;">Der Stablecoin-Anbieter Circle hat beim IPO eine schwindelerregend hohe Bewertung erreicht. Offenbar wollen künftig neben X auch Apple, Google und Air...</td>
+                    <td>10h</td>
+                    <td><a href="https://www.nzz.ch/finanzen/der-boersengang-der-krypto-firma-circle-ist-ein-durchschlagender-erfolg-doch-wieso-schwaecheln-bitcoin-und-co-ld.1888078" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Cointelegraph">Cointelegraph</span></td>
+                    <td>crypto</td>
+                    <td style="max-width: 400px;"><strong>Here’s what happened in crypto today</strong></td>
+                    <td style="max-width: 300px;"><p style="float: right; margin: 0 0 10px 15px; width: 240px;"><img alt="Here’s what happened in crypto today" src="https://images.cointelegraph.com/im...</td>
+                    <td>10h</td>
+                    <td><a href="https://cointelegraph.com/news/what-happened-in-crypto-today?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>news</td>
+                    <td style="max-width: 400px;"><strong>«Extrem»: Marcel Rohner über die Massnahmen zur Bankenregulierung</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/75e846c.jpg" />Der Bankier-Präsident und Ex-UBS-Chef hofft, dass das Parlament die Vo...</td>
+                    <td>10h</td>
+                    <td><a href="https://www.srf.ch/news/wirtschaft/ex-chef-gegen-neue-ubs-regeln-extrem-marcel-rohner-ueber-die-massnahmen-zur-bankenregulierung" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>schweiz</td>
+                    <td style="max-width: 400px;"><strong>«Extrem»: Marcel Rohner über die Massnahmen zur Bankenregulierung</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/75e846c.jpg" />Der Bankier-Präsident und Ex-UBS-Chef hofft, dass das Parlament die Vo...</td>
+                    <td>10h</td>
+                    <td><a href="https://www.srf.ch/news/wirtschaft/ex-chef-gegen-neue-ubs-regeln-extrem-marcel-rohner-ueber-die-massnahmen-zur-bankenregulierung" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>«Extrem»: Marcel Rohner über die Massnahmen zur Bankenregulierung</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/75e846c.jpg" />Der Bankier-Präsident und Ex-UBS-Chef hofft, dass das Parlament die Vo...</td>
+                    <td>10h</td>
+                    <td><a href="https://www.srf.ch/news/wirtschaft/ex-chef-gegen-neue-ubs-regeln-extrem-marcel-rohner-ueber-die-massnahmen-zur-bankenregulierung" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-20Min">20Min</span></td>
+                    <td>zurich</td>
+                    <td style="max-width: 400px;"><strong>Kampfjets fangen Hobbypilot Morell in seinem E-Flugzeug ab</strong></td>
+                    <td style="max-width: 300px;">Morell Westermann fliegt ein Elektroflugzeug und durfte am Mittwoch gemeinsam mit der schweizerischen Luftwaffe in die Luft. Sie trainieren den Umgang...</td>
+                    <td>10h</td>
+                    <td><a href="https://www.20min.ch/story/armeeuebung-kampfjets-fangen-hobbypilot-morell-mit-seinem-e-flugzeug-ab-103360031" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Tagesanzeiger">Tagesanzeiger</span></td>
+                    <td>schweiz</td>
+                    <td style="max-width: 400px;"><strong>Awards für Sammelstiftungen: Das sind die Gewinner des Pensionskassen-Ratings 2025</strong></td>
+                    <td style="max-width: 300px;">Mit einem feierlichen Event wurden diese Woche die besten Vorsorge­einrichtungen der Schweiz ausgezeichnet....</td>
+                    <td>10h</td>
+                    <td><a href="https://www.tagesanzeiger.ch/pensionskassen-rating-2025-das-sind-die-gewinner-371464768749" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Tagesanzeiger">Tagesanzeiger</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Awards für Sammelstiftungen: Das sind die Gewinner des Pensionskassen-Ratings 2025</strong></td>
+                    <td style="max-width: 300px;">Mit einem feierlichen Event wurden diese Woche die besten Vorsorge­einrichtungen der Schweiz ausgezeichnet....</td>
+                    <td>10h</td>
+                    <td><a href="https://www.tagesanzeiger.ch/pensionskassen-rating-2025-das-sind-die-gewinner-371464768749" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Tagesanzeiger">Tagesanzeiger</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Interview über Pensionskassen: «Ich gehe davon aus, dass die Umwandlungs­sätze vorerst stabil bleiben»</strong></td>
+                    <td style="max-width: 300px;">Vera Kupper Staub, die Präsidentin der Oberaufsichts­kommission Berufliche Vorsorge, über die Kompetenzen ihrer Bundesbehörde, gute Anlageergebnisse u...</td>
+                    <td>10h</td>
+                    <td><a href="https://www.tagesanzeiger.ch/pensionskassen-umwandlungssaetze-duerften-vorerst-stabil-bleiben-586993780927" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Tagesanzeiger">Tagesanzeiger</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Renditen bis über 10 Prozent: Nach Spitzenjahr finden die Schweizer Pensions­kassen zu neuer Stärke</strong></td>
+                    <td style="max-width: 300px;">Dank der starken Entwicklung globaler Aktien lag die Rendite 2024 bei durchschnittlich 7,7 Prozent....</td>
+                    <td>10h</td>
+                    <td><a href="https://www.tagesanzeiger.ch/schweizer-pensionskassen-2024-war-spitzenjahr-fuer-rendite-952101007111" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Tagesanzeiger">Tagesanzeiger</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Pensionskassenvergleich-Jubiläum: Bei gleichem Lohn wie vor 20 Jahren sieht die Rechnung heute deutlich bescheidener aus</strong></td>
+                    <td style="max-width: 300px;">Zum 20. Mal in Folge hat das Beratungs­unternehmen Weibel Hess & Partner zusammen mit der SonntagsZeitung einen umfassenden Pensionskassenvergleich du...</td>
+                    <td>10h</td>
+                    <td><a href="https://www.tagesanzeiger.ch/pensionskassen-rating-eine-rueckschau-auf-die-letzten-20-jahre-230129132387" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Theverge">Theverge</span></td>
+                    <td>tech</td>
+                    <td style="max-width: 400px;"><strong>There are only two commissioners left at the FCC</strong></td>
+                    <td style="max-width: 300px;">After the departure of one Republican and one Democratic commissioner on Friday, the Federal Communications Commission is down to two members, falling...</td>
+                    <td>10h</td>
+                    <td><a href="https://www.theverge.com/policy/681638/fcc-quorum-starks-simington-departure-brendan-carr" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>news</td>
+                    <td style="max-width: 400px;"><strong>Premiere für «Next-Gen»-Giganten Sinner und Alcaraz</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/5f6add.jpg" />Jannik Sinner und Carlos Alcaraz treffen in Paris erstmals in einem Gra...</td>
+                    <td>11h</td>
+                    <td><a href="https://www.srf.ch/sport/tennis/grand-slam-turniere/french-open-final-maenner-premiere-fuer-next-gen-giganten-sinner-und-alcaraz" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Tagesanzeiger">Tagesanzeiger</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Interview mit Wirtschaftsrechtlerin: Bankenregulierung: «Leisten kann sich die UBS die Kosten allemal»</strong></td>
+                    <td style="max-width: 300px;">Corinne Zellweger-Gutknecht erklärt, was das grössere Kapitalpolster für die Grossbank bedeutet. Und warum der Staat und die Steuerzahler dennoch nich...</td>
+                    <td>11h</td>
+                    <td><a href="https://www.tagesanzeiger.ch/wirtschaftsrechtlerin-leisten-kann-sich-die-ubs-die-kosten-allemal-653450769400" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Tagesanzeiger">Tagesanzeiger</span></td>
+                    <td>zurich</td>
+                    <td style="max-width: 400px;"><strong>Fussball in Winterthur: Luca Zuffi bleibt eine weitere Saison beim FCW</strong></td>
+                    <td style="max-width: 300px;">Luca Zuffi, einer der Schlüsselspieler des FC Winterthur, hat seinen Vertrag verlängert. Andererseits verlassen drei Spieler den Club....</td>
+                    <td>11h</td>
+                    <td><a href="https://www.tagesanzeiger.ch/fussball-luca-zuffi-weitere-saison-beim-fc-winterthur-709417244125" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Cointelegraph">Cointelegraph</span></td>
+                    <td>bitcoin</td>
+                    <td style="max-width: 400px;"><strong>Bitcoin DeFi platform Alex Protocol loses $8.3M to exploit</strong></td>
+                    <td style="max-width: 300px;"><p style="float: right; margin: 0 0 10px 15px; width: 240px;"><img alt="Bitcoin DeFi platform Alex Protocol loses $8.3M to exploit" src="https://image...</td>
+                    <td>11h</td>
+                    <td><a href="https://cointelegraph.com/news/bitcoin-defi-platform-alex-protocol-loses-8-3m-to-exploit?utm_source=rss_feed&utm_medium=rss_tag_bitcoin&utm_campaign=rss_partner_inbound" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Cointelegraph">Cointelegraph</span></td>
+                    <td>crypto</td>
+                    <td style="max-width: 400px;"><strong>Bitcoin DeFi platform Alex Protocol loses $8.3M to exploit</strong></td>
+                    <td style="max-width: 300px;"><p style="float: right; margin: 0 0 10px 15px; width: 240px;"><img alt="Bitcoin DeFi platform Alex Protocol loses $8.3M to exploit" src="https://image...</td>
+                    <td>11h</td>
+                    <td><a href="https://cointelegraph.com/news/bitcoin-defi-platform-alex-protocol-loses-8-3m-to-exploit?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Bislang schwerste russische Angriffe auf Grossstadt Charkiw</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/8b8da53.jpg" />In der zweitgrössten Stadt der Ukraine wurden Dutzende Explosionen gez...</td>
+                    <td>11h</td>
+                    <td><a href="https://www.srf.ch/news/international/ukraine/krieg-in-der-ukraine-bislang-schwerste-russische-angriffe-auf-grossstadt-charkiw" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Theverge">Theverge</span></td>
+                    <td>tech</td>
+                    <td style="max-width: 400px;"><strong>Apple is on defense at WWDC</strong></td>
+                    <td style="max-width: 300px;">It's early June and the vibes are decidedly off in Cupertino. The hype leading up to Apple's last two developer conferences felt much different. There...</td>
+                    <td>11h</td>
+                    <td><a href="https://www.theverge.com/apple/681739/wwdc-2025-epic-trial-apple-intelligence" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Cash">Cash</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>So perfide zocken uns Online-Betrüger ab</strong></td>
+                    <td style="max-width: 300px;">Podcast - Der Online-Betrug in der Schweiz ist alarmierend hoch. Im Podcast erklärt Tech-Journalist Tobias Bolzern, wie wir uns schützen können....</td>
+                    <td>11h</td>
+                    <td><a href="https://www.cash.ch/news/top-news/so-perfide-zocken-uns-online-betruger-ab-829764" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-20Min">20Min</span></td>
+                    <td>weather</td>
+                    <td style="max-width: 400px;"><strong>Spektakuläres Wetterphänomen über der Schweiz</strong></td>
+                    <td style="max-width: 300px;">Ein rotierender Gewitterwolkenkomplex hat am Freitagabend für ein Naturschauspiel über der Westschweiz gesorgt....</td>
+                    <td>12h</td>
+                    <td><a href="https://www.20min.ch/story/wetter-schweiz-die-natur-ist-unglaublich-rotierende-wolke-sorgt-fuer-staunen-103360109" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>news</td>
+                    <td style="max-width: 400px;"><strong>Tipps für einen starken Beckenboden</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/9ac35e.jpg" />Wie steht es um meinen Beckenboden? Wie lässt er sich einfach trainiere...</td>
+                    <td>12h</td>
+                    <td><a href="https://www.srf.ch/wissen/puls-kompakt/puls-kompakt-74-tipps-fuer-einen-starken-beckenboden" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Tipps für einen starken Beckenboden</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/9ac35e.jpg" />Wie steht es um meinen Beckenboden? Wie lässt er sich einfach trainiere...</td>
+                    <td>12h</td>
+                    <td><a href="https://www.srf.ch/wissen/puls-kompakt/puls-kompakt-74-tipps-fuer-einen-starken-beckenboden" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>news</td>
+                    <td style="max-width: 400px;"><strong>Ronaldo verzichtet auf Klub-WM – trotz Angeboten</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/59579b.jpg" />An der Klub-WM in Nordamerika wird es zu keinem Duell Ronaldo vs. Messi...</td>
+                    <td>12h</td>
+                    <td><a href="https://www.srf.ch/sport/fussball/fussball-allgemein/klub-wm-ohne-cr7-ronaldo-verzichtet-auf-klub-wm-trotz-angeboten" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Tagesanzeiger">Tagesanzeiger</span></td>
+                    <td>schweiz</td>
+                    <td style="max-width: 400px;"><strong>Ausstellung im Kunsthaus Zürich: Von Giotto bis Ninja Turtles: Die wilde Welt von Monster Chetwynd</strong></td>
+                    <td style="max-width: 300px;">Malerei, Skulptur, Performance, Installation: Die britische Künstlerin kann alles. Ihre Welt ist bunt, laut, voller Referenzen – und vielleicht in ihr...</td>
+                    <td>12h</td>
+                    <td><a href="https://www.tagesanzeiger.ch/monster-chetwynd-die-neue-ausstellung-im-kunsthaus-zuerich-927271107075" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Tagesanzeiger">Tagesanzeiger</span></td>
+                    <td>zurich</td>
+                    <td style="max-width: 400px;"><strong>Ausstellung im Kunsthaus Zürich: Von Giotto bis Ninja Turtles: Die wilde Welt von Monster Chetwynd</strong></td>
+                    <td style="max-width: 300px;">Malerei, Skulptur, Performance, Installation: Die britische Künstlerin kann alles. Ihre Welt ist bunt, laut, voller Referenzen – und vielleicht in ihr...</td>
+                    <td>12h</td>
+                    <td><a href="https://www.tagesanzeiger.ch/monster-chetwynd-die-neue-ausstellung-im-kunsthaus-zuerich-927271107075" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-Srf">Srf</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Krieg im Nahen Osten: Das passiert aktuell</strong></td>
+                    <td style="max-width: 300px;"><img align="left" hspace="5" src="https://srf-cms.rokka.io/640ws/3c4b3fe.jpg" />Die neuesten Entwicklungen zum Krieg im Nahen Osten erfahren Sie hier ...</td>
+                    <td>12h</td>
+                    <td><a href="https://www.srf.ch/news/international/nahost/die-lage-im-ueberblick-krieg-im-nahen-osten-das-passiert-aktuell-17" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                <tr>
+                    <td><span class="source-badge source-20Min">20Min</span></td>
+                    <td>wirtschaft</td>
+                    <td style="max-width: 400px;"><strong>Post verkaufte wochenlang Neonazi-Duftbäumchen</strong></td>
+                    <td style="max-width: 300px;">In zwei Post-Filialen wurden wochenlang Duftbäumchen mit Nazi-Symbolik, rechtsextremen Parolen und einem frauenverachtenden Motiv verkauft....</td>
+                    <td>12h</td>
+                    <td><a href="https://www.20min.ch/story/liestal-und-frick-post-verkaufte-wochenlang-neonazi-duftbaeumchen-103360092" target="_blank" class="news-link">🔗 Artikel</a></td>
+                </tr>
+            
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="timestamp">
+            RSS-Dashboard generiert am: 07.06.2025 23:28:11
+        </div>
+    </div>
+</body>
+</html>

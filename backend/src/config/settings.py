@@ -80,12 +80,12 @@ def get_settings() -> Settings:
                 return False
             return True
         
-        # Debug: Zeige geladene API Keys mit korrekter Validierung
-        print(f"🔑 Settings geladen:")
-        print(f"   OpenAI API Key: {'✅ Vorhanden' if is_valid_key(_settings.openai_api_key) else '❌ Fehlt'}")
-        print(f"   ElevenLabs API Key: {'✅ Vorhanden' if is_valid_key(_settings.elevenlabs_api_key) else '❌ Fehlt'}")
-        print(f"   CoinMarketCap API Key: {'✅ Vorhanden' if is_valid_key(_settings.coinmarketcap_api_key) else '❌ Fehlt'}")
-        print(f"   Weather API Key: {'✅ Vorhanden' if is_valid_key(_settings.weather_api_key) else '❌ Fehlt'}")
-        print(f"   Supabase URL: {'✅ Vorhanden' if is_valid_key(_settings.supabase_url) else '❌ Fehlt'}")
-        print(f"   Twitter Bearer: {'✅ Vorhanden' if is_valid_key(_settings.twitter_bearer_token) else '❌ Fehlt'}")
+        # Debug: Zeige geladene API Keys mit ASCII-Zeichen für Windows-Kompatibilität
+        print("Settings geladen:")
+        print(f"   OpenAI API Key: {'[OK]' if is_valid_key(_settings.openai_api_key) else '[FEHLT]'}")
+        print(f"   ElevenLabs API Key: {'[OK]' if is_valid_key(_settings.elevenlabs_api_key) else '[FEHLT]'}")
+        print(f"   CoinMarketCap API Key: {'[OK]' if is_valid_key(_settings.coinmarketcap_api_key) else '[FEHLT]'}")
+        print(f"   Weather API Key: {'[OK]' if is_valid_key(_settings.weather_api_key) else '[FEHLT]'}")
+        print(f"   Supabase URL: {'[OK]' if is_valid_key(_settings.supabase_url) else '[FEHLT]'}")
+        print(f"   Twitter Bearer: {'[OK]' if is_valid_key(_settings.twitter_bearer_token) else '[FEHLT]'}")
     return _settings 

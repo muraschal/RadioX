@@ -1,16 +1,11 @@
 #!/usr/bin/env python3
 
 """
-Bitcoin Service
-===============
+Bitcoin Service - Sammelt Bitcoin Preis-Daten
+============================================
 
-Service for Bitcoin data:
-- CoinMarketCap API Integration
-- Bitcoin price data
-- Bitcoin price trends
-- Bitcoin price alerts
-
-DEPENDENCIES: Only CoinMarketCap API Key
+Sammelt aktuelle Bitcoin-Preise von CoinMarketCap API.
+Fallback-Daten wenn API nicht verfügbar.
 """
 
 import asyncio
@@ -27,20 +22,26 @@ import random
 # Load environment variables from ROOT directory
 load_dotenv(Path(__file__).parent.parent.parent.parent / '.env')
 
+# Import Settings
+from config.settings import get_settings
+
 
 class BitcoinService:
     """
-    Service for CoinMarketCap API Integration - BITCOIN ONLY
+    Bitcoin Service für CoinMarketCap API
     
-    Retrieves current Bitcoin data for
-    broadcast generation.
-    
-    MINIMAL DEPENDENCIES: Only CoinMarketCap API
+    Features:
+    - Aktuelle Bitcoin Preise
+    - Trend-Analyse
+    - Price Alerts
+    - Fallback-Daten
+    - Caching (5 min)
     """
     
     def __init__(self):
-        # Load only CoinMarketCap API Key - NO other services
-        self.api_key = os.getenv('COINMARKETCAP_API_KEY')
+        # Load CoinMarketCap API Key from Settings
+        settings = get_settings()
+        self.api_key = settings.coinmarketcap_api_key
         self.base_url = "https://pro-api.coinmarketcap.com/v1"
         
         # Configuration - BITCOIN ONLY

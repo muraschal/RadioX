@@ -46,14 +46,17 @@ class DataCollectionService:
         
         logger.info("🚀 Starte vollständige Datensammlung...")
         
-        # Parallele Sammlung aller Daten
-        news_task = self._collect_all_news_safe(max_age_hours)
+        # SEQUENZIELLE Sammlung um Race Conditions zu vermeiden
+        logger.info("📰 Sammle News...")
+        news = await self._collect_all_news_safe(max_age_hours)
+        
+        # Parallele Sammlung für Weather + Crypto (diese haben keine Konflikte)
+        logger.info("🌍 Sammle Kontext-Daten parallel...")
         weather_task = self._collect_weather_safe()
         crypto_task = self._collect_crypto_safe()
         
-        # Warten auf alle Tasks
-        news, weather, crypto = await asyncio.gather(
-            news_task, weather_task, crypto_task,
+        weather, crypto = await asyncio.gather(
+            weather_task, crypto_task,
             return_exceptions=True
         )
         
@@ -712,11 +715,36 @@ class DataCollectionService:
         logger.info("📰 Sammle ALLE RSS News...")
         
         try:
+            # DEBUG: Teste RSS Service direkt
+            logger.info(f"🔧 DEBUG: Teste RSS Service mit max_age_hours={max_age_hours}")
+            
             # Einfach die rohen RSS News Items holen
             news_items = await self.rss_service.get_all_recent_news(max_age_hours)
             
+            logger.info(f"🔧 DEBUG: RSS Service returned {len(news_items) if news_items else 0} items")
+            
             if not news_items:
                 logger.warning("⚠️ Keine News gefunden")
+                
+                # ZUSÄTZLICHES DEBUGGING: Teste Feeds direkt
+                logger.info("🔧 DEBUG: Teste aktive Feeds...")
+                try:
+                    feeds = await self.rss_service.get_all_active_feeds()
+                    logger.info(f"🔧 DEBUG: {len(feeds)} aktive Feeds gefunden")
+                    
+                    if len(feeds) > 0:
+                        logger.info(f"🔧 DEBUG: Erster Feed: {feeds[0].get('source_name', 'Unknown')}")
+                        
+                        # Teste ersten Feed direkt
+                        try:
+                            test_items = await self.rss_service.fetch_feed_items(feeds[0]['feed_url'])
+                            logger.info(f"🔧 DEBUG: Erster Feed hat {len(test_items)} Items")
+                        except Exception as feed_e:
+                            logger.error(f"🔧 DEBUG: Feed-Test Fehler: {feed_e}")
+                    
+                except Exception as feeds_e:
+                    logger.error(f"🔧 DEBUG: Feeds-Test Fehler: {feeds_e}")
+                
                 return []
             
             # Konvertiere RSSNewsItem Objekte zu vollständigen JSON-Dictionaries
@@ -745,28 +773,21 @@ class DataCollectionService:
             
         except Exception as e:
             logger.error(f"❌ Fehler beim Sammeln der News: {e}")
+            import traceback
+            logger.error(f"🔧 DEBUG: Traceback: {traceback.format_exc()}")
             return []
     
     async def _collect_weather_safe(self) -> Dict[str, Any]:
-        """Sammelt ALLE Wetter-Daten - Current + Forecast + Smart Outlook"""
+        """Sammelt ALLE Wetter-Daten - Current Weather nur"""
         logger.info("🌤️ Hole ALLE Zürich Wetter-Daten...")
         
         try:
-            # Sammle ALLE verfügbaren Wetter-Informationen parallel
-            current_task = self.weather_service.get_current_weather("zurich")
-            forecast_task = self.weather_service.get_forecast("zurich", days=5)
-            outlook_task = self.weather_service.get_smart_outlook("zurich")
-            
-            current, forecast, outlook = await asyncio.gather(
-                current_task, forecast_task, outlook_task,
-                return_exceptions=True
-            )
+            # Sammle nur verfügbare Wetter-Informationen
+            current = await self.weather_service.get_current_weather("zurich")
             
             # Zusammenfassen aller Wetter-Daten
             weather_data = {
-                "current": current if not isinstance(current, Exception) else None,
-                "forecast": forecast if not isinstance(forecast, Exception) else [],
-                "outlook": outlook if not isinstance(outlook, Exception) else None,
+                "current": current,
                 "location": "Zürich",
                 "timestamp": datetime.now().isoformat()
             }
@@ -778,7 +799,7 @@ class DataCollectionService:
                     "description": weather_data["current"]["description"]
                 })
             
-            logger.info(f"✅ Zürich Wetter gesammelt (Current + {len(weather_data['forecast'])} Tage Forecast)")
+            logger.info(f"✅ Zürich Wetter gesammelt (Current Weather)")
             return weather_data
             
         except Exception as e:

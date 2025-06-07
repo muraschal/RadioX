@@ -2,24 +2,21 @@
 
 """
 Broadcast Generation Service
-===========================
+============================
 
-Service für die Generierung von Radio-Broadcast-Skripten:
-- GPT-4 basierte Skript-Generierung
-- Marcel & Jarvis Dialog-Erstellung
-- Stil-Anpassung nach Tageszeit
-- Broadcast-Optimierung für Radio
+Service für die Generierung von Broadcast-Skripten mit GPT-4.
+Erstellt natürliche Dialoge zwischen Marcel & Jarvis.
 """
 
 import asyncio
+import aiohttp
 import json
-import requests
 import uuid
 from datetime import datetime, timedelta
 from typing import Dict, Any, List, Optional
 from loguru import logger
 
-from .supabase_service import SupabaseService
+from ..infrastructure.supabase_service import SupabaseService
 
 # Import centralized settings
 import sys
