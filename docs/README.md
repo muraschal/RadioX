@@ -46,6 +46,7 @@
 |----------|---------|---------------|----------------|
 | **[🏗️ Architecture](developer-guide/architecture.md)** | 25 min | Intermediate | System design and components |
 | **[🔧 Development](developer-guide/development.md)** | 30 min | Intermediate | Setup development environment |
+| **[📊 Data Collection](developer-guide/data-collection.md)** | 20 min | Intermediate | Complete data collection system |
 | **[⚙️ Services](developer-guide/services.md)** | 25 min | Intermediate | Bitcoin & Weather service documentation |
 | **[🗄️ Database Schema](developer-guide/database-schema.md)** | 20 min | Intermediate | Centralized schema management |
 | **[🧪 Testing](developer-guide/testing.md)** | 15 min | Intermediate | Testing strategies and tools |
@@ -80,6 +81,8 @@
 - **30+ RSS Feeds** - Swiss & international news with professional dashboard
 - **RSS Management Dashboard** - Modern HTML interface with filtering and sorting
 - **Live RSS Analytics** - Real-time feed monitoring with 98+ articles
+- **📊 Data Collection Service** - Intelligent consolidation of all data sources
+- **🎨 Dual HTML Dashboards** - RSS-specific and comprehensive data views
 - **Bitcoin Service** - Professional price tracking with multi-timeframe analysis
 - **Weather Service** - Smart Swiss weather with time-based outlook
 - **Real-time Processing** - Fresh content every generation
@@ -114,6 +117,11 @@ python production/radiox_master.py --action generate_broadcast --generate-audio
 ```bash
 # Quick system test
 python cli/cli_master.py quick
+
+# Data Collection (comprehensive)
+python cli_data_collection.py              # All data + HTML dashboards
+python cli_data_collection.py --news-only  # RSS only
+python cli_data_collection.py --test       # Service tests
 
 # Test individual services
 python cli/cli_bitcoin.py          # Bitcoin price & trends
@@ -150,12 +158,13 @@ python cli/cli_rss.py test
 
 | 📊 Metric | 📈 Value |
 |-----------|----------|
-| **Total Guides** | 12 comprehensive guides |
-| **Total Pages** | 180+ pages of documentation |
-| **Code Examples** | 250+ practical examples |
+| **Total Guides** | 13 comprehensive guides |
+| **Total Pages** | 200+ pages of documentation |
+| **Code Examples** | 300+ practical examples |
 | **Coverage** | 100% feature coverage |
 | **Languages** | English & German support |
 | **RSS Feeds** | 30 active feeds, 11 sources |
+| **Data Collection** | 97+ articles, weather, bitcoin |
 | **Services** | Bitcoin, Weather, RSS with dashboards |
 | **Last Updated** | December 2024 |
 
@@ -172,6 +181,7 @@ python cli/cli_rss.py test
 | Create my first radio show | [🎙️ Show Generation](user-guide/show-generation.md) |
 | Change voice settings | [🎤 Voice Configuration](user-guide/voice-configuration.md) |
 | Monitor RSS feeds and news | [📰 RSS Dashboard](user-guide/rss-dashboard.md) |
+| Collect and analyze all data | [📊 Data Collection](developer-guide/data-collection.md) |
 | Understand the system | [🏗️ Architecture](developer-guide/architecture.md) |
 | Set up development | [🔧 Development](developer-guide/development.md) |
 | Learn about Bitcoin & Weather services | [⚙️ Services](developer-guide/services.md) |
@@ -189,8 +199,9 @@ python cli/cli_rss.py test
 |------------------|---------------------|------------------|
 | [🎙️ Show Generation](user-guide/show-generation.md) | [🏗️ Architecture](developer-guide/architecture.md) | [🏭 Production](deployment/production.md) |
 | [🎤 Voice Configuration](user-guide/voice-configuration.md) | [🔧 Development](developer-guide/development.md) | |
-| [📰 RSS Dashboard](user-guide/rss-dashboard.md) | [🧪 Testing](developer-guide/testing.md) | |
-| [🤝 Contributing](developer-guide/contributing.md) | [📚 API Reference](user-guide/api-reference.md) | |
+| [📰 RSS Dashboard](user-guide/rss-dashboard.md) | [📊 Data Collection](developer-guide/data-collection.md) | |
+| [🤝 Contributing](developer-guide/contributing.md) | [🧪 Testing](developer-guide/testing.md) | |
+| | [📚 API Reference](user-guide/api-reference.md) | |
 | | [🐳 Docker](deployment/docker.md) | |
 | | [📊 Monitoring](deployment/monitoring.md) | |
 

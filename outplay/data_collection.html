@@ -1,0 +1,1911 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RadioX Data Collection Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; background: rgba(255, 255, 255, 0.95); border-radius: 20px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1); overflow: hidden; }
+        .header { background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); color: white; padding: 30px; text-align: center; }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); }
+        .header .subtitle { font-size: 1.2em; opacity: 0.9; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; padding: 30px; background: #f8f9fa; }
+        .stat-card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); text-align: center; transition: transform 0.3s ease; }
+        .stat-card:hover { transform: translateY(-5px); }
+        .stat-card .icon { font-size: 3em; margin-bottom: 15px; }
+        .stat-card .number { font-size: 2.5em; font-weight: bold; color: #2c3e50; margin-bottom: 10px; }
+        .stat-card .label { font-size: 1.1em; color: #7f8c8d; text-transform: uppercase; letter-spacing: 1px; }
+        .content-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; padding: 30px; }
+        .news-section { background: white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); overflow: hidden; }
+        .section-header { background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: white; padding: 20px; font-size: 1.5em; font-weight: bold; }
+        .news-filters { padding: 20px; background: #ecf0f1; border-bottom: 1px solid #bdc3c7; }
+        .filter-buttons { display: flex; flex-wrap: wrap; gap: 10px; }
+        .filter-btn { padding: 8px 16px; border: none; border-radius: 20px; background: #95a5a6; color: white; cursor: pointer; transition: all 0.3s ease; font-size: 0.9em; }
+        .filter-btn.active { background: #3498db; transform: scale(1.05); }
+        .filter-btn:hover { background: #2980b9; }
+        .news-list { max-height: 800px; overflow-y: auto; }
+        .news-item { padding: 20px; border-bottom: 1px solid #ecf0f1; transition: background-color 0.3s ease; }
+        .news-item:hover { background-color: #f8f9fa; }
+        .news-item:last-child { border-bottom: none; }
+        .news-meta { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; font-size: 0.9em; }
+        .source-badge { padding: 4px 12px; border-radius: 12px; font-weight: bold; text-transform: uppercase; font-size: 0.8em; }
+        .source-nzz { background: #e74c3c; color: white; }
+        .source-20min { background: #f39c12; color: white; }
+        .source-srf { background: #27ae60; color: white; }
+        .source-tagesanzeiger { background: #8e44ad; color: white; }
+        .source-cash { background: #2ecc71; color: white; }
+        .source-heise { background: #34495e; color: white; }
+        .source-cointelegraph { background: #f1c40f; color: black; }
+        .source-techcrunch { background: #1abc9c; color: white; }
+        .source-theverge { background: #9b59b6; color: white; }
+        .source-rt { background: #e67e22; color: white; }
+        .source-bbc { background: #c0392b; color: white; }
+        .category-badge { padding: 4px 12px; border-radius: 12px; background: #ecf0f1; color: #2c3e50; font-size: 0.8em; }
+        .priority-badge { padding: 4px 8px; border-radius: 8px; font-weight: bold; font-size: 0.8em; }
+        .priority-10 { background: #e74c3c; color: white; }
+        .priority-9 { background: #f39c12; color: white; }
+        .priority-8 { background: #f1c40f; color: black; }
+        .priority-7 { background: #2ecc71; color: white; }
+        .priority-6 { background: #3498db; color: white; }
+        .priority-5 { background: #95a5a6; color: white; }
+        .age-badge { padding: 4px 8px; border-radius: 8px; background: #bdc3c7; color: #2c3e50; font-size: 0.8em; }
+        .news-title { font-size: 1.2em; font-weight: bold; color: #2c3e50; margin-bottom: 8px; line-height: 1.4; }
+        .news-summary { color: #7f8c8d; line-height: 1.5; margin-bottom: 10px; }
+        .news-link { display: inline-flex; align-items: center; gap: 8px; color: #3498db; text-decoration: none; font-weight: bold; transition: color 0.3s ease; }
+        .news-link:hover { color: #2980b9; }
+        .sidebar { display: flex; flex-direction: column; gap: 20px; }
+        .context-card { background: white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); overflow: hidden; }
+        .weather-card .section-header { background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); }
+        .crypto-card .section-header { background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%); color: #2c3e50; }
+        .card-content { padding: 25px; text-align: center; }
+        .weather-temp { font-size: 3em; font-weight: bold; color: #f39c12; margin-bottom: 10px; }
+        .weather-desc { font-size: 1.2em; color: #7f8c8d; margin-bottom: 15px; }
+        .weather-location { font-size: 1em; color: #95a5a6; }
+        .crypto-price { font-size: 2.5em; font-weight: bold; color: #f1c40f; margin-bottom: 10px; }
+        .crypto-change { font-size: 1.3em; font-weight: bold; margin-bottom: 15px; }
+        .crypto-change.positive { color: #27ae60; }
+        .crypto-change.negative { color: #e74c3c; }
+        .crypto-trend { font-size: 1em; color: #7f8c8d; background: #ecf0f1; padding: 10px; border-radius: 8px; }
+        .timestamp { text-align: center; padding: 20px; background: #ecf0f1; color: #7f8c8d; font-style: italic; }
+        @media (max-width: 768px) { .content-grid { grid-template-columns: 1fr; } .stats-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); } .filter-buttons { justify-content: center; } }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 RadioX Data Collection Dashboard</h1>
+            <div class="subtitle">Alle gesammelten Daten vor GPT-Priorisierung</div>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-card"><div class="icon">📰</div><div class="number" id="total-news">0</div><div class="label">News Artikel</div></div>
+            <div class="stat-card"><div class="icon">🔗</div><div class="number" id="total-links">0</div><div class="label">Mit URLs</div></div>
+            <div class="stat-card"><div class="icon">📡</div><div class="number" id="total-sources">0</div><div class="label">Quellen</div></div>
+            <div class="stat-card"><div class="icon">🏷️</div><div class="number" id="total-categories">0</div><div class="label">Kategorien</div></div>
+        </div>
+        <div class="content-grid">
+            <div class="news-section">
+                <div class="section-header">📰 News Artikel (für GPT-Priorisierung)</div>
+                <div class="news-filters">
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" data-filter="all">Alle</button>
+                        <button class="filter-btn" data-filter="zurich">Zürich</button>
+                        <button class="filter-btn" data-filter="news">News</button>
+                        <button class="filter-btn" data-filter="wirtschaft">Wirtschaft</button>
+                        <button class="filter-btn" data-filter="tech">Tech</button>
+                        <button class="filter-btn" data-filter="bitcoin">Bitcoin</button>
+                        <button class="filter-btn" data-filter="international">International</button>
+                        <button class="filter-btn" data-filter="schweiz">Schweiz</button>
+                    </div>
+                </div>
+                <div class="news-list" id="news-list"></div>
+            </div>
+            <div class="sidebar">
+                <div class="context-card weather-card">
+                    <div class="section-header">🌤️ Wetter Kontext</div>
+                    <div class="card-content" id="weather-content"></div>
+                </div>
+                <div class="context-card crypto-card">
+                    <div class="section-header">₿ Bitcoin Kontext</div>
+                    <div class="card-content" id="crypto-content"></div>
+                </div>
+            </div>
+        </div>
+        <div class="timestamp" id="timestamp"></div>
+    </div>
+    <script>
+        // Daten direkt eingebettet (kein fetch() nötig)
+        const data = {
+  "collection_timestamp": "2025-06-07T19:55:15.442583",
+  "max_age_hours": 12,
+  "news": [
+    {
+      "title": "Raphael Golta verkörpert das Establishment, Mandy Abou Shoak ist die Stimme der Migranten – die Zürcher SP steht vor einer Richtungswahl",
+      "summary": "An einem Podium treffen die beiden Konkurrenten für das Stadtpräsidium aufeinander – und sind sehr nett zueinander.",
+      "link": "https://www.nzz.ch/zuerich/stadtzuercher-sp-duell-wer-folgt-auf-corine-mauch-ld.1888014",
+      "published": "2025-06-07T15:27:19",
+      "source": "nzz",
+      "category": "zurich",
+      "priority": 10,
+      "weight": 3.0,
+      "published_timestamp": 1749302839.0,
+      "age_hours": 4.465678318888889,
+      "content_length": 115,
+      "has_link": true,
+      "source_category": "nzz_zurich"
+    },
+    {
+      "title": "Kampfjets fangen Hobbypilot Morell in seinem E-Flugzeug ab",
+      "summary": "Morell Westermann fliegt ein Elektroflugzeug und durfte am Mittwoch gemeinsam mit der schweizerischen Luftwaffe in die Luft. Sie trainieren den Umgang mit Kleinflugzeugen.",
+      "link": "https://www.20min.ch/story/armeeuebung-kampfjets-fangen-hobbypilot-morell-mit-seinem-e-flugzeug-ab-103360031",
+      "published": "2025-06-07T13:10:38",
+      "source": "20min",
+      "category": "zurich",
+      "priority": 10,
+      "weight": 2.5,
+      "published_timestamp": 1749294638.0,
+      "age_hours": 6.743733877777778,
+      "content_length": 171,
+      "has_link": true,
+      "source_category": "20min_zurich"
+    },
+    {
+      "title": "Nach vier Jahren Planung: 10'000 Teilnehmer treffen ein",
+      "summary": "Am Pfingstwochenende findet das Jublasurium in Wettingen AG statt. Über 10'000 Teilnehmer verbringen ihr Pfingstlager gemeinsam unter dem Motto «Insektenkonferenz».",
+      "link": "https://www.20min.ch/story/jublasurium-nach-vier-jahren-planung-10-000-teilnehmer-treffen-ein-103360083",
+      "published": "2025-06-07T10:14:01",
+      "source": "20min",
+      "category": "zurich",
+      "priority": 10,
+      "weight": 2.5,
+      "published_timestamp": 1749284041.0,
+      "age_hours": 9.687344990277778,
+      "content_length": 164,
+      "has_link": true,
+      "source_category": "20min_zurich"
+    },
+    {
+      "title": "Mann soll Bub (13) ins Gesicht geschlagen haben",
+      "summary": "In Buchs ZH kam es kürzlich zu einem Vorfall, bei dem ein erwachsener Mann ein Kind (13) geschlagen haben soll, nachdem es auf einem Spielplatz gespielt hatte.",
+      "link": "https://www.20min.ch/story/buchs-zh-faust-ins-gesicht-mann-geht-auf-kind-13-los-103357219",
+      "published": "2025-06-07T09:03:59",
+      "source": "20min",
+      "category": "zurich",
+      "priority": 10,
+      "weight": 2.5,
+      "published_timestamp": 1749279839.0,
+      "age_hours": 10.854567213055555,
+      "content_length": 159,
+      "has_link": true,
+      "source_category": "20min_zurich"
+    },
+    {
+      "title": "Polizei läutet um 6.15 Uhr bei Schwulenpaar und durchsucht Handys",
+      "summary": "Ein Paar aus Zürich wehrt sich gegen eine Hausdurchsuchung, die aufgrund des Verdachts auf eine Scheinehe durchgeführt wurde. Das Bundesgericht verhandelt den Fall.",
+      "link": "https://www.20min.ch/story/scheinehe-verdacht-polizei-laeutet-um-615-uhr-bei-schwulenpaar-und-durchsucht-handys-103360034",
+      "published": "2025-06-07T08:07:14",
+      "source": "20min",
+      "category": "zurich",
+      "priority": 10,
+      "weight": 2.5,
+      "published_timestamp": 1749276434.0,
+      "age_hours": 11.800400546944445,
+      "content_length": 164,
+      "has_link": true,
+      "source_category": "20min_zurich"
+    },
+    {
+      "title": "Spektakuläres Wetterphänomen über der Schweiz",
+      "summary": "Ein rotierender Gewitterwolkenkomplex hat am Freitagabend für ein Naturschauspiel über der Westschweiz gesorgt.",
+      "link": "https://www.20min.ch/story/wetter-schweiz-die-natur-ist-unglaublich-rotierende-wolke-sorgt-fuer-staunen-103360109",
+      "published": "2025-06-07T11:57:36",
+      "source": "20min",
+      "category": "weather",
+      "priority": 10,
+      "weight": 0.8,
+      "published_timestamp": 1749290256.0,
+      "age_hours": 7.960956103333333,
+      "content_length": 111,
+      "has_link": true,
+      "source_category": "20min_weather"
+    },
+    {
+      "title": "Budgetkürzungen für die humanitäre UNO-Hilfe sorgen für Unruhe",
+      "summary": "Zahlreiche Länder streichen ihre Budgets für die Entwicklungshilfe. Ein wenig bekanntes Klumpenrisiko rächt sich nun.",
+      "link": "https://www.srf.ch/news/international/humanitaere-hilfe-budgetkuerzungen-fuer-die-humanitaere-uno-hilfe-sorgen-fuer-unruhe",
+      "published": "2025-06-07T17:19:30",
+      "source": "srf",
+      "category": "news",
+      "priority": 9,
+      "weight": 2.0,
+      "published_timestamp": 1749309570.0,
+      "age_hours": 2.5959561038888888,
+      "content_length": 117,
+      "has_link": true,
+      "source_category": "srf_news"
+    },
+    {
+      "title": "Lausanne: Rund 1000 Menschen demonstrieren gegen «Polizeigewalt»",
+      "summary": "Zwei Wochen nach dem Tod eines 39-jährigen Nigerianers gehen erneut Leute auf die Strasse.",
+      "link": "https://www.srf.ch/news/schweiz/nach-tod-eines-mannes-lausanne-rund-1000-menschen-demonstrieren-gegen-polizeigewalt",
+      "published": "2025-06-07T16:32:25",
+      "source": "srf",
+      "category": "news",
+      "priority": 9,
+      "weight": 2.0,
+      "published_timestamp": 1749306745.0,
+      "age_hours": 3.3806783269444445,
+      "content_length": 90,
+      "has_link": true,
+      "source_category": "srf_news"
+    },
+    {
+      "title": "Gauff feiert bei Sabalenkas Fehler-Orgie ihre Paris-Premiere",
+      "summary": "Coco Gauff besiegt im Final von Paris die Weltnummer 1 Aryna Sabalenka und gewinnt erstmals die French Open.",
+      "link": "https://www.srf.ch/sport/tennis/grand-slam-turniere/french-open-final-frauen-gauff-feiert-bei-sabalenkas-fehler-orgie-ihre-paris-premiere",
+      "published": "2025-06-07T16:26:33",
+      "source": "srf",
+      "category": "news",
+      "priority": 9,
+      "weight": 2.0,
+      "published_timestamp": 1749306393.0,
+      "age_hours": 3.4784561055555554,
+      "content_length": 108,
+      "has_link": true,
+      "source_category": "srf_news"
+    },
+    {
+      "title": "Arbeiten nach dem Uber-Prinzip ist eine Gefahr für die Gesundheit",
+      "summary": "Digitale Lieferdienste für Essen und anderes setzen ihr Personal gesundheitlichen Risiken aus.",
+      "link": "https://www.srf.ch/news/dialog/uberisierung-der-arbeit-arbeiten-nach-dem-uber-prinzip-ist-eine-gefahr-fuer-die-gesundheit",
+      "published": "2025-06-07T16:08:19",
+      "source": "srf",
+      "category": "news",
+      "priority": 9,
+      "weight": 2.0,
+      "published_timestamp": 1749305299.0,
+      "age_hours": 3.782344995,
+      "content_length": 94,
+      "has_link": true,
+      "source_category": "srf_news"
+    },
+    {
+      "title": "Diese Juni-Regenwetterquiz vertreibt jede Langeweile",
+      "summary": "10 Fragen rund ums «Huddelwetter» und den Juni",
+      "link": "https://www.srf.ch/meteo/meteo-stories/meteo-quiz-diese-juni-regenwetterquiz-vertreibt-jede-langeweile",
+      "published": "2025-06-07T16:22:30",
+      "source": "srf",
+      "category": "news",
+      "priority": 9,
+      "weight": 2.0,
+      "published_timestamp": 1749306150.0,
+      "age_hours": 3.5459561066666665,
+      "content_length": 46,
+      "has_link": true,
+      "source_category": "srf_news"
+    },
+    {
+      "title": "Schulden nicht bezahlt: Brescia verschwindet aus Profifussball",
+      "summary": "Hier finden Sie die wichtigsten Neuigkeiten aus dem internationalen Fussball.",
+      "link": "https://www.srf.ch/sport/fussball/internationale-ligen/internationale-fussball-news-schulden-nicht-bezahlt-brescia-verschwindet-aus-profifussball",
+      "published": "2025-06-07T15:16:23",
+      "source": "srf",
+      "category": "news",
+      "priority": 9,
+      "weight": 2.0,
+      "published_timestamp": 1749302183.0,
+      "age_hours": 4.647900551666667,
+      "content_length": 77,
+      "has_link": true,
+      "source_category": "srf_news"
+    },
+    {
+      "title": "Blatten nach der Katastrophe – die neuesten Bilder",
+      "summary": "Millionen Tonnen Geröll und Eis haben die Berggemeinde begraben. Nun bahnt sich die Lonza durch den Schutt. Die Bilder.",
+      "link": "https://www.srf.ch/news/gletscherkollaps-im-oberwallis-blatten-nach-der-katastrophe-die-neuesten-bilder",
+      "published": "2025-06-07T14:44:00",
+      "source": "srf",
+      "category": "news",
+      "priority": 9,
+      "weight": 2.0,
+      "published_timestamp": 1749300240.0,
+      "age_hours": 5.187622774722222,
+      "content_length": 119,
+      "has_link": true,
+      "source_category": "srf_news"
+    },
+    {
+      "title": "«Die Russen schiessen mehr, weil sie mehr Munition haben»",
+      "summary": "Russland greift den Osten der Ukraine massiv an – vor allem um Charkiw. Der SRF-Korrespondent hat die Front besucht.",
+      "link": "https://www.srf.ch/news/international/bericht-von-der-ostfront-die-russen-schiessen-mehr-weil-sie-mehr-munition-haben",
+      "published": "2025-06-07T14:42:33",
+      "source": "srf",
+      "category": "news",
+      "priority": 9,
+      "weight": 2.0,
+      "published_timestamp": 1749300153.0,
+      "age_hours": 5.211789441944444,
+      "content_length": 116,
+      "has_link": true,
+      "source_category": "srf_news"
+    },
+    {
+      "title": "Die Schweizer Maschinenindustrie hat die Schmerzgrenze erreicht",
+      "summary": "Der Kampf gegen die Konjunktur und die Trumpschen Zölle am Beispiel der Schleifmaschinenfabrik Agathon.",
+      "link": "https://www.srf.ch/news/wirtschaft/krise-im-maschinenbau-die-schweizer-maschinenindustrie-hat-die-schmerzgrenze-erreicht",
+      "published": "2025-06-07T13:53:10",
+      "source": "srf",
+      "category": "news",
+      "priority": 9,
+      "weight": 2.0,
+      "published_timestamp": 1749297190.0,
+      "age_hours": 6.034844998055556,
+      "content_length": 103,
+      "has_link": true,
+      "source_category": "srf_news"
+    },
+    {
+      "title": "Unser Beckenboden – der Orgasmus-Booster schlechthin",
+      "summary": "Ein Teil der Sexualität ist lernbar: Mit Beckenbodentraining lässt sich Lust und Intensität beim Sex steigern.",
+      "link": "https://www.srf.ch/wissen/gesundheit/sexualitaet-staerken-unser-beckenboden-der-orgasmus-booster-schlechthin",
+      "published": "2025-06-07T13:47:19",
+      "source": "srf",
+      "category": "news",
+      "priority": 9,
+      "weight": 2.0,
+      "published_timestamp": 1749296839.0,
+      "age_hours": 6.132344998611112,
+      "content_length": 110,
+      "has_link": true,
+      "source_category": "srf_news"
+    },
+    {
+      "title": "Marc vor Alex: Marquez-Brüder in Aragon eine Klasse für sich",
+      "summary": "Marc Marquez feiert beim 8. Sprintrennen der Saison im spanischen Aragon den 7. Sieg in diesem Jahr.",
+      "link": "https://www.srf.ch/sport/motorsport/motorrad/motogp-sprint-von-aragon-marc-vor-alex-marquez-brueder-in-aragon-eine-klasse-fuer-sich",
+      "published": "2025-06-07T13:40:03",
+      "source": "srf",
+      "category": "news",
+      "priority": 9,
+      "weight": 2.0,
+      "published_timestamp": 1749296403.0,
+      "age_hours": 6.253456110277778,
+      "content_length": 100,
+      "has_link": true,
+      "source_category": "srf_news"
+    },
+    {
+      "title": "Downhillerin Balanche neben Podest – Chabbey gibt Leadertrikot ab",
+      "summary": "Hier finden Sie die wichtigsten Meldungen des Tages aus dem Radsport.",
+      "link": "https://www.srf.ch/sport/mehr-sport/rad/news-aus-dem-radsport-downhillerin-balanche-neben-podest-chabbey-gibt-leadertrikot-ab",
+      "published": "2025-06-07T14:44:13",
+      "source": "srf",
+      "category": "news",
+      "priority": 9,
+      "weight": 2.0,
+      "published_timestamp": 1749300253.0,
+      "age_hours": 5.184011666666667,
+      "content_length": 69,
+      "has_link": true,
+      "source_category": "srf_news"
+    },
+    {
+      "title": "«Extrem»: Marcel Rohner über die Massnahmen zur Bankenregulierung",
+      "summary": "Der Bankier-Präsident und Ex-UBS-Chef hofft, dass das Parlament die Vorlage des Bundesrats entschärft.",
+      "link": "https://www.srf.ch/news/wirtschaft/ex-chef-gegen-neue-ubs-regeln-extrem-marcel-rohner-ueber-die-massnahmen-zur-bankenregulierung",
+      "published": "2025-06-07T13:11:35",
+      "source": "srf",
+      "category": "news",
+      "priority": 9,
+      "weight": 2.0,
+      "published_timestamp": 1749294695.0,
+      "age_hours": 6.727900556111111,
+      "content_length": 102,
+      "has_link": true,
+      "source_category": "srf_news"
+    },
+    {
+      "title": "Premiere für «Next-Gen»-Giganten Sinner und Alcaraz",
+      "summary": "Jannik Sinner und Carlos Alcaraz treffen in Paris erstmals in einem Grand-Slam-Final aufeinander.",
+      "link": "https://www.srf.ch/sport/tennis/grand-slam-turniere/french-open-final-maenner-premiere-fuer-next-gen-giganten-sinner-und-alcaraz",
+      "published": "2025-06-07T12:47:22",
+      "source": "srf",
+      "category": "news",
+      "priority": 9,
+      "weight": 2.0,
+      "published_timestamp": 1749293242.0,
+      "age_hours": 7.131511667777778,
+      "content_length": 97,
+      "has_link": true,
+      "source_category": "srf_news"
+    },
+    {
+      "title": "Tipps für einen starken Beckenboden",
+      "summary": "Wie steht es um meinen Beckenboden? Wie lässt er sich einfach trainieren? Praxistipps der Bewegungstherapeutin.",
+      "link": "https://www.srf.ch/wissen/puls-kompakt/puls-kompakt-74-tipps-fuer-einen-starken-beckenboden",
+      "published": "2025-06-07T11:57:06",
+      "source": "srf",
+      "category": "news",
+      "priority": 9,
+      "weight": 2.0,
+      "published_timestamp": 1749290226.0,
+      "age_hours": 7.9692894461111115,
+      "content_length": 111,
+      "has_link": true,
+      "source_category": "srf_news"
+    },
+    {
+      "title": "Ronaldo verzichtet auf Klub-WM – trotz Angeboten",
+      "summary": "An der Klub-WM in Nordamerika wird es zu keinem Duell Ronaldo vs. Messi kommen, der Portugiese nimmt nicht teil.",
+      "link": "https://www.srf.ch/sport/fussball/fussball-allgemein/klub-wm-ohne-cr7-ronaldo-verzichtet-auf-klub-wm-trotz-angeboten",
+      "published": "2025-06-07T11:54:31",
+      "source": "srf",
+      "category": "news",
+      "priority": 9,
+      "weight": 2.0,
+      "published_timestamp": 1749290071.0,
+      "age_hours": 8.012345002222222,
+      "content_length": 112,
+      "has_link": true,
+      "source_category": "srf_news"
+    },
+    {
+      "title": "Game over für die Game-Industrie? Darum ist der Boom vorbei",
+      "summary": "Lange ging es für die Gamingbranche nur steil nach oben. Ein genauer Blick zeigt: Die Branche kämpft mit Problemen.",
+      "link": "https://www.srf.ch/kultur/games/branche-in-bredouille-game-over-fuer-die-game-industrie-darum-ist-der-boom-vorbei",
+      "published": "2025-06-07T10:33:22",
+      "source": "srf",
+      "category": "news",
+      "priority": 9,
+      "weight": 2.0,
+      "published_timestamp": 1749285202.0,
+      "age_hours": 9.364845002777777,
+      "content_length": 115,
+      "has_link": true,
+      "source_category": "srf_news"
+    },
+    {
+      "title": "Warum geht die «Bromance» zwischen Trump und Musk zu Ende?",
+      "summary": "Wie gut sind Sie informiert? Finden Sie es heraus! – in unserem Newsquiz.",
+      "link": "https://www.srf.ch/news/gesellschaft/newsquiz-der-woche-warum-geht-die-bromance-zwischen-trump-und-musk-zu-ende",
+      "published": "2025-06-07T10:22:09",
+      "source": "srf",
+      "category": "news",
+      "priority": 9,
+      "weight": 2.0,
+      "published_timestamp": 1749284529.0,
+      "age_hours": 9.551789448055555,
+      "content_length": 73,
+      "has_link": true,
+      "source_category": "srf_news"
+    },
+    {
+      "title": "Ok, Millennial! Jetzt ist‘s vorbei mit der Coolness",
+      "summary": "Vor einigen Jahren hiess es noch «Ok, Boomer!». Heute steht mit «Ok, Millennial!» die Generation Y in der Kritik.",
+      "link": "https://www.srf.ch/news/schweiz/satire-und-comedy/die-etwas-anderen-news-ok-millennial-jetzt-ist-s-vorbei-mit-der-coolness",
+      "published": "2025-06-07T10:04:55",
+      "source": "srf",
+      "category": "news",
+      "priority": 9,
+      "weight": 2.0,
+      "published_timestamp": 1749283495.0,
+      "age_hours": 9.839011670833333,
+      "content_length": 113,
+      "has_link": true,
+      "source_category": "srf_news"
+    },
+    {
+      "title": "Früher Tanz der Topstars bei der Dauphiné",
+      "summary": "Formtest einen Monat vor der Tour de France: Pogacar, Vingegaard und Evenepoel messen sich beim Critérium du Dauphiné.",
+      "link": "https://www.srf.ch/sport/mehr-sport/rad/pogacar-vingegaard-evenepoel-frueher-tanz-der-topstars-bei-der-dauphine",
+      "published": "2025-06-07T09:28:13",
+      "source": "srf",
+      "category": "news",
+      "priority": 9,
+      "weight": 2.0,
+      "published_timestamp": 1749281293.0,
+      "age_hours": 10.450678338055555,
+      "content_length": 118,
+      "has_link": true,
+      "source_category": "srf_news"
+    },
+    {
+      "title": "Ein todkranker Mann will für die Nachwelt ewig leben",
+      "summary": "Dies ist die Geschichte von Matthew. Todkrank will er für die Nachwelt einen digitalen Klon seiner selbst erschaffen.",
+      "link": "https://www.srf.ch/kultur/gesellschaft-religion/geschaeft-mit-der-verzweiflung-ein-todkranker-mann-will-fuer-die-nachwelt-ewig-leben",
+      "published": "2025-06-07T09:27:39",
+      "source": "srf",
+      "category": "news",
+      "priority": 9,
+      "weight": 2.0,
+      "published_timestamp": 1749281259.0,
+      "age_hours": 10.460122783055557,
+      "content_length": 117,
+      "has_link": true,
+      "source_category": "srf_news"
+    },
+    {
+      "title": "Trump über Musk: «Ich wünsche ihm alles Gute»",
+      "summary": "Nach dem öffentlichen Zerwürfnis mit Elon Musk ist US-Präsident Trump offenbar nicht an einer Versöhnung interessiert.",
+      "link": "https://www.srf.ch/news/international/ende-der-bromance-trump-ueber-musk-ich-wuensche-ihm-alles-gute",
+      "published": "2025-06-07T09:24:54",
+      "source": "srf",
+      "category": "news",
+      "priority": 9,
+      "weight": 2.0,
+      "published_timestamp": 1749281094.0,
+      "age_hours": 10.505956116944445,
+      "content_length": 118,
+      "has_link": true,
+      "source_category": "srf_news"
+    },
+    {
+      "title": "Romand für Romand? Magnin soll Celestini in Basel beerben",
+      "summary": "In Basel soll es zur Trainerrochade kommen. Noch fehlt eine offizielle Bestätigung des Klubs.",
+      "link": "https://www.srf.ch/sport/fussball/super-league/nachfolge-offenbar-geregelt-romand-fuer-romand-magnin-soll-celestini-in-basel-beerben",
+      "published": "2025-06-07T09:24:49",
+      "source": "srf",
+      "category": "news",
+      "priority": 9,
+      "weight": 2.0,
+      "published_timestamp": 1749281089.0,
+      "age_hours": 10.507345006666668,
+      "content_length": 93,
+      "has_link": true,
+      "source_category": "srf_news"
+    },
+    {
+      "title": "Der Kampf ums Geld – oder warum zwei Bahnen auf die Rigi fahren",
+      "summary": "Seit 150 Jahren fahren zwei Bahnen auf die Rigi. Schwyz baute die Arth-Rigi-Bahn, um im Tourismusgeschäft zu bleiben.",
+      "link": "https://www.srf.ch/news/schweiz/150-jahre-arth-rigi-bahn-der-kampf-ums-geld-oder-warum-zwei-bahnen-auf-die-rigi-fahren",
+      "published": "2025-06-07T08:57:49",
+      "source": "srf",
+      "category": "news",
+      "priority": 9,
+      "weight": 2.0,
+      "published_timestamp": 1749279469.0,
+      "age_hours": 10.957345007222221,
+      "content_length": 117,
+      "has_link": true,
+      "source_category": "srf_news"
+    },
+    {
+      "title": "Kampf um Sitze im Zürcher Stadtrat: Mandy Abou Shoak erhielt beim SP-Podium den lautesten Applaus",
+      "summary": "Die 35-Jährige zeigte sich persönlich und emotional. Ihr Kontrahent ums Zürcher Stadtpräsidium – Raphael Golta – lieferte routiniert. Bei einer Frage musste er lange nachdenken.",
+      "link": "https://www.tagesanzeiger.ch/sp-podium-in-zuerich-mandy-abou-shoak-vs-raphael-golta-517808530931",
+      "published": "2025-06-07T16:15:55",
+      "source": "tagesanzeiger",
+      "category": "zurich",
+      "priority": 8,
+      "weight": 3.0,
+      "published_timestamp": 1749305755.0,
+      "age_hours": 3.6556783416666665,
+      "content_length": 177,
+      "has_link": true,
+      "source_category": "tagesanzeiger_zurich"
+    },
+    {
+      "title": "Zürcher Freibad: Die Badi Allenmoos soll noch mehr Bäume bekommen",
+      "summary": "Die Stadt Zürich hat erste Pläne für den Umbau des Freibads veröffentlicht.",
+      "link": "https://www.tagesanzeiger.ch/zuercher-freibad-die-badi-allenmoos-soll-noch-mehr-baeume-bekommen-970329757659",
+      "published": "2025-06-07T10:06:13",
+      "source": "tagesanzeiger",
+      "category": "zurich",
+      "priority": 8,
+      "weight": 3.0,
+      "published_timestamp": 1749283573.0,
+      "age_hours": 9.81734500888889,
+      "content_length": 75,
+      "has_link": true,
+      "source_category": "tagesanzeiger_zurich"
+    },
+    {
+      "title": "Andreas Homokis Wochenende: «Jogginghosen gehören verboten»",
+      "summary": "Der Intendant Andreas Homoki verlässt das Opernhaus, wo er auch seine Wochenenden verbrachte. Abseits der Oper kocht er exotische Rezepte nach und schaut am Sonntagabend TV – aber nicht den «Tatort».",
+      "link": "https://www.tagesanzeiger.ch/andreas-homoki-so-verbringt-der-opernhausintendant-seine-wochenenden-in-zuerich-350313947723",
+      "published": "2025-06-07T08:06:27",
+      "source": "tagesanzeiger",
+      "category": "zurich",
+      "priority": 8,
+      "weight": 3.0,
+      "published_timestamp": 1749276387.0,
+      "age_hours": 11.813456120555555,
+      "content_length": 199,
+      "has_link": true,
+      "source_category": "tagesanzeiger_zurich"
+    },
+    {
+      "title": "Kunst im Park Seleger Moor: Die Grinsekatze von «Alice im Wunderland» taucht im Park auf",
+      "summary": "Üppige Natur, exotische Pflanzen, riesige Bäume und dazwischen Kunst: Im Park Seleger Moor in Rifferswil ist die «MoorArt25» eröffnet worden.",
+      "link": "https://www.tagesanzeiger.ch/seleger-moor-moorart25-im-park-in-rifferswil-ist-eroeffnet-650158567073",
+      "published": "2025-06-07T14:00:00",
+      "source": "tagesanzeiger",
+      "category": "zurich",
+      "priority": 8,
+      "weight": 3.0,
+      "published_timestamp": 1749297600.0,
+      "age_hours": 5.9209561213888895,
+      "content_length": 141,
+      "has_link": true,
+      "source_category": "tagesanzeiger_zurich"
+    },
+    {
+      "title": "Ausstellung im Kunsthaus Zürich: Von Giotto bis Ninja Turtles: Die wilde Welt von Monster Chetwynd",
+      "summary": "Malerei, Skulptur, Performance, Installation: Die britische Künstlerin kann alles. Ihre Welt ist bunt, laut, voller Referenzen – und vielleicht in ihrer Leichtigkeit auch politisch.",
+      "link": "https://www.tagesanzeiger.ch/monster-chetwynd-die-neue-ausstellung-im-kunsthaus-zuerich-927271107075",
+      "published": "2025-06-07T11:51:10",
+      "source": "tagesanzeiger",
+      "category": "zurich",
+      "priority": 8,
+      "weight": 3.0,
+      "published_timestamp": 1749289870.0,
+      "age_hours": 8.068178344444444,
+      "content_length": 181,
+      "has_link": true,
+      "source_category": "tagesanzeiger_zurich"
+    },
+    {
+      "title": "Fussball in Winterthur: Luca Zuffi bleibt eine weitere Saison beim FCW",
+      "summary": "Luca Zuffi, einer der Schlüsselspieler des FC Winterthur, hat seinen Vertrag verlängert. Andererseits verlassen drei Spieler den Club.",
+      "link": "https://www.tagesanzeiger.ch/fussball-luca-zuffi-weitere-saison-beim-fc-winterthur-709417244125",
+      "published": "2025-06-07T12:35:36",
+      "source": "tagesanzeiger",
+      "category": "zurich",
+      "priority": 8,
+      "weight": 3.0,
+      "published_timestamp": 1749292536.0,
+      "age_hours": 7.327622789444444,
+      "content_length": 134,
+      "has_link": true,
+      "source_category": "tagesanzeiger_zurich"
+    },
+    {
+      "title": "Is a Bitcoin price rally to $150K possible by year's end?",
+      "summary": "<img alt=\"Is a Bitcoin price rally to $150K possible by year's end?\" src=\"https://images.cointelegraph.com/images/528_aHR0cHM6Ly9zMy5jb2ludGVsZWdyYXBoLmNvbS91cGxvYWRzLzIwMjUtMDYvMDE5NzQ5YWMtNjI2ZS03OGJjLWJkZGMtZTI4YjZlMGE3M2Ri.jpg\" /",
+      "link": "https://cointelegraph.com/news/is-bitcoin-price-rally-to-150k-possible-by-year-end?utm_source=rss_feed&utm_medium=rss_tag_bitcoin&utm_campaign=rss_partner_inbound",
+      "published": "2025-06-07T14:05:00",
+      "source": "cointelegraph",
+      "category": "bitcoin",
+      "priority": 8,
+      "weight": 2.0,
+      "published_timestamp": 1749297900.0,
+      "age_hours": 5.837622790277778,
+      "content_length": 233,
+      "has_link": true,
+      "source_category": "cointelegraph_bitcoin"
+    },
+    {
+      "title": "Bitcoin DeFi platform Alex Protocol loses $8.3M to exploit",
+      "summary": "</p",
+      "link": "https://cointelegraph.com/news/bitcoin-defi-platform-alex-protocol-loses-8-3m-to-exploit?utm_source=rss_feed&utm_medium=rss_tag_bitcoin&utm_campaign=rss_partner_inbound",
+      "published": "2025-06-07T12:21:35",
+      "source": "cointelegraph",
+      "category": "bitcoin",
+      "priority": 8,
+      "weight": 2.0,
+      "published_timestamp": 1749291695.0,
+      "age_hours": 7.561233901944445,
+      "content_length": 3,
+      "has_link": true,
+      "source_category": "cointelegraph_bitcoin"
+    },
+    {
+      "title": "Singapore’s ousted crypto firms may not find shelter elsewhere",
+      "summary": "<img alt=\"Singapore’s ousted crypto firms may not find shelter elsewhere\" src=\"https://images.cointelegraph.com/images/528_aHR0cHM6Ly9zMy5jb2ludGVsZWdyYXBoLmNvbS91cGxvYWRzLzIwMjUtMDYvMDE5NzQ1N2MtYjM1MS03M2Y0LWI1YmItMjI2ZWI1NjdmYTRi.jpg\" /",
+      "link": "https://cointelegraph.com/news/singapore-crypto-shelter-elsewhere?utm_source=rss_feed&utm_medium=rss_tag_bitcoin&utm_campaign=rss_partner_inbound",
+      "published": "2025-06-07T09:32:36",
+      "source": "cointelegraph",
+      "category": "bitcoin",
+      "priority": 8,
+      "weight": 2.0,
+      "published_timestamp": 1749281556.0,
+      "age_hours": 10.377622791388887,
+      "content_length": 238,
+      "has_link": true,
+      "source_category": "cointelegraph_bitcoin"
+    },
+    {
+      "title": "Bürohr – Wirtschaftsnews der Woche: McKinsey weiss, wie man Stellen einspart",
+      "summary": "Das «Bürohr» der «SonntagsZeitung» ist eine Institution. Gerüchte, Possen, Erfolgsmeldungen: Hier lesen Sie, was abseits der grossen Schlagzeilen in der Wirtschaft passiert.",
+      "link": "https://www.tagesanzeiger.ch/buerohr-mckinsey-weiss-wie-man-stellen-einspart-261633104423",
+      "published": "2025-06-07T15:10:48",
+      "source": "tagesanzeiger",
+      "category": "schweiz",
+      "priority": 8,
+      "weight": 1.8,
+      "published_timestamp": 1749301848.0,
+      "age_hours": 4.740956125,
+      "content_length": 173,
+      "has_link": true,
+      "source_category": "tagesanzeiger_schweiz"
+    },
+    {
+      "title": "Awards für Sammelstiftungen: Das sind die Gewinner des Pensionskassen-Ratings 2025",
+      "summary": "Mit einem feierlichen Event wurden diese Woche die besten Vorsorge­einrichtungen der Schweiz ausgezeichnet.",
+      "link": "https://www.tagesanzeiger.ch/pensionskassen-rating-2025-das-sind-die-gewinner-371464768749",
+      "published": "2025-06-07T13:00:00",
+      "source": "tagesanzeiger",
+      "category": "schweiz",
+      "priority": 8,
+      "weight": 1.8,
+      "published_timestamp": 1749294000.0,
+      "age_hours": 6.920956125555555,
+      "content_length": 107,
+      "has_link": true,
+      "source_category": "tagesanzeiger_schweiz"
+    },
+    {
+      "title": "Interview über Pensionskassen: «Ich gehe davon aus, dass die Umwandlungs­sätze vorerst stabil bleiben»",
+      "summary": "Vera Kupper Staub, die Präsidentin der Oberaufsichts­kommission Berufliche Vorsorge, über die Kompetenzen ihrer Bundesbehörde, gute Anlageergebnisse und die Risiken von Kapitalbezügen.",
+      "link": "https://www.tagesanzeiger.ch/pensionskassen-umwandlungssaetze-duerften-vorerst-stabil-bleiben-586993780927",
+      "published": "2025-06-07T13:00:00",
+      "source": "tagesanzeiger",
+      "category": "schweiz",
+      "priority": 8,
+      "weight": 1.8,
+      "published_timestamp": 1749294000.0,
+      "age_hours": 6.920956126111111,
+      "content_length": 184,
+      "has_link": true,
+      "source_category": "tagesanzeiger_schweiz"
+    },
+    {
+      "title": "Sprachquiz: Das grosse ABC: Sprechen Sie ein schönes Deutsch?",
+      "summary": "Im heutigen Quiz geht es nicht um Grammatik oder Rechtschreibung, sondern um Stilgefühl, Sprachfeinheit und Wortwonne. 11 Fragen, jeweils drei Antwortmöglichkeiten.",
+      "link": "https://www.tagesanzeiger.ch/sprachquiz-sprechen-sie-ein-schoenes-deutsch-457417626277",
+      "published": "2025-06-07T10:57:39",
+      "source": "tagesanzeiger",
+      "category": "schweiz",
+      "priority": 8,
+      "weight": 1.8,
+      "published_timestamp": 1749286659.0,
+      "age_hours": 8.960122793333333,
+      "content_length": 164,
+      "has_link": true,
+      "source_category": "tagesanzeiger_schweiz"
+    },
+    {
+      "title": "Mini-PC Acemagic M1 im Test: Ryzen 7 für 336 Euro – Preis-Tipp mit Abstrichen",
+      "summary": "Der Acemagic M1 verspricht auf dem Papier starke Hardware, die für 336 Euro unüblich ist. Ob er das Leistungsversprechen einhalten kann, zeigt sich im Test.",
+      "link": "https://www.heise.de/bestenlisten/testbericht/mini-pc-acemagic-m1-im-test/0y2t27b?wt_mc=rss.red.ho.beitrag.rdf.beitrag.beitrag",
+      "published": "2025-06-07T14:00:00",
+      "source": "heise",
+      "category": "tech",
+      "priority": 8,
+      "weight": 1.3,
+      "published_timestamp": 1749297600.0,
+      "age_hours": 5.920956127222222,
+      "content_length": 156,
+      "has_link": true,
+      "source_category": "heise_tech"
+    },
+    {
+      "title": "heise-Angebot: Product Owner AI Day: Zielführender KI-Einsatz bei der Produktentwicklung",
+      "summary": "Die Online-Konferenz am 6. November zeigt Product Ownern und Produktmanagerinnen, wie KI zu besseren Entscheidungen und effizienteren Workflows verhilft.",
+      "link": "https://www.heise.de/news/Product-Owner-AI-Day-Zielfuehrender-KI-Einsatz-bei-der-Produktentwicklung-10435527.html?wt_mc=rss.red.ho.beitrag.rdf.beitrag.beitrag",
+      "published": "2025-06-07T08:00:00",
+      "source": "heise",
+      "category": "tech",
+      "priority": 8,
+      "weight": 1.3,
+      "published_timestamp": 1749276000.0,
+      "age_hours": 11.920956128055556,
+      "content_length": 153,
+      "has_link": true,
+      "source_category": "heise_tech"
+    },
+    {
+      "title": "Nigerianer starb nach Polizeikontrolle: Demos und Strafverfahren",
+      "summary": "In Lausanne forderten am Samstag rund 1000 Menschen Gerechtigkeit für den bei einer Polizeikontrolle verstorbenen Kenechukwu. Sein Bruder spricht von einem «barbarischen» Vorfall.",
+      "link": "https://www.20min.ch/story/lausanne-nigerianer-starb-nach-polizeikontrolle-demos-und-strafverfahren-103360173",
+      "published": "2025-06-07T17:38:22",
+      "source": "20min",
+      "category": "schweiz",
+      "priority": 8,
+      "weight": 1.0,
+      "published_timestamp": 1749310702.0,
+      "age_hours": 2.281511684166667,
+      "content_length": 179,
+      "has_link": true,
+      "source_category": "20min_schweiz"
+    },
+    {
+      "title": "Schweizer F/A-18-Piloten trainieren in Italien – gegen den F-35",
+      "summary": "Die Schweizer Luftwaffe trainiert den Luftkampf in Italien. Mit ihren F/A-18 fliegen die Piloten so nahe am Boden, wie es in der Schweiz unmöglich wäre. Auch den Zweikampf gegen den F-35 üben die Männer – dass sie fast alle Kämpfe verlieren, freut sie.",
+      "link": "https://www.20min.ch/story/schweizer-luftwaffe-uebt-mit-fa-18-in-italien-103359553",
+      "published": "2025-06-07T08:27:45",
+      "source": "20min",
+      "category": "schweiz",
+      "priority": 8,
+      "weight": 1.0,
+      "published_timestamp": 1749277665.0,
+      "age_hours": 11.458456129166667,
+      "content_length": 252,
+      "has_link": true,
+      "source_category": "20min_schweiz"
+    },
+    {
+      "title": "Taylor Swift machte alle reich — sogar ihre Feinde",
+      "summary": "Unterhaltung - Popstar Taylor Swift hat endlich ihre Songs zurück. Ein Einblick in ihre Karriere und wie jeder, der an ihrer Musik beteiligt war, Geld gemacht hat.",
+      "link": "https://www.cash.ch/news/top-news/taylor-swift-machte-alle-reich-sogar-ihre-feinde-830021",
+      "published": "2025-06-07T16:00:00",
+      "source": "cash",
+      "category": "wirtschaft",
+      "priority": 7,
+      "weight": 1.5,
+      "published_timestamp": 1749304800.0,
+      "age_hours": 3.920956129722222,
+      "content_length": 163,
+      "has_link": true,
+      "source_category": "cash_wirtschaft"
+    },
+    {
+      "title": "China bestätigt Gespräche mit den USA",
+      "summary": "Handelsstreit - Delegationen der USA und Chinas wollen sich nächste Woche in London an einen Tisch setzen.",
+      "link": "https://www.cash.ch/news/top-news/china-bestatigt-gesprache-mit-den-usa-831629",
+      "published": "2025-06-07T15:35:36",
+      "source": "cash",
+      "category": "wirtschaft",
+      "priority": 7,
+      "weight": 1.5,
+      "published_timestamp": 1749303336.0,
+      "age_hours": 4.3276227969444445,
+      "content_length": 106,
+      "has_link": true,
+      "source_category": "cash_wirtschaft"
+    },
+    {
+      "title": "Anleger blicken in der neuen Woche auf US-Konjunkturdaten",
+      "summary": "Börsenvorschau - In der neue Woche treffen US-Konjunkturdaten ein, die Hinweise auf kommende Zinsentscheide geben.",
+      "link": "https://www.cash.ch/news/top-news/anleger-blicken-in-der-neuen-woche-auf-us-konjunkturdaten-831486",
+      "published": "2025-06-07T15:00:00",
+      "source": "cash",
+      "category": "wirtschaft",
+      "priority": 7,
+      "weight": 1.5,
+      "published_timestamp": 1749301200.0,
+      "age_hours": 4.920956130833334,
+      "content_length": 114,
+      "has_link": true,
+      "source_category": "cash_wirtschaft"
+    },
+    {
+      "title": "Musk löscht brisanten Post zu Epstein-Akten im Onlinedienst X",
+      "summary": "Missbrauchsskandal - Einträge auf der Onlineplattform X sind verschwunden, wonach Musk behauptet hatte, Trump komme in unter Verschluss gehaltenen Aktien zum Missbrauchsskandal um den US-Milliardär Jeffrey Epstein vor.",
+      "link": "https://www.cash.ch/news/top-news/musk-loscht-brisanten-post-zu-epstein-akten-im-onlinedienst-x-831624",
+      "published": "2025-06-07T14:39:59",
+      "source": "cash",
+      "category": "wirtschaft",
+      "priority": 7,
+      "weight": 1.5,
+      "published_timestamp": 1749299999.0,
+      "age_hours": 5.254567242777777,
+      "content_length": 218,
+      "has_link": true,
+      "source_category": "cash_wirtschaft"
+    },
+    {
+      "title": "Chinas Exportbeschränkungen für Seltene Erden",
+      "summary": "Rohstoffe - Hersteller in der ganzen Welt warnen vor den Auswirkungen chinesischer Exportbeschränkungen für Seltene Erden.",
+      "link": "https://www.cash.ch/news/top-news/chinas-exportbeschrankungen-fur-seltene-erden-831479",
+      "published": "2025-06-07T14:00:00",
+      "source": "cash",
+      "category": "wirtschaft",
+      "priority": 7,
+      "weight": 1.5,
+      "published_timestamp": 1749297600.0,
+      "age_hours": 5.920956132222222,
+      "content_length": 122,
+      "has_link": true,
+      "source_category": "cash_wirtschaft"
+    },
+    {
+      "title": "So perfide zocken uns Online-Betrüger ab",
+      "summary": "Podcast - Der Online-Betrug in der Schweiz ist alarmierend hoch. Im Podcast erklärt Tech-Journalist Tobias Bolzern, wie wir uns schützen können.",
+      "link": "https://www.cash.ch/news/top-news/so-perfide-zocken-uns-online-betruger-ab-829764",
+      "published": "2025-06-07T12:00:00",
+      "source": "cash",
+      "category": "wirtschaft",
+      "priority": 7,
+      "weight": 1.5,
+      "published_timestamp": 1749290400.0,
+      "age_hours": 7.9209561327777775,
+      "content_length": 144,
+      "has_link": true,
+      "source_category": "cash_wirtschaft"
+    },
+    {
+      "title": "Euro-Währungshüter über Zinssenkungen: «Würde zustimmen, dass wir fast fertig sind»",
+      "summary": "Geldpolitik - Laut dem kroatischen Notenbankchef Boris Vujcic wird die Europäische Zentralbank die Zinsen kaum mehr weiter senken.",
+      "link": "https://www.cash.ch/news/top-news/euro-wahrungshuter-uber-zinssenkungen-wurde-zustimmen-dass-wir-fast-fertig-sind-831609",
+      "published": "2025-06-07T11:14:33",
+      "source": "cash",
+      "category": "wirtschaft",
+      "priority": 7,
+      "weight": 1.5,
+      "published_timestamp": 1749287673.0,
+      "age_hours": 8.678456133333334,
+      "content_length": 130,
+      "has_link": true,
+      "source_category": "cash_wirtschaft"
+    },
+    {
+      "title": "Das sind die besten 3a-Fonds zur Stärkung der dritten Säule",
+      "summary": "Analyse - Günstige 3a-Produkte von kleinen digitalen Anbietern schneiden in der Regel besser ab als aktiv verwaltete Fonds der Banken.",
+      "link": "https://www.cash.ch/news/top-news/das-sind-die-besten-3a-fonds-zur-starkung-der-dritten-saule-830199",
+      "published": "2025-06-07T09:00:00",
+      "source": "cash",
+      "category": "wirtschaft",
+      "priority": 7,
+      "weight": 1.5,
+      "published_timestamp": 1749279600.0,
+      "age_hours": 10.920956134166667,
+      "content_length": 134,
+      "has_link": true,
+      "source_category": "cash_wirtschaft"
+    },
+    {
+      "title": "Here’s what happened in crypto today",
+      "summary": "Need to know what",
+      "link": "https://cointelegraph.com/news/what-happened-in-crypto-today?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+      "published": "2025-06-07T13:12:58",
+      "source": "cointelegraph",
+      "category": "crypto",
+      "priority": 7,
+      "weight": 1.5,
+      "published_timestamp": 1749294778.0,
+      "age_hours": 6.704845023611111,
+      "content_length": 17,
+      "has_link": true,
+      "source_category": "cointelegraph_crypto"
+    },
+    {
+      "title": "Musician made $3M selling NFTs and lost it all to taxes and a crypto crash",
+      "summary": "<img alt=\"Musician made $3M selling NFTs and lost it all to taxes and a crypto crash\" src=\"https://images.cointelegraph.com/images/528_aHR0cHM6Ly9zMy5jb2ludGVsZWdyYXBoLmNvbS91cGxvYWRzLzIwMjUtMDYvMDE5NzQ5ZDgtMjgwOC03OTJlLWExYWEtNzcyODliNzI",
+      "link": "https://cointelegraph.com/news/nft-artist-crypto-tax-nightmare-song?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+      "published": "2025-06-07T11:02:24",
+      "source": "cointelegraph",
+      "category": "crypto",
+      "priority": 7,
+      "weight": 1.5,
+      "published_timestamp": 1749286944.0,
+      "age_hours": 8.880956135277778,
+      "content_length": 238,
+      "has_link": true,
+      "source_category": "cointelegraph_crypto"
+    },
+    {
+      "title": "Trump touts memecoin as sentiment gauge as $520M unlock nears",
+      "summary": "",
+      "link": "https://cointelegraph.com/news/trump-memecoin-unlock-july-2025-price-sentiment?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+      "published": "2025-06-07T08:52:24",
+      "source": "cointelegraph",
+      "category": "crypto",
+      "priority": 7,
+      "weight": 1.5,
+      "published_timestamp": 1749279144.0,
+      "age_hours": 11.0476228025,
+      "content_length": 0,
+      "has_link": true,
+      "source_category": "cointelegraph_crypto"
+    },
+    {
+      "title": "Erste Besucher vor Ort – Betroffene nehmen Augenschein",
+      "summary": "Zehn Tage nach dem Gletscher-Abbruch ist das Walliser Lötschental wieder zugänglich.",
+      "link": "https://www.srf.ch/news/schweiz/katastrophe-im-loetschental-erste-besucher-vor-ort-betroffene-nehmen-augenschein",
+      "published": "2025-06-07T17:16:10",
+      "source": "srf",
+      "category": "wirtschaft",
+      "priority": 7,
+      "weight": 1.3,
+      "published_timestamp": 1749309370.0,
+      "age_hours": 2.651511692222222,
+      "content_length": 84,
+      "has_link": true,
+      "source_category": "srf_wirtschaft"
+    },
+    {
+      "title": "Nur noch 30 Minuten Wartezeit vor dem Gotthard-Nordportal",
+      "summary": "Derzeit staut sich der Verkehr auf drei Kilometern Länge vor dem Nordportal. Am Vormittag waren es sogar 20 Kilometer.",
+      "link": "https://www.srf.ch/news/schweiz/alle-wollen-in-den-sueden-nur-noch-30-minuten-wartezeit-vor-dem-gotthard-nordportal",
+      "published": "2025-06-07T17:24:29",
+      "source": "srf",
+      "category": "wirtschaft",
+      "priority": 7,
+      "weight": 1.3,
+      "published_timestamp": 1749309869.0,
+      "age_hours": 2.5129005816666665,
+      "content_length": 118,
+      "has_link": true,
+      "source_category": "srf_wirtschaft"
+    },
+    {
+      "title": "Bislang schwerste russische Angriff auf Grossstadt Charkiw",
+      "summary": "In der zweitgrössten Stadt der Ukraine wurden Dutzende Explosionen gezählt. Menschen starben, andere wurden verletzt.",
+      "link": "https://www.srf.ch/news/international/ukraine/krieg-in-der-ukraine-bislang-schwerste-russische-angriff-auf-grossstadt-charkiw",
+      "published": "2025-06-07T12:15:39",
+      "source": "srf",
+      "category": "wirtschaft",
+      "priority": 7,
+      "weight": 1.3,
+      "published_timestamp": 1749291339.0,
+      "age_hours": 7.660122804166666,
+      "content_length": 117,
+      "has_link": true,
+      "source_category": "srf_wirtschaft"
+    },
+    {
+      "title": "Renditen bis über 10 Prozent: Nach Spitzenjahr finden die Schweizer Pensions­kassen zu neuer Stärke",
+      "summary": "Dank der starken Entwicklung globaler Aktien lag die Rendite 2024 bei durchschnittlich 7,7 Prozent.",
+      "link": "https://www.tagesanzeiger.ch/schweizer-pensionskassen-2024-war-spitzenjahr-fuer-rendite-952101007111",
+      "published": "2025-06-07T13:00:00",
+      "source": "tagesanzeiger",
+      "category": "wirtschaft",
+      "priority": 7,
+      "weight": 1.3,
+      "published_timestamp": 1749294000.0,
+      "age_hours": 6.920956138055556,
+      "content_length": 99,
+      "has_link": true,
+      "source_category": "tagesanzeiger_wirtschaft"
+    },
+    {
+      "title": "Pensionskassenvergleich-Jubiläum: Bei gleichem Lohn wie vor 20 Jahren sieht die Rechnung heute deutlich bescheidener aus",
+      "summary": "Zum 20. Mal in Folge hat das Beratungs­unternehmen Weibel Hess & Partner zusammen mit der SonntagsZeitung einen umfassenden Pensionskassenvergleich durchgeführt.",
+      "link": "https://www.tagesanzeiger.ch/pensionskassen-rating-eine-rueckschau-auf-die-letzten-20-jahre-230129132387",
+      "published": "2025-06-07T13:00:00",
+      "source": "tagesanzeiger",
+      "category": "wirtschaft",
+      "priority": 7,
+      "weight": 1.3,
+      "published_timestamp": 1749294000.0,
+      "age_hours": 6.920956138611111,
+      "content_length": 161,
+      "has_link": true,
+      "source_category": "tagesanzeiger_wirtschaft"
+    },
+    {
+      "title": "Interview mit Wirtschaftsrechtlerin: Bankenregulierung: «Leisten kann sich die UBS die Kosten allemal»",
+      "summary": "Corinne Zellweger-Gutknecht erklärt, was das grössere Kapitalpolster für die Grossbank bedeutet. Und warum der Staat und die Steuerzahler dennoch nicht aus dem Schneider sind.",
+      "link": "https://www.tagesanzeiger.ch/wirtschaftsrechtlerin-leisten-kann-sich-die-ubs-die-kosten-allemal-653450769400",
+      "published": "2025-06-07T12:46:24",
+      "source": "tagesanzeiger",
+      "category": "wirtschaft",
+      "priority": 7,
+      "weight": 1.3,
+      "published_timestamp": 1749293184.0,
+      "age_hours": 7.1476228058333335,
+      "content_length": 175,
+      "has_link": true,
+      "source_category": "tagesanzeiger_wirtschaft"
+    },
+    {
+      "title": "Leere Regale und Hamsterkäufe: Reiskrise in Japan: Reispreise haben sich seit dem Sommer verdoppelt",
+      "summary": "Das Grundnahrungsmittel wird in Japan zur Mangelware. Während Verbraucher rationierte Einkäufe akzeptieren müssen, gesteht Ministerpräsident Ishiba ratlos: «Wir wissen nicht, warum es uns nicht gelungen ist, die Preise zu senken.»",
+      "link": "https://www.tagesanzeiger.ch/reiskrise-in-japan-reispreise-haben-sich-seit-dem-sommer-verdoppelt-415358365105",
+      "published": "2025-06-07T08:21:32",
+      "source": "tagesanzeiger",
+      "category": "wirtschaft",
+      "priority": 7,
+      "weight": 1.3,
+      "published_timestamp": 1749277292.0,
+      "age_hours": 11.562067250833334,
+      "content_length": 230,
+      "has_link": true,
+      "source_category": "tagesanzeiger_wirtschaft"
+    },
+    {
+      "title": "Week in Review: Why Anthropic cut access to Windsurf",
+      "summary": "Welcome back to Week in Review! Got lots for you today, including why Windsurf lost access to Claude, ChatGPT’s new features, WWDC 2025, Elon Musk’s fight with Donald Trump, and lots more. Have a great weekend! Duh: During an interview at TC Sessions: AI 2025, Anthropic’s co-founde",
+      "link": "https://techcrunch.com/2025/06/07/week-in-review-why-anthropic-cut-access-to-windsurf/",
+      "published": "2025-06-07T17:11:00",
+      "source": "techcrunch",
+      "category": "latest",
+      "priority": 7,
+      "weight": 1.3,
+      "published_timestamp": 1749309060.0,
+      "age_hours": 2.7376228072222224,
+      "content_length": 282,
+      "has_link": true,
+      "source_category": "techcrunch_latest"
+    },
+    {
+      "title": "Will Musk vs. Trump affect xAI’s $5 billion debt deal?",
+      "summary": "While the online feud between Elon Musk and President Donald Trump seemed to drive traffic to Musk’s social media platform X (formerly Twitter), it could also create issues for the platform’s parent company xAI. Musk merged X and xAI earlier this year, with Bloomberg reporting this week that he was",
+      "link": "https://techcrunch.com/2025/06/07/will-musk-vs-trump-affect-xais-5-billion-debt-deal/",
+      "published": "2025-06-07T16:37:35",
+      "source": "techcrunch",
+      "category": "latest",
+      "priority": 7,
+      "weight": 1.3,
+      "published_timestamp": 1749307055.0,
+      "age_hours": 3.294567252222222,
+      "content_length": 299,
+      "has_link": true,
+      "source_category": "techcrunch_latest"
+    },
+    {
+      "title": "Superblocks CEO: How to find a unicorn idea by studying AI system prompts",
+      "summary": "Brad Menezes, CEO of enterprise vibe coding startup Superblocks, is convinced that the next crop of billion-dollar startup ideas are hiding in almost plain sight: system prompts.",
+      "link": "https://techcrunch.com/2025/06/07/superblocks-ceo-how-to-find-a-unicorn-idea-by-studying-ai-system-prompts/",
+      "published": "2025-06-07T15:16:00",
+      "source": "techcrunch",
+      "category": "latest",
+      "priority": 7,
+      "weight": 1.3,
+      "published_timestamp": 1749302160.0,
+      "age_hours": 4.6542894752777775,
+      "content_length": 178,
+      "has_link": true,
+      "source_category": "techcrunch_latest"
+    },
+    {
+      "title": "At the Bitcoin Conference, the Republicans were for sale",
+      "summary": "\"I want to make a big announcement,\" said Faryar Shirzad, the chief policy officer of Coinbase, to a nearly empty room. His words echoed across the massive hall at the Bitcoin Conference, deep in the caverns of The Venetian Expo in Las Vegas, and it wasn't apparent how many people were watching on t",
+      "link": "https://www.theverge.com/cryptocurrency/679685/bitcoin-conference-gop-takeover",
+      "published": "2025-06-07T17:46:22",
+      "source": "theverge",
+      "category": "tech",
+      "priority": 6,
+      "weight": 1.2,
+      "published_timestamp": 1749311182.0,
+      "age_hours": 2.1481783647222223,
+      "content_length": 300,
+      "has_link": true,
+      "source_category": "theverge_tech"
+    },
+    {
+      "title": "8 games from the Wholesome Direct 2025 that you can play right now",
+      "summary": "The Wholesome Direct is always full of cute and charming games to keep an eye on for the future. But it's also a great place to find things to play now - and that's especially true this year. The 2025 edition of the livestream showcase included a number of games that released during the show […",
+      "link": "https://www.theverge.com/games/678265/wholesome-direct-2025-best-games-play-now",
+      "published": "2025-06-07T17:00:00",
+      "source": "theverge",
+      "category": "tech",
+      "priority": 6,
+      "weight": 1.2,
+      "published_timestamp": 1749308400.0,
+      "age_hours": 2.9209561430555553,
+      "content_length": 295,
+      "has_link": true,
+      "source_category": "theverge_tech"
+    },
+    {
+      "title": "The Verge’s 2025 Father’s Day gift guide",
+      "summary": "Father's Day rules. It's a day to celebrate all that dads have contributed to the people, homes, and communities that they're a part of. Being a dad is a lot of work - something I can vouch for, being a relatively new one myself - so for Father's Day, why not give dear old dad […]",
+      "link": "https://www.theverge.com/tech/673799/best-fathers-day-gift-ideas-2025",
+      "published": "2025-06-07T15:08:49",
+      "source": "theverge",
+      "category": "tech",
+      "priority": 6,
+      "weight": 1.2,
+      "published_timestamp": 1749301729.0,
+      "age_hours": 4.774011699444444,
+      "content_length": 281,
+      "has_link": true,
+      "source_category": "theverge_tech"
+    },
+    {
+      "title": "The soul of The Last of Us is in Gustavo Santaolalla’s music",
+      "summary": "When fans nervously tuned in to watch HBO's adaptation of one of their favorite video games, there was one familiar presence that immediately calmed their nerves: the mournful guitar of Gustavo Santaolalla. As certain story beats changed and beloved polygonal faces were replaced with new actors, the",
+      "link": "https://www.theverge.com/interview/681172/gustavo-santaolalla-interview-the-last-of-us-music",
+      "published": "2025-06-07T15:00:00",
+      "source": "theverge",
+      "category": "tech",
+      "priority": 6,
+      "weight": 1.2,
+      "published_timestamp": 1749301200.0,
+      "age_hours": 4.920956144444444,
+      "content_length": 300,
+      "has_link": true,
+      "source_category": "theverge_tech"
+    },
+    {
+      "title": "Apple’s latest AirPods Pro with USB-C just received a $70 discount",
+      "summary": "This year’s WWDC kicks off in less than a week, which means Apple is likely to announce a string of software changes in short order, some of which are designed to improve Apple’s latest pair of premium earbuds. Thankfully, if you haven’t yet pulled the trigger on the second-gen AirPods Pro, they’re",
+      "link": "https://www.theverge.com/tech/681365/apple-airpods-2-usb-c-meta-quest-3s-deal-sale",
+      "published": "2025-06-07T14:10:47",
+      "source": "theverge",
+      "category": "tech",
+      "priority": 6,
+      "weight": 1.2,
+      "published_timestamp": 1749298247.0,
+      "age_hours": 5.741233922777778,
+      "content_length": 299,
+      "has_link": true,
+      "source_category": "theverge_tech"
+    },
+    {
+      "title": "A ban on state AI laws could smash Big Tech’s legal guardrails",
+      "summary": "Senate Commerce Republicans have kept a ten year moratorium on state AI laws in their latest version of President Donald Trump's massive budget package. And a growing number of lawmakers and civil society groups warn that its broad language could put consumer protections on the chopping block. Repub",
+      "link": "https://www.theverge.com/politics/681727/ro-khanna-ai-state-law-moratorium-reconciliation",
+      "published": "2025-06-07T14:00:00",
+      "source": "theverge",
+      "category": "tech",
+      "priority": 6,
+      "weight": 1.2,
+      "published_timestamp": 1749297600.0,
+      "age_hours": 5.9209561455555555,
+      "content_length": 300,
+      "has_link": true,
+      "source_category": "theverge_tech"
+    },
+    {
+      "title": "There are only two commissioners left at the FCC",
+      "summary": "After the departure of one Republican and one Democratic commissioner on Friday, the Federal Communications Commission is down to two members, falling below the quorum threshold for what's typically a five-person panel. Commissioners Nathan Simington and Geoffrey Starks stepped down at the end of th",
+      "link": "https://www.theverge.com/policy/681638/fcc-quorum-starks-simington-departure-brendan-carr",
+      "published": "2025-06-07T13:00:00",
+      "source": "theverge",
+      "category": "tech",
+      "priority": 6,
+      "weight": 1.2,
+      "published_timestamp": 1749294000.0,
+      "age_hours": 6.920956146388889,
+      "content_length": 300,
+      "has_link": true,
+      "source_category": "theverge_tech"
+    },
+    {
+      "title": "Apple is on defense at WWDC",
+      "summary": "It's early June and the vibes are decidedly off in Cupertino. The hype leading up to Apple's last two developer conferences felt much different. There was anticipation in 2023 for a potentially groundbreaking new headset. In 2024, there was a sense of urgency leading up to the company's AI announcem",
+      "link": "https://www.theverge.com/apple/681739/wwdc-2025-epic-trial-apple-intelligence",
+      "published": "2025-06-07T12:00:00",
+      "source": "theverge",
+      "category": "tech",
+      "priority": 6,
+      "weight": 1.2,
+      "published_timestamp": 1749290400.0,
+      "age_hours": 7.9209561469444445,
+      "content_length": 300,
+      "has_link": true,
+      "source_category": "theverge_tech"
+    },
+    {
+      "title": "TMNT: Tactical Takedown is a radical twist on turn-based strategy",
+      "summary": "I usually struggle with strategy games. They're typically too hard for me, and I often get overwhelmed at managing multiple characters or squads. But I couldn't put down Teenage Mutant Ninja Turtles: Tactical Takedown, which blends ideas from strategy games and classic TMNT arcade games to keep thin",
+      "link": "https://www.theverge.com/games-review/674953/teenage-mutant-ninja-turtles-tactical-takedown-review",
+      "published": "2025-06-07T09:00:00",
+      "source": "theverge",
+      "category": "tech",
+      "priority": 6,
+      "weight": 1.2,
+      "published_timestamp": 1749279600.0,
+      "age_hours": 10.9209561475,
+      "content_length": 300,
+      "has_link": true,
+      "source_category": "theverge_tech"
+    },
+    {
+      "title": "Kiev sends the living to die, but won’t accept its dead",
+      "summary": "Controlling the narrative is more important for Ukraine than the dignity of its fallen – or the well-being of those still alive <a href=\"https://www.r",
+      "link": "https://www.rt.com/russia/618779-kiev-living-dead-accept/?utm_source=rss&utm_medium=rss&utm_campaign=RSS",
+      "published": "2025-06-07T16:24:05",
+      "source": "rt",
+      "category": "international",
+      "priority": 6,
+      "weight": 1.0,
+      "published_timestamp": 1749306245.0,
+      "age_hours": 3.5195672591666667,
+      "content_length": 150,
+      "has_link": true,
+      "source_category": "rt_international"
+    },
+    {
+      "title": "Ukraine’s shame: Why Kiev refuses to take back its dead and wounded",
+      "summary": "Accepting the 6,000 bodies Moscow is returning would mean paying out compensations, leaving less money to send new recruits to the slaughter <a href=\"",
+      "link": "https://www.rt.com/russia/618778-ukraine-pow-swap-dead/?utm_source=rss&utm_medium=rss&utm_campaign=RSS",
+      "published": "2025-06-07T15:12:56",
+      "source": "rt",
+      "category": "international",
+      "priority": 6,
+      "weight": 1.0,
+      "published_timestamp": 1749301976.0,
+      "age_hours": 4.705400593333334,
+      "content_length": 150,
+      "has_link": true,
+      "source_category": "rt_international"
+    },
+    {
+      "title": "Biggest drone strike hits Ukraine's second city",
+      "summary": "At least three people were killed and 40 injured in Kharkiv and Kherson in drone and missile strikes.",
+      "link": "https://www.bbc.com/news/articles/cwyjd1z8yg5o",
+      "published": "2025-06-07T17:27:44",
+      "source": "bbc",
+      "category": "international",
+      "priority": 6,
+      "weight": 1.0,
+      "published_timestamp": 1749310064.0,
+      "age_hours": 2.458733927222222,
+      "content_length": 101,
+      "has_link": true,
+      "source_category": "bbc_international"
+    },
+    {
+      "title": "Body of Thai hostage recovered from Gaza, Israel says",
+      "summary": "Nattapong Pinta was captured alive and was likely killed during the first months of captivity, the Israeli military says.",
+      "link": "https://www.bbc.com/news/articles/cev4l7kxdllo",
+      "published": "2025-06-07T14:22:44",
+      "source": "bbc",
+      "category": "international",
+      "priority": 6,
+      "weight": 1.0,
+      "published_timestamp": 1749298964.0,
+      "age_hours": 5.542067261111111,
+      "content_length": 121,
+      "has_link": true,
+      "source_category": "bbc_international"
+    },
+    {
+      "title": "US brings back El Salvador deportee to face charges",
+      "summary": "Salvadoran Kilmar Ábrego García, whose case became a political flashpoint, has been charged with human trafficking by US officials.",
+      "link": "https://www.bbc.com/news/articles/c7v7ynv98r8o",
+      "published": "2025-06-07T16:14:07",
+      "source": "bbc",
+      "category": "international",
+      "priority": 6,
+      "weight": 1.0,
+      "published_timestamp": 1749305647.0,
+      "age_hours": 3.6856783727777778,
+      "content_length": 131,
+      "has_link": true,
+      "source_category": "bbc_international"
+    },
+    {
+      "title": "Andrew Tate caught speeding 146km/h over limit in Romania",
+      "summary": "A sports car driven by the controversial influencer clocked four times the speed limit in a 30mph zone.",
+      "link": "https://www.bbc.com/news/articles/cy8dwwylpyxo",
+      "published": "2025-06-07T15:53:57",
+      "source": "bbc",
+      "category": "international",
+      "priority": 6,
+      "weight": 1.0,
+      "published_timestamp": 1749304437.0,
+      "age_hours": 4.021789484444445,
+      "content_length": 103,
+      "has_link": true,
+      "source_category": "bbc_international"
+    },
+    {
+      "title": "Liberia's ex-speaker charged with arson over parliament fire",
+      "summary": "The blaze broke out a day after protests over plans to oust former speaker Jonathan Fonati Koffa.",
+      "link": "https://www.bbc.com/news/articles/cgq3j5nq15wo",
+      "published": "2025-06-07T17:16:59",
+      "source": "bbc",
+      "category": "international",
+      "priority": 6,
+      "weight": 1.0,
+      "published_timestamp": 1749309419.0,
+      "age_hours": 2.637900596111111,
+      "content_length": 97,
+      "has_link": true,
+      "source_category": "bbc_international"
+    },
+    {
+      "title": "Central Asia's tallest Lenin statue taken down",
+      "summary": "The monument to the Soviet patriarch will be replaced with a flagpole, authorities in Kyrgyzstan say.",
+      "link": "https://www.bbc.com/news/articles/c201yy6gknpo",
+      "published": "2025-06-07T16:38:58",
+      "source": "bbc",
+      "category": "international",
+      "priority": 6,
+      "weight": 1.0,
+      "published_timestamp": 1749307138.0,
+      "age_hours": 3.271511707777778,
+      "content_length": 101,
+      "has_link": true,
+      "source_category": "bbc_international"
+    },
+    {
+      "title": "'They have perfect dark skin': The African nation home to fashion's favourite models",
+      "summary": "Why models from South Sudan, a lush but troubled nation, are sought after by the big fashion brands.",
+      "link": "https://www.bbc.com/news/articles/cre99ldr515o",
+      "published": "2025-06-07T10:08:38",
+      "source": "bbc",
+      "category": "international",
+      "priority": 6,
+      "weight": 1.0,
+      "published_timestamp": 1749283718.0,
+      "age_hours": 9.77706726388889,
+      "content_length": 100,
+      "has_link": true,
+      "source_category": "bbc_international"
+    },
+    {
+      "title": "Riot police and protesters clash after LA immigration raids",
+      "summary": "It came after federal raids in the city on Friday in which agents reportedly took dozens of people into custody.",
+      "link": "https://www.bbc.com/news/videos/c7v7yql5r86o",
+      "published": "2025-06-07T11:03:13",
+      "source": "bbc",
+      "category": "international",
+      "priority": 6,
+      "weight": 1.0,
+      "published_timestamp": 1749286993.0,
+      "age_hours": 8.867345042222222,
+      "content_length": 112,
+      "has_link": true,
+      "source_category": "bbc_international"
+    },
+    {
+      "title": "Konsumentenforum warnt vor Ticket-Kauf bei Viagogo",
+      "summary": "Die Festivalsaison steht an. Wegen Problemen mit Tickets bei Viagogo häufen sich die Meldungen bei der Ombudsstelle. Konsumentenschützer raten vom Kauf auf der Plattform ab.",
+      "link": "https://www.20min.ch/story/ticket-reseller-konsumentenforum-warnt-vor-ticket-kauf-bei-viagogo-103359171",
+      "published": "2025-06-07T17:13:46",
+      "source": "20min",
+      "category": "wirtschaft",
+      "priority": 5,
+      "weight": 1.0,
+      "published_timestamp": 1749309226.0,
+      "age_hours": 2.6915117094444447,
+      "content_length": 173,
+      "has_link": true,
+      "source_category": "20min_wirtschaft"
+    },
+    {
+      "title": "Mit diesen 74 Ländern will der Bundesrat Krypto-Daten teilen",
+      "summary": "Der Bundesrat hat dem Parlament 74 Staaten für den Informationsaustausch über Kryptowerte vorgeschlagen. Der erste Datenaustausch soll 2027 erfolgen.",
+      "link": "https://www.20min.ch/story/steuertransparenz-mit-diesen-74-laendern-will-die-schweiz-krypto-daten-teilen-103360048",
+      "published": "2025-06-07T14:05:51",
+      "source": "20min",
+      "category": "wirtschaft",
+      "priority": 5,
+      "weight": 1.0,
+      "published_timestamp": 1749297951.0,
+      "age_hours": 5.823456154444445,
+      "content_length": 149,
+      "has_link": true,
+      "source_category": "20min_wirtschaft"
+    },
+    {
+      "title": "Algen begraben karibische Traumstrände unter sich",
+      "summary": "Algen überziehen Küsten von Puerto Rico bis Guyana. Der Tourismus leidet. Die Ursache ist für Experten ein Rätsel.",
+      "link": "https://www.20min.ch/story/rekordmenge-algen-begraben-karibische-traumstraende-unter-sich-103360103",
+      "published": "2025-06-07T13:50:10",
+      "source": "20min",
+      "category": "wirtschaft",
+      "priority": 5,
+      "weight": 1.0,
+      "published_timestamp": 1749297010.0,
+      "age_hours": 6.084845043611112,
+      "content_length": 114,
+      "has_link": true,
+      "source_category": "20min_wirtschaft"
+    },
+    {
+      "title": "Post verkaufte wochenlang Neonazi-Duftbäumchen",
+      "summary": "In zwei Post-Filialen wurden wochenlang Duftbäumchen mit Nazi-Symbolik, rechtsextremen Parolen und einem frauenverachtenden Motiv verkauft.",
+      "link": "https://www.20min.ch/story/liestal-und-frick-post-verkaufte-wochenlang-neonazi-duftbaeumchen-103360092",
+      "published": "2025-06-07T11:32:19",
+      "source": "20min",
+      "category": "wirtschaft",
+      "priority": 5,
+      "weight": 1.0,
+      "published_timestamp": 1749288739.0,
+      "age_hours": 8.382345044166666,
+      "content_length": 139,
+      "has_link": true,
+      "source_category": "20min_wirtschaft"
+    },
+    {
+      "title": "Kaputte Strände: Leidest du unter der Algenplage in der Karibik?",
+      "summary": "An den Traumstränden in der Karibik hat sich eine Rekordmenge Algen angesammelt. Bist du davon betroffen? Melde dich bei uns!",
+      "link": "https://www.20min.ch/story/aufruf-kaputte-straende-leidest-du-unter-der-algenplage-in-der-karibik-103360047",
+      "published": "2025-06-07T09:42:07",
+      "source": "20min",
+      "category": "wirtschaft",
+      "priority": 5,
+      "weight": 1.0,
+      "published_timestamp": 1749282127.0,
+      "age_hours": 10.21901171138889,
+      "content_length": 125,
+      "has_link": true,
+      "source_category": "20min_wirtschaft"
+    },
+    {
+      "title": "«Wir müssen Kinder schützen»: Greift EU bei Social Media durch?",
+      "summary": "Mehrere EU-Staaten fordern strengere Alterskontrollen für soziale Medien. Die EU-Kommission plant verbindliche Vorgaben und arbeitet an einer App zur Altersprüfung.",
+      "link": "https://www.20min.ch/story/alterskontrollen-wir-muessen-kinder-schuetzen-greift-eu-bei-social-media-durch-103360052",
+      "published": "2025-06-07T08:59:29",
+      "source": "20min",
+      "category": "wirtschaft",
+      "priority": 5,
+      "weight": 1.0,
+      "published_timestamp": 1749279569.0,
+      "age_hours": 10.9295672675,
+      "content_length": 164,
+      "has_link": true,
+      "source_category": "20min_wirtschaft"
+    },
+    {
+      "title": "Deutsche Industrie baut in einem Jahr über 100'000 Jobs ab",
+      "summary": "Die Wirtschaftskrise in Deutschland hinterlässt Spuren in der Industrie. Vor allem bei Autoherstellern verlieren viele Menschen ihren Job.",
+      "link": "https://www.20min.ch/story/autobranche-leidet-deutsche-industrie-baut-in-einem-jahr-ueber-100-000-jobs-ab-103360049",
+      "published": "2025-06-07T08:14:02",
+      "source": "20min",
+      "category": "wirtschaft",
+      "priority": 5,
+      "weight": 1.0,
+      "published_timestamp": 1749276842.0,
+      "age_hours": 11.687067268333333,
+      "content_length": 138,
+      "has_link": true,
+      "source_category": "20min_wirtschaft"
+    },
+    {
+      "title": "KI datiert Qumran-Schriftrollen neu – Texte älter als gedacht",
+      "summary": "Forscher kombinieren KI und Radiokarbondaten – und datieren mehrere Bibeltexte um Jahrzehnte früher als bisher gedacht.",
+      "link": "https://www.20min.ch/story/bibeltexte-ki-datiert-qumran-schriftrollen-neu-texte-aelter-als-gedacht-103359781",
+      "published": "2025-06-07T08:44:10",
+      "source": "20min",
+      "category": "science",
+      "priority": 5,
+      "weight": 1.0,
+      "published_timestamp": 1749278650.0,
+      "age_hours": 11.184845046666666,
+      "content_length": 119,
+      "has_link": true,
+      "source_category": "20min_science"
+    },
+    {
+      "title": "Deepfake-Schock in Neuseeland: Politikerin zeigt KI-Nacktfoto",
+      "summary": "Die neuseeländische Abgeordnete Laura McClure hat im Parlament ein KI-generiertes Nacktfoto von sich selbst präsentiert. Damit macht sie auf die wachsende Gefahr durch Deepfakes aufmerksam – und fordert eine Gesetzesänderung. Entsprechende Regelungen sollen d",
+      "link": "https://www.20min.ch/video/deepfake-politikerin-zeigt-ki-nacktfoto-im-parlament-in-neuseeland-103360111",
+      "published": "2025-06-07T13:49:42",
+      "source": "20min",
+      "category": "tech",
+      "priority": 5,
+      "weight": 1.0,
+      "published_timestamp": 1749296982.0,
+      "age_hours": 6.092622824999999,
+      "content_length": 259,
+      "has_link": true,
+      "source_category": "20min_tech"
+    },
+    {
+      "title": "Arman schmeisst Schule und macht aus Imbiss Milliarden-Geschäft",
+      "summary": "2017 investierten drei Freunde 900 Dollar in ein Imbiss-Geschäft. Letztes Jahr machten sie eine Milliarde Dollar Umsatz damit. Filialen haben sie inzwischen in mehreren Ländern.",
+      "link": "https://www.20min.ch/story/dave-s-hot-chicken-arman-schmeisst-schule-und-macht-aus-imbiss-milliarden-geschaeft-103359571",
+      "published": "2025-06-07T10:41:38",
+      "source": "20min",
+      "category": "lifestyle",
+      "priority": 4,
+      "weight": 0.8,
+      "published_timestamp": 1749285698.0,
+      "age_hours": 9.227067270000001,
+      "content_length": 177,
+      "has_link": true,
+      "source_category": "20min_lifestyle"
+    }
+  ],
+  "weather": {
+    "current": {
+      "temperature": 15.7,
+      "feels_like": 15.7,
+      "humidity": 91,
+      "pressure": 1015,
+      "description": "moderate rain",
+      "wind_speed": 6.4,
+      "wind_direction": 146,
+      "visibility": 10.0,
+      "clouds": 75,
+      "location": "Zürich",
+      "timestamp": "2025-06-07T19:55:11.346601"
+    },
+    "forecast": [
+      {
+        "date": "2025-06-07",
+        "day_name": "Saturday",
+        "temperature_max": 16.1,
+        "temperature_min": 15.7,
+        "weather_main": "Rain",
+        "weather_description": "light rain",
+        "precipitation": 1.8,
+        "wind_speed": 4.9,
+        "humidity": 91
+      },
+      {
+        "date": "2025-06-08",
+        "day_name": "Sunday",
+        "temperature_max": 18.4,
+        "temperature_min": 13.5,
+        "weather_main": "Rain",
+        "weather_description": "light rain",
+        "precipitation": 1.3,
+        "wind_speed": 4.6,
+        "humidity": 93
+      },
+      {
+        "date": "2025-06-09",
+        "day_name": "Monday",
+        "temperature_max": 22.6,
+        "temperature_min": 7.7,
+        "weather_main": "Clouds",
+        "weather_description": "broken clouds",
+        "precipitation": 0,
+        "wind_speed": 2.2,
+        "humidity": 81
+      },
+      {
+        "date": "2025-06-10",
+        "day_name": "Tuesday",
+        "temperature_max": 25.1,
+        "temperature_min": 8.6,
+        "weather_main": "Clear",
+        "weather_description": "clear sky",
+        "precipitation": 0,
+        "wind_speed": 2.2,
+        "humidity": 88
+      },
+      {
+        "date": "2025-06-11",
+        "day_name": "Wednesday",
+        "temperature_max": 27.6,
+        "temperature_min": 10.9,
+        "weather_main": "Clouds",
+        "weather_description": "broken clouds",
+        "precipitation": 0,
+        "wind_speed": 2.3,
+        "humidity": 89
+      }
+    ],
+    "outlook": {
+      "type": "current_plus_tomorrow",
+      "location": "Zürich",
+      "current": {
+        "temperature": 15.7,
+        "description": "moderate rain",
+        "wind_speed": 6.4,
+        "humidity": 91
+      },
+      "tomorrow": {
+        "date": "2025-06-08",
+        "day_name": "Sunday",
+        "temperature_max": 18.4,
+        "temperature_min": 13.5,
+        "weather_main": "Rain",
+        "weather_description": "light rain",
+        "precipitation": 1.3,
+        "wind_speed": 4.6,
+        "humidity": 93
+      }
+    },
+    "location": "Zürich",
+    "timestamp": "2025-06-07T19:55:11.635292",
+    "temperature": 15.7,
+    "description": "moderate rain"
+  },
+  "crypto": {
+    "bitcoin": {
+      "symbol": "BTC",
+      "name": "Bitcoin",
+      "price_usd": 105467.77,
+      "change_1h": 0.08,
+      "change_24h": 0.73,
+      "change_7d": 1.04,
+      "change_30d": 4.39,
+      "change_60d": 36.36,
+      "change_90d": 28.1,
+      "market_cap": 2096239470926.315,
+      "volume_24h": 37798822377.10922,
+      "last_updated": "2025-06-07T17:54:00.000Z",
+      "timestamp": "2025-06-07T19:55:11.507837"
+    },
+    "trend": {
+      "trend": "stable",
+      "emoji": "➡️",
+      "message": "Bitcoin stable: +0.7%",
+      "change_24h": 0.73,
+      "price": 105467.77,
+      "formatted": "➡️ $105,468 (+0.7%)"
+    },
+    "alerts": [
+      {
+        "type": "price_threshold",
+        "message": "₿ Bitcoin above $100,000! Current: $105,467.77",
+        "price": 105467.77,
+        "threshold": 100000
+      }
+    ],
+    "timestamp": "2025-06-07T19:55:11.554203",
+    "radio_formats": {
+      "24h": "Bitcoin is trading at 105,468 dollars and is up by 0.7 percent in the last 24 hours.",
+      "7d": "Bitcoin is trading at 105,468 dollars and is up by 1.0 percent in the last 7 days."
+    }
+  },
+  "success": true,
+  "errors": []
+};
+        
+        function loadData() {
+            try {
+                displayStats(data); 
+                displayNews(data.news || []); 
+                displayWeather(data.weather); 
+                displayCrypto(data.crypto); 
+                displayTimestamp(data.collection_timestamp);
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('news-list').innerHTML = '<div style="padding: 20px; text-align: center; color: #e74c3c;">Fehler beim Laden der Daten</div>';
+            }
+        }
+        
+        function displayStats(data) {
+            const news = data.news || []; 
+            const newsWithLinks = news.filter(item => item.has_link); 
+            const sources = [...new Set(news.map(item => item.source))]; 
+            const categories = [...new Set(news.map(item => item.category))];
+            document.getElementById('total-news').textContent = news.length; 
+            document.getElementById('total-links').textContent = newsWithLinks.length; 
+            document.getElementById('total-sources').textContent = sources.length; 
+            document.getElementById('total-categories').textContent = categories.length;
+        }
+        
+        function displayNews(news) {
+            const newsList = document.getElementById('news-list');
+            if (!news || news.length === 0) { 
+                newsList.innerHTML = '<div style="padding: 20px; text-align: center;">Keine News verfügbar</div>'; 
+                return; 
+            }
+            newsList.innerHTML = news.map(item => `<div class="news-item" data-category="${item.category}" data-source="${item.source}"><div class="news-meta"><span class="source-badge source-${item.source}">${item.source}</span><span class="category-badge">${item.category}</span><span class="priority-badge priority-${item.priority}">P${item.priority}</span><span class="age-badge">${Math.round(item.age_hours)}h alt</span></div><div class="news-title">${item.title}</div><div class="news-summary">${item.summary}</div>${item.has_link ? `<a href="${item.link}" target="_blank" class="news-link">🔗 Vollständiger Artikel (für GPT)</a>` : ''}</div>`).join('');
+            setupFilters(news);
+        }
+        
+        function setupFilters(news) {
+            const filterButtons = document.querySelectorAll('.filter-btn'); 
+            const newsItems = document.querySelectorAll('.news-item');
+            filterButtons.forEach(button => { 
+                button.addEventListener('click', () => { 
+                    filterButtons.forEach(btn => btn.classList.remove('active')); 
+                    button.classList.add('active'); 
+                    const filter = button.dataset.filter; 
+                    newsItems.forEach(item => { 
+                        if (filter === 'all' || item.dataset.category === filter || item.dataset.source === filter) { 
+                            item.classList.remove('hidden'); 
+                        } else { 
+                            item.classList.add('hidden'); 
+                        } 
+                    }); 
+                }); 
+            });
+        }
+        
+        function displayWeather(weather) {
+            const weatherContent = document.getElementById('weather-content');
+            if (!weather || !weather.current) { 
+                weatherContent.innerHTML = '<div style="color: #e74c3c;">Keine Wetterdaten verfügbar</div>'; 
+                return; 
+            }
+            
+            const current = weather.current;
+            const forecast = weather.forecast || [];
+            const outlook = weather.outlook || null;
+            
+            let weatherHtml = `
+                <div class="weather-temp">${current.temperature}°C</div>
+                <div class="weather-desc">${current.description}</div>
+                <div class="weather-location">📍 ${weather.location || 'Zürich'}</div>
+                <div style="margin-top: 15px; font-size: 0.9em; color: #7f8c8d;">
+                    💨 ${current.wind_speed}km/h | 💧 ${current.humidity}%
+                </div>
+            `;
+            
+            // Outlook (Tomorrow) anzeigen
+            if (outlook && outlook.tomorrow) {
+                const tom = outlook.tomorrow;
+                weatherHtml += `
+                    <div style="margin-top: 15px; padding: 10px; background: #ecf0f1; border-radius: 8px;">
+                        <div style="font-weight: bold; margin-bottom: 5px;">🌅 Morgen</div>
+                        <div>${tom.temp_min}°C - ${tom.temp_max}°C</div>
+                        <div style="font-size: 0.9em; color: #7f8c8d;">${tom.description}</div>
+                        ${tom.precipitation > 0 ? `<div style="font-size: 0.9em;">🌧️ ${tom.precipitation}mm</div>` : ''}
+                    </div>
+                `;
+            }
+            
+            // 5-Tage Forecast (kompakt)
+            if (forecast.length > 0) {
+                weatherHtml += `
+                    <div style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+                        <div style="font-weight: bold; margin-bottom: 8px;">📅 5-Tage Forecast</div>
+                        <div style="font-size: 0.8em;">
+                `;
+                
+                forecast.slice(0, 3).forEach(day => {
+                    const date = new Date(day.date).toLocaleDateString('de-DE', {weekday: 'short'});
+                    weatherHtml += `
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
+                            <span>${date}</span>
+                            <span>${Math.round(day.temp_min)}°-${Math.round(day.temp_max)}°</span>
+                        </div>
+                    `;
+                });
+                
+                weatherHtml += `</div></div>`;
+            }
+            
+            weatherContent.innerHTML = weatherHtml;
+        }
+        
+        function displayCrypto(crypto) {
+            const cryptoContent = document.getElementById('crypto-content');
+            if (!crypto || !crypto.bitcoin) { 
+                cryptoContent.innerHTML = '<div style="color: #e74c3c;">Keine Bitcoin-Daten verfügbar</div>'; 
+                return; 
+            }
+            
+            const bitcoin = crypto.bitcoin; 
+            const trend = crypto.trend || null;
+            const alerts = crypto.alerts || [];
+            
+            const change24h = bitcoin.change_24h || 0; 
+            const changeClass = change24h >= 0 ? 'positive' : 'negative'; 
+            const changeSymbol = change24h >= 0 ? '+' : '';
+            
+            let cryptoHtml = `
+                <div class="crypto-price">$${bitcoin.price_usd.toLocaleString()}</div>
+                <div class="crypto-change ${changeClass}">${changeSymbol}${change24h.toFixed(1)}% (24h)</div>
+            `;
+            
+            // Trend-Analyse anzeigen
+            if (trend && trend.message) {
+                cryptoHtml += `
+                    <div style="margin: 15px 0; padding: 10px; background: #ecf0f1; border-radius: 8px; font-size: 0.9em;">
+                        <div style="font-weight: bold; margin-bottom: 5px;">${trend.emoji} Trend</div>
+                        <div>${trend.message}</div>
+                    </div>
+                `;
+            }
+            
+            // Alle Zeiträume anzeigen (wie im CLI)
+            cryptoHtml += `
+                <div style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+                    <div style="font-weight: bold; margin-bottom: 8px;">📊 Alle Zeiträume</div>
+                    <div style="font-size: 0.85em; line-height: 1.4;">
+                        <div>1h: ${bitcoin.change_1h ? (bitcoin.change_1h >= 0 ? '+' : '') + bitcoin.change_1h.toFixed(2) + '%' : 'N/A'}</div>
+                        <div>24h: ${changeSymbol}${change24h.toFixed(2)}%</div>
+                        <div>7d: ${bitcoin.change_7d ? (bitcoin.change_7d >= 0 ? '+' : '') + bitcoin.change_7d.toFixed(2) + '%' : 'N/A'}</div>
+                        <div>30d: ${bitcoin.change_30d ? (bitcoin.change_30d >= 0 ? '+' : '') + bitcoin.change_30d.toFixed(2) + '%' : 'N/A'}</div>
+                        <div>60d: ${bitcoin.change_60d ? (bitcoin.change_60d >= 0 ? '+' : '') + bitcoin.change_60d.toFixed(2) + '%' : 'N/A'}</div>
+                        <div>90d: ${bitcoin.change_90d ? (bitcoin.change_90d >= 0 ? '+' : '') + bitcoin.change_90d.toFixed(2) + '%' : 'N/A'}</div>
+                    </div>
+                </div>
+            `;
+            
+            // Market Cap und Volume
+            if (bitcoin.market_cap) {
+                cryptoHtml += `
+                    <div style="margin-top: 15px; padding: 10px; background: #fff3cd; border-radius: 8px; font-size: 0.85em;">
+                        <div>💰 Market Cap: $${(bitcoin.market_cap / 1e12).toFixed(2)}T</div>
+                        ${bitcoin.volume_24h ? `<div>📊 24h Volume: $${(bitcoin.volume_24h / 1e9).toFixed(1)}B</div>` : ''}
+                    </div>
+                `;
+            }
+            
+            // Alerts anzeigen
+            if (alerts && alerts.length > 0) {
+                cryptoHtml += `
+                    <div style="margin-top: 15px; padding: 10px; background: #f8d7da; border-radius: 8px; font-size: 0.85em;">
+                        <div style="font-weight: bold; color: #721c24;">🚨 Alerts</div>
+                        ${alerts.map(alert => `<div>${alert.message}</div>`).join('')}
+                    </div>
+                `;
+            }
+            
+            cryptoContent.innerHTML = cryptoHtml;
+        }
+        
+        function displayTimestamp(timestamp) {
+            const timestampElement = document.getElementById('timestamp');
+            if (timestamp) { 
+                const date = new Date(timestamp); 
+                timestampElement.textContent = `Daten gesammelt am: ${date.toLocaleString('de-DE')}`; 
+            } else { 
+                timestampElement.textContent = 'Zeitstempel nicht verfügbar'; 
+            }
+        }
+        
+        // Daten beim Laden der Seite anzeigen
+        document.addEventListener('DOMContentLoaded', loadData);
+    </script>
+</body>
+</html>
