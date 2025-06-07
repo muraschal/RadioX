@@ -7,6 +7,11 @@ from pydantic_settings import BaseSettings
 from pydantic import Field
 from typing import Optional, Dict, List
 import os
+from pathlib import Path
+
+# Root-Verzeichnis ermitteln (ein Verzeichnis über backend/)
+ROOT_DIR = Path(__file__).parent.parent.parent
+ENV_FILE_PATH = ROOT_DIR / ".env"
 
 
 class Settings(BaseSettings):
@@ -22,6 +27,12 @@ class Settings(BaseSettings):
     
     # OpenAI GPT (optional für ersten Test)
     openai_api_key: Optional[str] = Field(None, env="OPENAI_API_KEY")
+    
+    # Weather API
+    weather_api_key: Optional[str] = Field(None, env="WEATHER_API_KEY")
+    
+    # CoinMarketCap API
+    coinmarketcap_api_key: Optional[str] = Field(None, env="COINMARKETCAP_API_KEY")
     
     # Spotify API (optional für ersten Test)
     spotify_client_id: Optional[str] = Field(None, env="SPOTIFY_CLIENT_ID")
@@ -59,99 +70,6 @@ class Settings(BaseSettings):
     max_content_per_hour: int = Field(20, env="MAX_CONTENT_PER_HOUR")
     relevance_threshold: float = Field(0.6, env="RELEVANCE_THRESHOLD")
     
-    # Personas Configuration
-    personas: Dict = {
-        "maximalist": {
-            "name": "Bitcoin Maximalist",
-            "voice_style": "Frech, direkt, Bitcoin-maximalistisch",
-            "elevenlabs_voice_id": "21m00Tcm4TlvDq8ikWAM",  # Rachel
-            "intro_style": "Willkommen bei RadioX, dem einzig wahren Bitcoin-Radio!",
-            "news_style": "Breaking aus dem Bitcoin-Space:",
-            "outro_style": "Das war euer Update aus der Bitcoin-Matrix."
-        },
-        "cyberpunk": {
-            "name": "Cyberpunk Matrix",
-            "voice_style": "Dystopisch, tech-fokussiert, Matrix-Style",
-            "elevenlabs_voice_id": "EXAVITQu4vr4xnSDxMaL",  # Bella
-            "intro_style": "Verbindung zur Matrix hergestellt. RadioX lädt...",
-            "news_style": "Datenstream empfangen:",
-            "outro_style": "Transmission beendet. Weiter geht's mit Musik..."
-        },
-        "retro": {
-            "name": "80s Retro Wave",
-            "voice_style": "80s Nostalgie mit Bitcoin-Twist",
-            "elevenlabs_voice_id": "ErXwobaYiN019PkySvjV",  # Antoni
-            "intro_style": "Zurück in die Zukunft mit RadioX - Bitcoin meets 80s!",
-            "news_style": "Newsflash aus der Zukunft:",
-            "outro_style": "Totally radical! Weiter mit den Beats..."
-        },
-        "professional": {
-            "name": "Professional News",
-            "voice_style": "Seriös, professionell, nachrichtentauglich",
-            "elevenlabs_voice_id": "pNInz6obpgDQGcFmaJgB",  # Adam
-            "intro_style": "Guten Tag, hier ist RadioX mit den aktuellen Nachrichten.",
-            "news_style": "Aktuelle Meldung:",
-            "outro_style": "Das waren die Nachrichten. Jetzt Musik."
-        }
-    }
-    
-    # Default Category Mix für verschiedene Stream-Typen
-    stream_templates: Dict = {
-        "bitcoin_focus": {
-            "name": "Bitcoin Focus",
-            "description": "Bitcoin-lastiger Stream mit Tech-News",
-            "category_mix": {
-                "bitcoin": 50,
-                "tech": 25,
-                "wirtschaft": 20,
-                "lokal": 5
-            }
-        },
-        "balanced_news": {
-            "name": "Balanced News",
-            "description": "Ausgewogener Mix aller Kategorien",
-            "category_mix": {
-                "bitcoin": 20,
-                "wirtschaft": 25,
-                "tech": 20,
-                "politik": 15,
-                "lokal": 10,
-                "sport": 10
-            }
-        },
-        "business_focus": {
-            "name": "Business Focus",
-            "description": "Wirtschafts- und Finanz-fokussiert",
-            "category_mix": {
-                "wirtschaft": 40,
-                "bitcoin": 30,
-                "tech": 20,
-                "politik": 10
-            }
-        },
-        "swiss_local": {
-            "name": "Swiss Local Mix",
-            "description": "Schweiz-fokussiert mit lokalen News",
-            "category_mix": {
-                "lokal": 40,
-                "wirtschaft": 25,
-                "bitcoin": 20,
-                "tech": 15
-            }
-        },
-        "entertainment": {
-            "name": "Entertainment Mix",
-            "description": "Leichter Mix mit Entertainment",
-            "category_mix": {
-                "entertainment": 30,
-                "sport": 25,
-                "tech": 20,
-                "bitcoin": 15,
-                "lokal": 10
-            }
-        }
-    }
-    
     # Content Processing Rules
     content_processing: Dict = {
         "max_tweet_length": 280,
@@ -163,7 +81,7 @@ class Settings(BaseSettings):
     }
     
     class Config:
-        env_file = ".env"
+        env_file = str(ENV_FILE_PATH)  # Verwende Root .env Datei
         env_file_encoding = "utf-8"
         case_sensitive = False
         extra = "ignore"  # Ignoriert unbekannte Felder in .env
@@ -189,16 +107,6 @@ def ensure_directories():
     # Kategoriebasierte Temp-Ordner
     for category in ["bitcoin", "wirtschaft", "tech", "politik", "sport", "lokal", "wissenschaft", "entertainment"]:
         os.makedirs(f"{settings.temp_dir}/content/{category}", exist_ok=True)
-
-
-def get_category_mix(template_name: str) -> Dict[str, int]:
-    """Gibt die Kategorie-Mischung für ein Template zurück"""
-    return settings.stream_templates.get(template_name, {}).get("category_mix", {})
-
-
-def get_persona_config(persona_name: str) -> Dict:
-    """Gibt die Konfiguration für eine Persona zurück"""
-    return settings.personas.get(persona_name, settings.personas["cyberpunk"])
 
 
 # Initialisierung beim Import

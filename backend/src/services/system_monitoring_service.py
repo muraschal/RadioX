@@ -83,7 +83,7 @@ class SystemMonitoringService:
             error_data = {
                 "session_id": "system_monitoring",  # Fix: NOT NULL constraint
                 "event_type": "system_error",
-                "event_data": {
+                "data": {
                     "error_type": error_type,
                     "error_message": error_message,
                     "system_stats": await self._get_current_system_stats()
@@ -164,53 +164,23 @@ class SystemMonitoringService:
         
         cleanup_results = {
             "broadcast_logs": 0,
-            "used_news": 0,
-            "old_broadcasts": 0,
-            "log_files": 0,
-            "total_freed_mb": 0
+            "old_logs": 0
         }
         
-        cutoff_date = datetime.now() - timedelta(days=days_old)
-        cutoff_iso = cutoff_date.isoformat()
-        
         try:
-            # 1. Alte Broadcast-Logs löschen
+            # Cleanup alte broadcast_logs (älter als 30 Tage)
+            cutoff_date = datetime.now() - timedelta(days=30)
+            cutoff_iso = cutoff_date.isoformat()
+            
             logs_response = self.supabase.client.table('broadcast_logs').delete().lt('timestamp', cutoff_iso).execute()
             cleanup_results["broadcast_logs"] = len(logs_response.data) if logs_response.data else 0
             
-            # 2. Alte Used-News löschen
-            news_response = self.supabase.client.table('used_news').delete().lt('used_at', cutoff_iso).execute()
-            cleanup_results["used_news"] = len(news_response.data) if news_response.data else 0
-            
-            # 3. Alte Broadcast-Scripts löschen (optional, nur sehr alte)
-            very_old_cutoff = (datetime.now() - timedelta(days=days_old * 2)).isoformat()
-            broadcasts_response = self.supabase.client.table('broadcast_scripts').delete().lt('created_at', very_old_cutoff).execute()
-            cleanup_results["old_broadcasts"] = len(broadcasts_response.data) if broadcasts_response.data else 0
-            
-            # 4. Alte Log-Dateien löschen
-            log_cleanup = await self._cleanup_log_files(days_old)
-            cleanup_results["log_files"] = log_cleanup["files_deleted"]
-            cleanup_results["total_freed_mb"] = log_cleanup["size_freed_mb"]
-            
-            logger.info(f"✅ Cleanup abgeschlossen: {cleanup_results}")
-            
-            # Log Cleanup-Aktivität
-            await self.log_system_event("data_cleanup", cleanup_results)
-            
-            return {
-                "success": True,
-                "cleanup_results": cleanup_results,
-                "cutoff_date": cutoff_iso
-            }
+            logger.info(f"🧹 Cleanup abgeschlossen: {cleanup_results['broadcast_logs']} alte Logs gelöscht")
             
         except Exception as e:
-            logger.error(f"❌ Fehler beim Daten-Cleanup: {e}")
-            await self.log_error("cleanup_error", str(e))
-            return {
-                "success": False,
-                "error": str(e),
-                "partial_results": cleanup_results
-            }
+            logger.error(f"❌ Fehler beim Cleanup: {e}")
+            
+        return cleanup_results
     
     async def test_monitoring(self) -> bool:
         """Testet das Monitoring-System"""
@@ -280,20 +250,41 @@ class SystemMonitoringService:
         """Prüft Datenbank-Gesundheit"""
         
         try:
-            # Test-Query zur Datenbank
-            start_time = datetime.now()
-            response = self.supabase.client.table('broadcast_scripts').select('session_id').limit(1).execute()
-            query_time = (datetime.now() - start_time).total_seconds()
+            # VEREINFACHTE DB-STRUKTUR PRÜFEN
+            tables = ['rss_feed_preferences', 'voice_configurations', 'show_presets', 'broadcast_logs']
             
-            # Tabellen-Größen prüfen
-            tables_info = await self._get_table_sizes()
-            
-            return {
-                "connection_status": "healthy",
-                "query_response_time_ms": round(query_time * 1000, 2),
-                "tables_info": tables_info,
-                "last_check": datetime.now().isoformat()
+            health_data = {
+                "database": {
+                    "tables_accessible": 0,
+                    "errors": []
+                }
             }
+            
+            for table in tables:
+                try:
+                    response = self.supabase.client.table(table).select("*", count="exact").limit(1).execute()
+                    table_count = response.count if hasattr(response, 'count') else len(response.data)
+                    health_data["database"][f"{table}_count"] = table_count
+                    
+                    if table_count >= 0:
+                        health_data["database"]["tables_accessible"] += 1
+                        
+                except Exception as e:
+                    logger.warning(f"⚠️ Tabelle {table} nicht erreichbar: {e}")
+                    health_data["database"]["errors"].append(f"{table}: {str(e)}")
+            
+            # Gesamt-Gesundheit bewerten
+            total_tables = len(tables)
+            accessible_tables = health_data["database"]["tables_accessible"]
+            
+            if accessible_tables == total_tables:
+                health_data["database"]["status"] = "healthy"
+            elif accessible_tables > total_tables * 0.5:
+                health_data["database"]["status"] = "degraded"
+            else:
+                health_data["database"]["status"] = "critical"
+            
+            return health_data
             
         except Exception as e:
             logger.error(f"❌ Datenbank-Health-Check Fehler: {e}")
@@ -321,14 +312,21 @@ class SystemMonitoringService:
         """Sammelt Performance-Metriken"""
         
         try:
-            # Letzte Broadcasts analysieren
-            recent_broadcasts = self.supabase.client.table('broadcast_scripts').select('*').gte('created_at', (datetime.now() - timedelta(hours=24)).isoformat()).execute()
+            # VEREINFACHT: Nur broadcast_logs verwenden (keine broadcast_scripts mehr)
+            recent_broadcasts = self.supabase.client.table('broadcast_logs').select('*').eq('event_type', 'broadcast_generated').gte('timestamp', (datetime.now() - timedelta(hours=24)).isoformat()).execute()
             
             broadcasts_24h = len(recent_broadcasts.data) if recent_broadcasts.data else 0
             
-            # Durchschnittliche Broadcast-Dauer
+            # Durchschnittliche Broadcast-Dauer aus broadcast_logs
             if recent_broadcasts.data:
-                avg_duration = sum(b.get('estimated_duration_minutes', 0) for b in recent_broadcasts.data) / len(recent_broadcasts.data)
+                durations = []
+                for b in recent_broadcasts.data:
+                    data = b.get('data', {})
+                    duration = data.get('estimated_duration_minutes', 0)
+                    if duration > 0:
+                        durations.append(duration)
+                
+                avg_duration = sum(durations) / len(durations) if durations else 0
             else:
                 avg_duration = 0
             
@@ -453,8 +451,8 @@ class SystemMonitoringService:
         """Holt Tabellen-Größen aus der Datenbank"""
         
         try:
-            # Einfache Row-Counts für die wichtigsten Tabellen
-            tables = ['broadcast_scripts', 'broadcast_logs', 'used_news', 'rss_feed_preferences']
+            # VEREINFACHTE 4-TABELLEN-STRUKTUR
+            tables = ['rss_feed_preferences', 'voice_configurations', 'show_presets', 'broadcast_logs']
             table_info = {}
             
             for table in tables:
@@ -510,7 +508,7 @@ class SystemMonitoringService:
             log_data = {
                 "session_id": "system_monitoring",  # Fix: NOT NULL constraint
                 "event_type": event_type,
-                "event_data": event_data,
+                "data": event_data,
                 "timestamp": datetime.now().isoformat()
             }
             

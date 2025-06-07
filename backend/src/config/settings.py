@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     coinmarketcap_api_key: Optional[str] = None
     
     # Weather API
-    weather_api_key: Optional[str] = None
+    weather_api_key: Optional[str] = None  # OpenWeatherMap API Key
     
     # Twitter/X (alte und neue Feldnamen)
     twitter_bearer_token: Optional[str] = None
@@ -43,9 +43,6 @@ class Settings(BaseSettings):
     x_bearer_token: Optional[str] = None
     x_access_token: Optional[str] = None
     x_access_token_secret: Optional[str] = None
-    
-    # SRF Weather
-    srf_weather_api_key: Optional[str] = None
     
     # Spotify
     spotify_client_id: Optional[str] = None
@@ -73,12 +70,22 @@ def get_settings() -> Settings:
     global _settings
     if _settings is None:
         _settings = Settings()
-        # Debug: Zeige geladene API Keys (ohne Werte zu loggen)
+        
+        # Hilfsfunktion für Template-Wert-Erkennung
+        def is_valid_key(value: Optional[str]) -> bool:
+            """Prüft ob ein API Key gültig ist (nicht None, nicht leer, nicht Template)"""
+            if not value:
+                return False
+            if value.startswith("your_") or value.endswith("_here"):
+                return False
+            return True
+        
+        # Debug: Zeige geladene API Keys mit korrekter Validierung
         print(f"🔑 Settings geladen:")
-        print(f"   OpenAI API Key: {'✅ Vorhanden' if _settings.openai_api_key else '❌ Fehlt'}")
-        print(f"   ElevenLabs API Key: {'✅ Vorhanden' if _settings.elevenlabs_api_key else '❌ Fehlt'}")
-        print(f"   CoinMarketCap API Key: {'✅ Vorhanden' if _settings.coinmarketcap_api_key else '❌ Fehlt'}")
-        print(f"   Weather API Key: {'✅ Vorhanden' if _settings.weather_api_key else '❌ Fehlt'}")
-        print(f"   Supabase URL: {'✅ Vorhanden' if _settings.supabase_url else '❌ Fehlt'}")
-        print(f"   Twitter Bearer: {'✅ Vorhanden' if _settings.x_bearer_token else '❌ Fehlt'}")
+        print(f"   OpenAI API Key: {'✅ Vorhanden' if is_valid_key(_settings.openai_api_key) else '❌ Fehlt'}")
+        print(f"   ElevenLabs API Key: {'✅ Vorhanden' if is_valid_key(_settings.elevenlabs_api_key) else '❌ Fehlt'}")
+        print(f"   CoinMarketCap API Key: {'✅ Vorhanden' if is_valid_key(_settings.coinmarketcap_api_key) else '❌ Fehlt'}")
+        print(f"   Weather API Key: {'✅ Vorhanden' if is_valid_key(_settings.weather_api_key) else '❌ Fehlt'}")
+        print(f"   Supabase URL: {'✅ Vorhanden' if is_valid_key(_settings.supabase_url) else '❌ Fehlt'}")
+        print(f"   Twitter Bearer: {'✅ Vorhanden' if is_valid_key(_settings.twitter_bearer_token) else '❌ Fehlt'}")
     return _settings 

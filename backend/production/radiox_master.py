@@ -21,14 +21,14 @@ from datetime import datetime, timedelta
 from typing import Dict, Any, Optional
 from loguru import logger
 
-# Add src to path
-sys.path.append(str(Path(__file__).parent / "src"))
+# Add parent directory to path for src imports
+sys.path.append(str(Path(__file__).parent.parent))
 
-from services.data_collection_service import DataCollectionService
-from services.content_processing_service import ContentProcessingService
-from services.broadcast_generation_service import BroadcastGenerationService
-from services.audio_generation_service import AudioGenerationService
-from services.system_monitoring_service import SystemMonitoringService
+from src.services.data_collection_service import DataCollectionService
+from src.services.content_processing_service import ContentProcessingService
+from src.services.broadcast_generation_service import BroadcastGenerationService
+from src.services.audio_generation_service import AudioGenerationService
+from src.services.system_monitoring_service import SystemMonitoringService
 
 
 class RadioXMaster:
@@ -48,7 +48,7 @@ class RadioXMaster:
         # Konfiguration
         self.config = {
             "default_news_count": 4,
-            "max_news_age_hours": 1,
+            "max_news_age_hours": 6,
             "default_broadcast_duration": 10,
             "supported_languages": ["de", "en"],
             "radio_channels": ["zurich", "basel", "bern"],
@@ -60,7 +60,7 @@ class RadioXMaster:
         target_time: Optional[str] = None,
         channel: str = "zurich",
         news_count: int = 4,
-        max_news_age: int = 1,
+        max_news_age: int = 6,
         generate_audio: bool = False,
         language: str = "en"
     ) -> Dict[str, Any]:
@@ -85,15 +85,15 @@ class RadioXMaster:
         try:
             # 1. DATENSAMMLUNG
             logger.info("📊 Phase 1: Datensammlung")
-            raw_data = await self.data_collector.collect_all_data(
+            data = await self.data_collector.collect_all_data(
                 channel=channel,
-                max_news_age_hours=max_news_age
+                max_news_age_hours=max_news_age or self.config["max_news_age_hours"]  # Standard: 6 Stunden
             )
             
             # 2. CONTENT-VERARBEITUNG
             logger.info("🔄 Phase 2: Content-Verarbeitung")
             processed_content = await self.content_processor.process_content(
-                raw_data=raw_data,
+                raw_data=data,
                 target_news_count=news_count,
                 target_time=target_time
             )
@@ -111,10 +111,11 @@ class RadioXMaster:
             audio_files = None
             if generate_audio:
                 logger.info("🔊🎨 Phase 4: Audio- und Cover-Generierung")
-                audio_files = await self.audio_generator.generate_audio_with_cover(
+                audio_files = await self.audio_generator.generate_complete_broadcast(
                     script=broadcast_script,
-                    broadcast_content=processed_content,
-                    target_time=target_time
+                    include_music=False,
+                    include_cover=True,
+                    export_format="mp3"
                 )
             
             # 5. SYSTEM-MONITORING
@@ -131,7 +132,7 @@ class RadioXMaster:
                 "success": True,
                 "broadcast": broadcast_script,
                 "audio_files": audio_files,
-                "raw_data": raw_data,
+                "raw_data": data,
                 "processed_content": processed_content,
                 "timestamp": datetime.now().isoformat()
             }
@@ -221,7 +222,14 @@ class RadioXMaster:
     async def get_system_status(self) -> Dict[str, Any]:
         """Holt den aktuellen System-Status"""
         
-        return await self.system_monitor.get_system_status()
+        status_data = await self.system_monitor.get_system_status()
+        
+        # Erweitere um success und timestamp für einheitliche API
+        return {
+            "success": True,
+            "system_status": status_data,
+            "timestamp": datetime.now().isoformat()
+        }
     
     async def cleanup_old_data(self, days_old: int = 7) -> Dict[str, Any]:
         """Räumt alte Daten auf"""
@@ -259,7 +267,7 @@ async def main():
     parser.add_argument("--channel", default="zurich", help="Radio-Kanal")
     parser.add_argument("--language", choices=["de", "en"], default="en", help="Language: English (en) or German (de)")
     parser.add_argument("--news-count", type=int, default=4, help="Anzahl News")
-    parser.add_argument("--max-age", type=int, default=1, help="Max. News-Alter (Stunden)")
+    parser.add_argument("--max-age", type=int, default=6, help="Max. News-Alter (Stunden)")
     parser.add_argument("--generate-audio", action="store_true", help="Audio generieren")
     parser.add_argument("--cleanup-days", type=int, default=7, help="Cleanup-Alter (Tage)")
     
@@ -323,6 +331,14 @@ async def main():
             print("\nSERVICE-STATUS:")
             for service, status in result["service_tests"].items():
                 print(f"  {service}: {status}")
+        
+        elif args.action == "system_status":
+            print("\nSYSTEM-STATUS:")
+            status = result["system_status"]
+            print(f"  Health Score: {status.get('health_score', 0):.2f}")
+            print(f"  Status: {status.get('status', 'unknown')}")
+            if status.get('alerts'):
+                print(f"  Alerts: {len(status['alerts'])}")
         
         print(f"\n⏰ Zeitstempel: {result['timestamp']}")
         print("="*60)

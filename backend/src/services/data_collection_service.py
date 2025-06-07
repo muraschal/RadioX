@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
 """
-Data Collection Service
-======================
+Data Collection Service - NUR SHOW PRESET BASIERT
+================================================
 
 Zentraler Service für die Sammlung aller externen Daten:
-- RSS News Feeds
+- RSS News Feeds (Show Preset basiert)
 - Twitter/X API
 - Wetter-Daten
 - Kryptowährung-Preise
@@ -19,7 +19,7 @@ from loguru import logger
 
 from .rss_service import RSSService
 from .weather_service import WeatherService
-from .crypto_service import CoinMarketCapService
+from .bitcoin_service import BitcoinService
 # Twitter service removed - no longer used
 
 
@@ -29,12 +29,14 @@ class DataCollectionService:
     
     Koordiniert alle externen Datenquellen und stellt
     eine einheitliche API für Datensammlung bereit.
+    
+    NUR SHOW PRESET BASIERT - Keine Legacy Channel API mehr
     """
     
     def __init__(self):
         self.rss_service = RSSService()
         self.weather_service = WeatherService()
-        self.crypto_service = CoinMarketCapService()
+        self.crypto_service = BitcoinService()
         # self.twitter_service = TwitterService()  # Removed - no longer used
         
         # Konfiguration
@@ -46,17 +48,19 @@ class DataCollectionService:
             "timeout_seconds": 30
         }
     
-    async def collect_all_data(
+    # ==================== SHOW PRESET BASIERTE API ====================
+    
+    async def collect_all_data_for_preset(
         self, 
-        channel: str = "zurich",
+        preset_name: str,
         max_news_age_hours: int = 1,
         include_twitter: bool = False
     ) -> Dict[str, Any]:
         """
-        Sammelt alle verfügbaren Daten für einen Broadcast
+        Sammelt alle verfügbaren Daten für einen Broadcast basierend auf Show Preset
         
         Args:
-            channel: Radio-Kanal für spezifische Feeds
+            preset_name: Show Preset Name (z.B. "bitcoin_focus", "tech_deep_dive")
             max_news_age_hours: Maximales Alter der News
             include_twitter: Ob Twitter-Daten gesammelt werden sollen
             
@@ -64,24 +68,23 @@ class DataCollectionService:
             Dict mit allen gesammelten Daten
         """
         
-        logger.info(f"📊 Sammle alle Daten für Kanal '{channel}'")
+        logger.info("📊 Sammle alle Daten...")
         
         # Parallele Datensammlung für bessere Performance
         tasks = []
         
-        # RSS News (immer)
-        tasks.append(self._collect_news_safe(channel, max_news_age_hours))
+        # RSS News (Show Preset basiert)
+        tasks.append(self._collect_news_for_preset_safe(preset_name, max_news_age_hours))
         
-        # Wetter (immer)
-        location = self._get_location_for_channel(channel)
-        tasks.append(self._collect_weather_safe(location))
+        # Wetter (immer Zürich als Standard)
+        tasks.append(self._collect_weather_safe("Zürich"))
         
         # Crypto (immer)
         tasks.append(self._collect_crypto_safe())
         
         # Twitter (optional)
         if include_twitter:
-            tasks.append(self._collect_twitter_safe(channel))
+            tasks.append(self._collect_twitter_safe())
         
         # Alle Tasks parallel ausführen
         results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -93,33 +96,35 @@ class DataCollectionService:
             "crypto": results[2] if not isinstance(results[2], Exception) else None,
             "twitter": results[3] if len(results) > 3 and not isinstance(results[3], Exception) else None,
             "collection_timestamp": datetime.now().isoformat(),
-            "channel": channel,
+            "preset_name": preset_name,
             "data_quality": self._assess_data_quality(results)
         }
         
-        logger.info(f"✅ Datensammlung abgeschlossen: {len(data['news'])} News, "
-                   f"Wetter: {'✅' if data['weather'] else '❌'}, "
-                   f"Crypto: {'✅' if data['crypto'] else '❌'}")
+        logger.info(f"✅ Datensammlung abgeschlossen: {len(data['news'])} News, Wetter: {'✅' if data['weather'] else '❌'}, Bitcoin: {'✅' if data['crypto'] else '❌'}")
         
         return data
     
-    async def collect_news_data(
+    async def collect_news_data_for_preset(
         self, 
-        channel: str = "zurich",
+        preset_name: str,
         max_age_hours: int = 1
     ) -> Dict[str, Any]:
-        """Sammelt nur News-Daten"""
+        """
+        Sammelt nur News-Daten basierend auf Show Preset
+        """
         
-        logger.info(f"📰 Sammle News-Daten für Kanal '{channel}'")
+        logger.info(f"📰 Sammle News-Daten für Show Preset '{preset_name}'")
         
-        news = await self._collect_news_safe(channel, max_age_hours)
+        news = await self._collect_news_for_preset_safe(preset_name, max_age_hours)
         
         return {
             "news": news,
             "collection_timestamp": datetime.now().isoformat(),
-            "channel": channel,
+            "preset_name": preset_name,
             "news_count": len(news)
         }
+
+    # ==================== TESTING & MONITORING ====================
     
     async def collect_context_data(self, location: str = "Zürich") -> Dict[str, Any]:
         """Sammelt nur Kontext-Daten (Wetter, Crypto)"""
@@ -148,13 +153,13 @@ class DataCollectionService:
         
         results = {}
         
-        # Test RSS Feeds
+        # Test RSS Feeds (Show Preset)
         try:
-            test_feeds = await self.rss_service.get_feeds_for_channel("zurich")
-            results["rss_feeds"] = len(test_feeds) > 0
+            test_feeds = await self.rss_service.get_feeds_for_show_preset("zurich")
+            results["rss_feeds_preset"] = len(test_feeds) > 0
         except Exception as e:
-            logger.error(f"RSS Test Fehler: {e}")
-            results["rss_feeds"] = False
+            logger.error(f"RSS Preset Test Fehler: {e}")
+            results["rss_feeds_preset"] = False
         
         # Test Weather Service
         try:
@@ -183,67 +188,63 @@ class DataCollectionService:
         logger.info(f"🔧 Verbindungstests abgeschlossen: {results}")
         return results
     
-    # Private Helper Methods
+    # ==================== PRIVATE HELPER METHODS ====================
     
-    async def _collect_news_safe(self, channel: str, max_age_hours: int) -> List[Dict[str, Any]]:
-        """Sammelt News mit Fehlerbehandlung"""
+    async def _collect_news_for_preset_safe(self, preset_name: str, max_age_hours: int) -> List[Dict[str, Any]]:
+        """
+        Sammelt News für Show Preset mit Fehlerbehandlung
+        """
         
-        logger.info(f"📰 Sammle News für Kanal '{channel}' (max {max_age_hours}h alt)")
+        logger.info("📰 Sammle News für Show Preset...")
         
         try:
-            # Verwende die neue RSSService API
-            news_items = await self.rss_service.get_recent_news(
-                channel=channel,
-                max_age_hours=max_age_hours
-            )
+            # Verwende die korrekte RSS Service Methode
+            news_items = await self.rss_service.get_recent_news_for_preset(preset_name, max_age_hours)
             
             if not news_items:
-                logger.warning(f"⚠️ Keine News für Kanal '{channel}' gefunden")
+                logger.warning(f"⚠️ Keine News für Preset '{preset_name}' gefunden")
                 return []
             
-            # Konvertiere zu Dictionary format
-            all_news = []
-            for item in news_items:
-                try:
-                    if hasattr(item, '__dict__'):
-                        news_dict = item.__dict__.copy()
-                        
-                        # Konvertiere datetime zu string
-                        if hasattr(item, 'published') and item.published:
-                            news_dict['published'] = item.published.isoformat()
-                        if hasattr(item, 'collected_at') and item.collected_at:
-                            news_dict['collected_at'] = item.collected_at.isoformat()
-                        
-                        all_news.append(news_dict)
-                        
-                except Exception as e:
-                    logger.warning(f"⚠️ Fehler bei News-Item Konvertierung: {e}")
-                    continue
+            logger.info(f"🔗 {len(news_items)} News gefunden")
             
-            logger.info(f"📰 {len(all_news)} News erfolgreich gesammelt")
+            # Konvertiere RSSNewsItem zu Dict für Kompatibilität
+            all_news = []
+            for news_item in news_items:
+                news_dict = {
+                    "title": news_item.title,
+                    "summary": news_item.summary,
+                    "url": news_item.link,
+                    "published": news_item.published.isoformat(),
+                    "source_name": news_item.source,
+                    "primary_category": news_item.category,
+                    "priority": news_item.priority,
+                    "weight": news_item.weight,
+                    "relevance_score": news_item.relevance_score,
+                    "tags": news_item.tags
+                }
+                all_news.append(news_dict)
+            
+            logger.info(f"✅ {len(all_news)} News gesammelt")
             return all_news
             
         except Exception as e:
-            logger.error(f"❌ Fehler bei News-Sammlung: {e}")
+            logger.error(f"❌ Fehler beim Sammeln der News für Show Preset '{preset_name}': {e}")
             return []
     
     async def _collect_weather_safe(self, location: str) -> Optional[Dict[str, Any]]:
         """Sammelt Wetter-Daten mit Fehlerbehandlung"""
+        logger.info("🌤️ Hole Wetter-Daten...")
+        
         try:
-            weather = await self.weather_service.get_current_weather(location)
+            weather_data = await self.weather_service.get_current_weather(location)
             
-            if weather and hasattr(weather, '__dict__'):
-                weather_dict = weather.__dict__.copy()
-                
-                # Konvertiere datetime-Objekte
-                for key, value in weather_dict.items():
-                    if isinstance(value, datetime):
-                        weather_dict[key] = value.isoformat()
-                
-                logger.info(f"🌡️ Wetter für {location}: {weather_dict.get('temperature', '?')}°C")
-                return weather_dict
-            
-            return None
+            if weather_data:
+                temp = weather_data.get('temperature', 'N/A')
+                logger.info(f"✅ Wetter: {temp}°C")
+                return weather_data
+            else:
+                logger.warning("⚠️ Keine Wetter-Daten verfügbar")
+                return None
             
         except Exception as e:
             logger.error(f"❌ Fehler bei Wetter-Sammlung: {e}")
@@ -251,26 +252,24 @@ class DataCollectionService:
     
     async def _collect_crypto_safe(self) -> Optional[Dict[str, Any]]:
         """Sammelt Crypto-Daten mit Fehlerbehandlung"""
+        logger.info("₿ Hole Bitcoin-Daten...")
+        
         try:
-            crypto = await self.crypto_service.get_bitcoin_price()
+            crypto_data = await self.crypto_service.get_bitcoin_price()
             
-            if crypto:
-                # Konvertiere datetime-Objekte falls vorhanden
-                crypto_dict = crypto.copy()
-                for key, value in crypto_dict.items():
-                    if isinstance(value, datetime):
-                        crypto_dict[key] = value.isoformat()
-                
-                logger.info(f"₿ Bitcoin: ${crypto_dict.get('price', 0):,.0f}")
-                return crypto_dict
-            
-            return None
+            if crypto_data:
+                price = crypto_data.get('price_usd', 'N/A')
+                logger.info(f"✅ Bitcoin: ${price:,.0f}")
+                return crypto_data
+            else:
+                logger.warning("⚠️ Keine Bitcoin-Daten verfügbar")
+                return None
             
         except Exception as e:
             logger.error(f"❌ Fehler bei Crypto-Sammlung: {e}")
             return None
     
-    async def _collect_twitter_safe(self, channel: str) -> Optional[List[Dict[str, Any]]]:
+    async def _collect_twitter_safe(self) -> Optional[List[Dict[str, Any]]]:
         """Sammelt Twitter-Daten mit Fehlerbehandlung - DISABLED"""
         try:
             logger.info("🐦 Twitter Service deaktiviert - keine Tweets gesammelt")
@@ -279,27 +278,6 @@ class DataCollectionService:
         except Exception as e:
             logger.error(f"❌ Fehler bei Twitter-Sammlung: {e}")
             return None
-    
-    def _get_location_for_channel(self, channel: str) -> str:
-        """Bestimmt Standort basierend auf Kanal"""
-        location_map = {
-            "zurich": "Zürich",
-            "basel": "Basel", 
-            "bern": "Bern"
-        }
-        return location_map.get(channel, "Zürich")
-    
-    def _get_twitter_terms_for_channel(self, channel: str) -> List[str]:
-        """Bestimmt Twitter-Suchbegriffe basierend auf Kanal"""
-        base_terms = ["Schweiz", "Switzerland"]
-        
-        channel_terms = {
-            "zurich": ["Zürich", "Zurich"],
-            "basel": ["Basel"],
-            "bern": ["Bern"]
-        }
-        
-        return base_terms + channel_terms.get(channel, [])
     
     def _assess_data_quality(self, results: List[Any]) -> Dict[str, Any]:
         """Bewertet die Qualität der gesammelten Daten"""

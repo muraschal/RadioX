@@ -20,7 +20,7 @@ def main():
     
     services = [
         {
-            "script": "cli_crypto.py",
+            "script": "cli/cli_crypto.py",
             "icon": "₿",
             "name": "Crypto Service",
             "description": "Bitcoin-Preis, Trend-Analyse, Crypto-Daten",
@@ -32,7 +32,7 @@ def main():
             ]
         },
         {
-            "script": "cli_broadcast.py", 
+            "script": "cli/cli_broadcast.py", 
             "icon": "🎭",
             "name": "Broadcast Generation Service",
             "description": "V3 English Broadcast-Skripte generieren",
@@ -44,19 +44,19 @@ def main():
             ]
         },
         {
-            "script": "cli_rss.py",
+            "script": "cli/cli_rss.py",
             "icon": "🔗", 
             "name": "RSS Service",
             "description": "News von RSS-Feeds sammeln und verarbeiten",
             "commands": [
                 "--action sources   # Alle RSS-Quellen",
-                "--action news      # News für Kanal sammeln", 
-                "--action crypto    # Bitcoin/Crypto News",
-                "--action tech      # Tech News"
+                "--action recent    # News für Kanal sammeln", 
+                "--action test      # Service-Test",
+                "--action stats     # RSS Statistiken"
             ]
         },
         {
-            "script": "radiox_master.py",
+            "script": "production/radiox_master.py",
             "icon": "🎙️",
             "name": "Master Service",
             "description": "Komplette Broadcast-Pipeline orchestrieren",
@@ -64,6 +64,18 @@ def main():
                 "--action generate_broadcast  # Vollständiger Broadcast",
                 "--action test_services       # Alle Services testen",
                 "--action system_status       # System-Status"
+            ]
+        },
+        {
+            "script": "production/rss_handler.py",
+            "icon": "📰",
+            "name": "RSS Handler",
+            "description": "Standalone RSS Collection & Processing",
+            "commands": [
+                "--action recent    # RSS News sammeln",
+                "--action test      # RSS Service testen",
+                "--action stats     # RSS Statistiken",
+                "--action sources   # Alle RSS Feeds anzeigen"
             ]
         }
     ]
@@ -80,31 +92,39 @@ def main():
     print("💡 BEISPIELE:")
     print("-" * 60)
     print("# Bitcoin-Trend anzeigen:")
-    print("python cli_crypto.py --action trend")
+    print("python cli/cli_crypto.py --action trend")
     print()
     print("# V3 English Demo-Broadcast generieren:")
-    print("python cli_broadcast.py --action demo --language en")
+    print("python cli/cli_broadcast.py --action demo --language en")
     print()
-    print("# Crypto News sammeln:")
-    print("python cli_rss.py --action crypto --limit 5")
+    print("# RSS News sammeln:")
+    print("python cli/cli_rss.py --action recent --limit 5")
     print()
     print("# Kompletter Test aller Services:")
-    print("python radiox_master.py --action test_services")
+    print("python production/radiox_master.py --action test_services")
     print()
     print("# Vollständiger English Broadcast:")
-    print("python radiox_master.py --action generate_broadcast --language en --news-count 3")
+    print("python production/radiox_master.py --action generate_broadcast --language en --news-count 3")
+    print()
+    print("# Standalone RSS Collection:")
+    print("python production/rss_handler.py --action recent --channel zurich")
     
     print("\n" + "=" * 60)
-    print("🎯 SERVICE ARCHITEKTUR:")
+    print("🎯 NEUE ORDNER-STRUKTUR:")
     print("-" * 60)
+    print("📁 cli/                   # Development & Testing CLIs")
+    print("📁 production/            # Production-ready Scripts")
+    print("📁 src/services/          # Core Business Logic")
+    print("📁 config/                # Configuration & Settings")
+    print()
     print("✅ Jeder Service ist SEPARAT aufrufbar")
-    print("✅ Keine Duplikate oder Overlaps")
-    print("✅ Ultra klare Nomenklatur")
-    print("✅ Modulare, testbare Komponenten")
+    print("✅ Klare Trennung: Development vs Production")
+    print("✅ Ultra modulare Architektur")
+    print("✅ Enterprise-Level Best Practices")
     print("✅ V3 English als Standard")
-    print("✅ Gekapselte Funktionalitäten")
+    print("✅ Deployment-ready Scripts")
     
-    print(f"\n🚀 RADIOX V3 ENGLISH SYSTEM - PRODUCTION READY!")
+    print(f"\n🚀 RADIOX V3 ENGLISH SYSTEM - ENTERPRISE ARCHITECTURE!")
 
 
 if __name__ == "__main__":

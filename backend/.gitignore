@@ -56,4 +56,20 @@ Thumbs.db
 # Backup-Dateien
 *.bak
 *.backup
-*.old 
+*.old
+
+# 🚨 VERBOTENE TEMPORÄRE SCRIPTS - NIEMALS COMMITTEN
+helper_*.py
+temp_*.py
+debug_*.py
+quick_*.py
+test_*.py
+fix_*.py
+patch_*.py
+experiment_*.py
+random_*.py
+util_*.py
+
+# Ausnahmen für offizielle Scripts
+!test_official.py
+!util_official.py 

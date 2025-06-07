@@ -177,6 +177,10 @@ class BroadcastGenerationService:
             logger.error(f"Broadcast Generation Test Fehler: {e}")
             return False
     
+    async def test_broadcast_generation(self) -> bool:
+        """Alias für test_generation - für CLI Kompatibilität"""
+        return await self.test_generation()
+    
     # Private Methods
     
     def _determine_broadcast_style(self, target_time: Optional[str] = None) -> Dict[str, Any]:

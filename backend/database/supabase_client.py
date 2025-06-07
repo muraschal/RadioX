@@ -344,5 +344,16 @@ class SupabaseClient:
             return None
 
 
-# Singleton Instance
-db = SupabaseClient() 
+# Singleton Instance - Lazy Loading
+_db_instance = None
+
+def get_db():
+    """Lazy loading der Supabase Client Instanz"""
+    global _db_instance
+    if _db_instance is None:
+        try:
+            _db_instance = SupabaseClient()
+        except Exception as e:
+            logger.error(f"Fehler beim Initialisieren der Supabase-Verbindung: {e}")
+            raise
+    return _db_instance 

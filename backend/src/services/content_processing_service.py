@@ -36,7 +36,7 @@ class ContentProcessingService:
         
         # Konfiguration
         self.config = {
-            "min_news_length": 50,
+            "min_news_length": 20,
             "max_news_length": 1000,
             "duplicate_threshold": 0.8,
             "sentiment_weights": {
@@ -73,7 +73,8 @@ class ContentProcessingService:
         self,
         raw_data: Dict[str, Any],
         target_news_count: int = 4,
-        target_time: Optional[str] = None
+        target_time: Optional[str] = None,
+        preset_name: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Verarbeitet alle gesammelten Rohdaten
@@ -82,53 +83,43 @@ class ContentProcessingService:
             raw_data: Rohdaten vom DataCollectionService
             target_news_count: Gewünschte Anzahl News
             target_time: Zielzeit für zeitspezifische Optimierung
+            preset_name: Show Preset Name für Focus-Bestimmung
             
         Returns:
             Dict mit verarbeiteten und optimierten Daten
         """
         
-        logger.info(f"🔄 Verarbeite Content für {target_news_count} News")
+        logger.info("🔄 Verarbeite Content...")
         
-        # 1. News-Verarbeitung
-        processed_news = await self._process_news(
-            raw_data.get("news", []),
-            target_count=target_news_count
-        )
-        
-        # 2. Kontext-Daten aufbereiten
-        processed_context = self._process_context_data(
-            weather=raw_data.get("weather"),
-            crypto=raw_data.get("crypto"),
-            twitter=raw_data.get("twitter")
-        )
-        
-        # 3. Zeitspezifische Optimierung
-        if target_time:
-            processed_news = self._optimize_for_time(processed_news, target_time)
-        
-        # 4. Themen-Balance sicherstellen
-        balanced_news = self._ensure_topic_balance(processed_news)
-        
-        # 5. Finale Qualitätsprüfung
-        quality_score = self._assess_content_quality(balanced_news, processed_context)
-        
-        result = {
-            "selected_news": balanced_news,
-            "context_data": processed_context,
-            "processing_stats": {
-                "original_news_count": len(raw_data.get("news", [])),
-                "processed_news_count": len(balanced_news),
+        try:
+            # News verarbeiten
+            selected_news = await self._process_news(
+                raw_news=raw_data.get("news", []),
+                target_count=target_news_count
+            )
+            
+            # Content-Fokus bestimmen (mit Show Preset)
+            content_focus = self._determine_content_focus(selected_news, preset_name)
+            
+            # Qualitätsbewertung
+            quality_score = self._calculate_content_quality(selected_news, raw_data)
+            
+            result = {
+                "selected_news": selected_news,
+                "weather_data": raw_data.get("weather"),
+                "crypto_data": raw_data.get("crypto"),
+                "content_focus": content_focus,
                 "quality_score": quality_score,
+                "target_time": target_time,
+                "preset_name": preset_name,
                 "processing_timestamp": datetime.now().isoformat()
-            },
-            "topic_distribution": self._analyze_topic_distribution(balanced_news),
-            "content_metrics": self._calculate_content_metrics(balanced_news)
-        }
-        
-        logger.info(f"✅ Content verarbeitet: {len(balanced_news)} News, "
-                   f"Qualität: {quality_score:.2f}")
-        
-        return result
+            }
+            
+            logger.info(f"✅ Content verarbeitet: {len(selected_news)} News, Qualität: {quality_score:.2f}")
+            return result
+        except Exception as e:
+            logger.error(f"Content Processing Fehler: {e}")
+            return None
     
     async def analyze_news(self, news_list: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Analysiert News ohne Selektion"""
@@ -180,17 +171,17 @@ class ContentProcessingService:
     
     async def _process_news(
         self, 
-        news_list: List[Dict[str, Any]], 
+        raw_news: List[Dict[str, Any]], 
         target_count: int
     ) -> List[Dict[str, Any]]:
         """Verarbeitet und selektiert News"""
         
-        if not news_list:
+        if not raw_news:
             logger.warning("⚠️ Keine News zum Verarbeiten")
             return []
         
         # 1. Basis-Filterung
-        filtered_news = self._filter_news_quality(news_list)
+        filtered_news = self._filter_news_quality(raw_news)
         logger.info(f"📰 {len(filtered_news)} News nach Qualitäts-Filter")
         
         # 2. Kategorisierung
@@ -217,11 +208,16 @@ class ContentProcessingService:
         filtered = []
         
         for news in news_list:
-            # Mindestlänge prüfen
+            # Mindestlänge prüfen (lockerer)
             title_len = len(news.get("title", ""))
             summary_len = len(news.get("summary", ""))
             
-            if title_len < 10 or summary_len < self.config["min_news_length"]:
+            # Sehr lockere Mindestanforderungen
+            if title_len < 5:  # Reduziert von 10 auf 5
+                continue
+            
+            # Summary ist optional - wenn vorhanden, dann mindestens 10 Zeichen
+            if summary_len > 0 and summary_len < 10:  # Reduziert von min_news_length auf 10
                 continue
             
             # Maximallänge prüfen
@@ -229,7 +225,7 @@ class ContentProcessingService:
                 # Kürze Summary
                 news["summary"] = news["summary"][:self.config["max_news_length"]] + "..."
             
-            # Spam-Filter
+            # Spam-Filter (lockerer)
             if self._is_spam_content(news):
                 continue
             
@@ -621,17 +617,103 @@ class ContentProcessingService:
         """Markiert News als verwendet in der Datenbank"""
         
         try:
+            from datetime import datetime  # Import für timestamp
+            session_id = f"content_processing_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            
             for news in news_list:
-                used_news_data = {
-                    "content_hash": news.get("content_hash"),
-                    "title": news.get("title"),
-                    "source": news.get("source"),
-                    "used_at": datetime.now().isoformat(),
-                    "category": news.get("primary_category")
+                # VEREINFACHT: Speichere in broadcast_logs (angepasst an vorhandene Struktur)
+                news_log_data = {
+                    "session_id": session_id,
+                    "event_type": "news_used",
+                    "data": {
+                        "news_id": news.get("id", "unknown"),
+                        "title": news.get("title", ""),
+                        "source": news.get("source_name", ""),
+                        "summary": news.get("summary", ""),
+                        "url": news.get("url", ""),
+                        "category": news.get("primary_category", ""),
+                        "emotion_score": news.get("emotion_score", 0),
+                        "urgency_level": news.get("urgency_level", 1)
+                    },
+                    "timestamp": datetime.now().isoformat()
                 }
                 
-                self.supabase.client.table('used_news').insert(used_news_data).execute()
+                self.supabase.client.table('broadcast_logs').insert(news_log_data).execute()
+                logger.debug(f"✅ News-Verwendung in broadcast_logs gespeichert: {news.get('title', 'Unknown')}")
                 
         except Exception as e:
-            logger.warning(f"⚠️ Fehler beim Markieren verwendeter News: {e}")
-            # Nicht kritisch, daher nur Warning 
+            logger.warning(f"⚠️ Fehler beim Speichern der News-Verwendung: {e}")
+    
+    def _determine_content_focus(self, selected_news: List[Dict[str, Any]], preset_name: str = None) -> Dict[str, Any]:
+        """Bestimmt den Content-Fokus basierend auf Show Preset und ausgewählten News"""
+        
+        if not selected_news:
+            return {
+                "primary_focus": preset_name or "general",
+                "secondary_focus": None,
+                "local_ratio": 0,
+                "categories": [],
+                "preset_based": True
+            }
+        
+        # Kategorien analysieren
+        categories = [news.get("primary_category", "general") for news in selected_news]
+        category_counts = Counter(categories)
+        
+        # Primärer Fokus: Verwende Show Preset Name als Basis
+        if preset_name:
+            # Mapping von Show Preset zu Focus
+            preset_focus_mapping = {
+                "zurich": "local",
+                "tech": "technology", 
+                "crypto": "crypto",
+                "geopolitik": "politics",
+                "news": "breaking"
+            }
+            primary_focus = preset_focus_mapping.get(preset_name, preset_name)
+        else:
+            # Fallback: Häufigste Kategorie
+            most_common = category_counts.most_common(2)
+            primary_focus = most_common[0][0] if most_common else "general"
+        
+        # Sekundärer Fokus: Häufigste Kategorie aus den News
+        most_common = category_counts.most_common(2)
+        secondary_focus = most_common[1][0] if len(most_common) > 1 else None
+        
+        # Lokal-Anteil
+        local_count = sum(1 for news in selected_news if news.get("is_local", False))
+        local_ratio = local_count / len(selected_news)
+        
+        return {
+            "primary_focus": primary_focus,
+            "secondary_focus": secondary_focus,
+            "local_ratio": local_ratio,
+            "categories": list(category_counts.keys()),
+            "category_distribution": dict(category_counts),
+            "preset_based": bool(preset_name),
+            "preset_name": preset_name
+        }
+    
+    def _calculate_content_quality(self, selected_news: List[Dict[str, Any]], raw_data: Dict[str, Any]) -> float:
+        """Berechnet die Gesamtqualität des Contents"""
+        
+        if not selected_news:
+            return 0.0
+        
+        # News-Qualität (70%)
+        news_metrics = self._calculate_content_metrics(selected_news)
+        news_quality = (
+            news_metrics["diversity_score"] * 0.4 +
+            news_metrics["quality_score"] * 0.4 +
+            news_metrics["local_ratio"] * 0.2
+        ) * 0.7
+        
+        # Kontext-Qualität (30%)
+        context_quality = 0
+        if raw_data.get("weather"):
+            context_quality += 0.15
+        if raw_data.get("crypto"):
+            context_quality += 0.15
+        
+        total_quality = news_quality + context_quality
+        return min(1.0, round(total_quality, 2)) 

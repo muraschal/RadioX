@@ -1,6 +1,9 @@
 # RadioX Backend Dependencies - Vereinfacht
 # Essenzielle Pakete für RadioX Funktionalität
 
+# SYSTEM DEPENDENCIES (manuell installieren):
+# - ffmpeg (für Audio-Verarbeitung): https://ffmpeg.org/download.html
+
 # FastAPI Backend
 fastapi>=0.100.0
 uvicorn>=0.20.0
@@ -24,6 +27,7 @@ pydub>=0.25.0
 
 # Audio Metadata
 mutagen>=1.47.0
+eyed3>=0.9.7
 
 # Date/Time
 python-dateutil>=2.8.0
@@ -37,3 +41,6 @@ loguru>=0.7.0
 # Async HTTP
 aiohttp>=3.8.0
 aiofiles>=23.0.0 
+
+# System Monitoring
+psutil>=5.9.0 

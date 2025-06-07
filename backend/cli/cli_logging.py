@@ -1,20 +1,19 @@
 #!/usr/bin/env python3
 """
-CLI Content Logging
-===================
-
-Standalone CLI für Content Logging Service Testing
+📋 RadioX Content Logging Service - Standalone CLI
+Supabase Content Logging Testing
 """
 
-import sys
 import asyncio
+import argparse
+import sys
 from pathlib import Path
 from datetime import datetime, timedelta
 
-# Add the src directory to the path so we can import our services
-sys.path.append(str(Path(__file__).parent / "src"))
+# Add parent directory to path for src imports
+sys.path.append(str(Path(__file__).parent.parent))
 
-from services.content_logging_service import ContentLoggingService
+from src.services.content_logging_service import ContentLoggingService
 from loguru import logger
 
 
